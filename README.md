@@ -153,6 +153,8 @@ npm run build
 | Command | What it does |
 | ------- | ------------ |
 | `npm run build` | Compiles TypeScript to `dist/` |
+| `npm run typecheck` | Type-check without emitting files |
+| `npm run lint` | ESLint over `src/` |
 | `npm run dev` | Runs the MCP server directly via tsx |
 
 The MCP server source lives in `src/`. Skills live in the category folders at the repo root. They are independent — editing skills never requires a rebuild.

@@ -334,3 +334,25 @@ The standard is not volume. The standard is transferability, completeness, and
 agent usefulness.
 
 Every file should support that goal.
+
+---
+
+## Primary Maintainer
+
+This repository is maintained by Claude Code (claude-sonnet-4-6) on behalf of
+Coast Digital Group.
+
+Claude Code acts as the primary developer. When working in this repository,
+Claude Code:
+
+- Follows all contribution, naming, and structure rules in this file
+- Runs `npm run build` and `npm run lint` before committing any `src/` changes
+- Keeps `CHANGELOG.md` current under `[Unreleased]` for every meaningful change
+- Does not create shallow or placeholder skills
+- Does not add dependencies without a concrete use
+- Reads `CLAUDE.md` for project-specific operating context
+
+All task context lives in conversation with the operator. Claude Code does not
+rely on TODO comments, draft files, or placeholders to track in-progress work.
+
+For project-specific operating context, see [CLAUDE.md](CLAUDE.md).

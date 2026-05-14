@@ -1,3 +1,4 @@
+import { createRequire } from 'module'
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import {
@@ -6,6 +7,9 @@ import {
   type Tool
 } from '@modelcontextprotocol/sdk/types.js'
 import { discoverSkills, getCategories, getSkill } from './skills.js'
+
+const require = createRequire(import.meta.url)
+const { version } = require('../package.json') as { version: string }
 
 function buildTools(categories: string[]): Tool[] {
   return [
@@ -69,7 +73,7 @@ export async function startServer(): Promise<void> {
   const tools = buildTools(categories)
 
   const server = new Server(
-    { name: '@coastdigitalgroup/coastai-skills', version: '0.1.0' },
+    { name: '@coastdigitalgroup/coastai-skills', version },
     { capabilities: { tools: {} } }
   )
 

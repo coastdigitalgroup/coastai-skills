@@ -5,6 +5,21 @@ All notable changes to this project will be documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `typecheck` npm script (`tsc --noEmit`) for type-checking without emitting
+
+### Changed
+
+- Server version is now read from `package.json` at runtime via `createRequire`
+  rather than hardcoded — version only needs to be maintained in one place
+- `lint` script simplified from `eslint src/**/*.ts` to `eslint src` for
+  reliable cross-shell glob behavior
+
+### Removed
+
+- `zod` runtime dependency — was declared but never imported in any source file
+
 ## [0.1.0] — 2026-04-26
 
 ### Added
