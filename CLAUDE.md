@@ -1,7 +1,17 @@
-# CLAUDE.md — Developer Guide
+# CLAUDE.md — CoastAi Skills
 
-This file is the operating reference for Claude Code as the primary developer
-and maintainer of this repository.
+This file is the authoritative guide for Claude Code as the primary developer
+and maintainer of this repository. Read it before touching any source file.
+
+## Project Identity
+
+**Human owner:** Bradley Potts (brad.potts@coastdigitalgroup.com)
+**Primary AI developer:** Claude Code (claude-sonnet-4-6)
+
+## Commit Policy
+
+Claude Code does not create git commits in this repository. Prepare changes,
+run all validation, and leave staging, committing, and pushing to human review.
 
 ## Project overview
 
@@ -89,9 +99,7 @@ Optional support folders: `examples/`, `templates/`, `references/`, `assets/`,
   present-tense, task-focused
 - Support files reference `SKILL.md` content; they do not replace it
 
-## Maintainer context
+## Package context
 
-Owner: Coast Digital Group (brad.potts@coastdigitalgroup.com)
-Primary dev: Claude Code (claude-sonnet-4-6)
 Package: `@coastdigitalgroup/coastai-skills` on npm
 Repo: github.com/coastdigitalgroup/coast-ai-skills
