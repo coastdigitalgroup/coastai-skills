@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Container Queries Example: Responsive Card</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --text: #1f2937;
+      --bg-alt: #f3f4f6;
+      --white: #ffffff;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.5;
+      color: var(--text);
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    section {
+      margin-bottom: 4rem;
+    }
+
+    h2 {
+      border-bottom: 2px solid var(--bg-alt);
+      padding-bottom: 0.5rem;
+      margin-bottom: 2rem;
+    }
+
+    /* --- The Problem Layout --- */
+    .layout-demo {
+      display: grid;
+      grid-template-columns: 300px 1fr; /* Sidebar and Main Content */
+      gap: 2rem;
+    }
+
+    .sidebar, .main-content {
+      background: var(--bg-alt);
+      padding: 1.5rem;
+      border-radius: 8px;
+    }
+
+    /* --- The Component (Before: Media Queries) --- */
+    /* On a large screen, the sidebar card is stuck in vertical mode
+       even if it should be horizontal, or vice-versa, because it only
+       knows the screen is wide. */
+    .card-mq {
+      background: var(--white);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 1rem;
+    }
+
+    .card-mq img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .card-mq-content {
+      padding: 1rem;
+    }
+
+    /* Media query makes EVERY card horizontal on desktop,
+       even the one in the narrow sidebar where it breaks! */
+    @media (min-width: 800px) {
+      .card-mq.force-horizontal {
+        display: flex;
+      }
+      .card-mq.force-horizontal img {
+        width: 200px;
+        height: auto;
+      }
+    }
+
+    /* --- The Component (After: Container Queries) --- */
+
+    /* 1. Define the container wrapper */
+    .card-container {
+      container-type: inline-size;
+      container-name: product-card;
+      margin-bottom: 1rem;
+    }
+
+    .card-cq {
+      background: var(--white);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-cq img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .card-cq-content {
+      padding: 1rem;
+    }
+
+    /* 2. Query the container size, NOT the viewport */
+    @container product-card (min-width: 400px) {
+      .card-cq {
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .card-cq img {
+        width: 180px;
+        height: 180px;
+      }
+
+      .card-cq-content h3 {
+        font-size: 1.5rem;
+      }
+    }
+
+    /* Extra Density: Change typography based on container width */
+    @container product-card (min-width: 600px) {
+      .card-cq-content {
+        padding: 2rem;
+      }
+      .card-cq-content h3 {
+        font-size: 2rem;
+        color: var(--primary);
+      }
+    }
+
+    h3 { margin: 0 0 0.5rem 0; }
+    p { margin: 0; color: #666; font-size: 0.9rem; }
+
+    .tag {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      background: #e5e7eb;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Container Queries vs. Media Queries</h1>
+  <p>Standard media queries respond to the window size. Container queries respond to the space allocated to the component.</p>
+
+  <section>
+    <h2>The Media Query Problem</h2>
+    <p>Both cards below use <code>@media (min-width: 800px)</code>. Because the screen is > 800px, they both try to be horizontal. The sidebar card is crushed.</p>
+
+    <div class="layout-demo">
+      <div class="sidebar">
+        <strong>Sidebar (300px)</strong>
+        <div class="card-mq force-horizontal">
+          <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80" alt="Product">
+          <div class="card-mq-content">
+            <h3>Broken Card</h3>
+            <p>I am horizontal because the screen is wide, but my sidebar is narrow!</p>
+          </div>
+        </div>
+      </div>
+      <div class="main-content">
+        <strong>Main Area (Fluid)</strong>
+        <div class="card-mq force-horizontal">
+          <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80" alt="Product">
+          <div class="card-mq-content">
+            <h3>Correct Card</h3>
+            <p>I look fine here because there is plenty of space.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The Container Query Solution</h2>
+    <p>Both cards below are the <strong>exact same component</strong>. They use <code>@container (min-width: 400px)</code>. The one in the sidebar "knows" it only has 300px and stays vertical.</p>
+
+    <div class="layout-demo">
+      <div class="sidebar">
+        <strong>Sidebar (300px)</strong>
+        <!-- Wrapper defines the container -->
+        <div class="card-container">
+          <div class="card-cq">
+            <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&q=80" alt="Product">
+            <div class="card-cq-content">
+              <h3>Smart Card</h3>
+              <p>I know I'm in a narrow sidebar, so I stay vertical.</p>
+              <span class="tag">Adaptive</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="main-content">
+        <strong>Main Area (Fluid)</strong>
+        <!-- Wrapper defines the container -->
+        <div class="card-container">
+          <div class="card-cq">
+            <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&q=80" alt="Product">
+            <div class="card-cq-content">
+              <h3>Smart Card</h3>
+              <p>I have space, so I've automatically switched to horizontal layout.</p>
+              <span class="tag">Adaptive</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>
