@@ -1,0 +1,64 @@
+/*
+  Container Query Component Boilerplate
+  Use this template to build components that are layout-aware.
+*/
+
+/**
+ * 1. THE CONTAINER WRAPPER
+ * This element defines the boundary that children will query.
+ * Always apply this to a wrapper, as an element cannot query itself.
+ */
+.component-wrapper {
+  /* Establish an inline-size (width) container */
+  container-type: inline-size;
+
+  /* Naming prevents conflicts when components are nested */
+  container-name: my-component-container;
+
+  /* Optional: Ensure the wrapper doesn't collapse if empty/loading */
+  min-width: 1px;
+}
+
+/**
+ * 2. THE COMPONENT (DEFAULT / NARROW STATE)
+ * Define the "mobile-first" or "narrow-first" styles here.
+ * These will also serve as the fallback for older browsers.
+ */
+.my-component {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/**
+ * 3. ADAPTIVE LAYOUT (WIDE STATE)
+ * Apply transformations based on the container's width.
+ */
+@container my-component-container (min-width: 500px) {
+  .my-component {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+/**
+ * 4. FLUID TYPOGRAPHY & SPACING
+ * Use container-relative units (cqw, cqi) for proportional scaling
+ * that stays synced with the component's actual size.
+ */
+.my-component-title {
+  /* Scales between 1rem and 2rem based on container width */
+  font-size: clamp(1rem, 4cqi, 2rem);
+}
+
+.my-component-body {
+  /* 5% of the container's width */
+  padding: 5cqi;
+}
+
+/**
+ * 5. NESTED COMPONENT SUPPORT
+ * If this component contains another container-aware child,
+ * the naming above ensures '@container child-name' targets the
+ * correct parent.
+ */
