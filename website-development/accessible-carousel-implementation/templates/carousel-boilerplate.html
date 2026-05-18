@@ -1,0 +1,83 @@
+<!--
+  Carousel Boilerplate
+  Uses CSS Scroll Snap for performance and WAI-ARIA for accessibility.
+-->
+<style>
+  .c-carousel {
+    --gap: 1rem;
+    position: relative;
+  }
+
+  .c-carousel__list {
+    display: flex;
+    gap: var(--gap);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .c-carousel__item {
+    flex: 0 0 100%; /* Default to 1 slide visible */
+    scroll-snap-align: start;
+  }
+
+  /* Hide scrollbars but allow scrolling */
+  .c-carousel__list {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .c-carousel__list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+</style>
+
+<section
+  class="c-carousel"
+  aria-roledescription="carousel"
+  aria-label="[DESCRIPTIVE NAME]"
+>
+  <div class="sr-only" aria-live="polite" id="carousel-status-announcer"></div>
+
+  <ul class="c-carousel__list" id="carousel-list">
+    <!-- Items go here -->
+    <li
+      class="c-carousel__item"
+      role="group"
+      aria-roledescription="slide"
+      aria-label="1 of [TOTAL]"
+    >
+      <!-- Content -->
+    </li>
+  </ul>
+
+  <div class="c-carousel__controls">
+    <button
+      aria-controls="carousel-list"
+      aria-label="Previous Slide"
+      onclick="/* Logic */"
+    >
+      Previous
+    </button>
+    <button
+      aria-controls="carousel-list"
+      aria-label="Next Slide"
+      onclick="/* Logic */"
+    >
+      Next
+    </button>
+  </div>
+</section>

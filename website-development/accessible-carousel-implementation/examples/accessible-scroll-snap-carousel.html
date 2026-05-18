@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Accessible Scroll Snap Carousel</title>
+    <style>
+      :root {
+        --carousel-gap: 1rem;
+        --carousel-item-width: 80%;
+      }
+
+      .carousel-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        position: relative;
+      }
+
+      /* The scrolling container */
+      .carousel-items {
+        display: flex;
+        gap: var(--carousel-gap);
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        list-style: none;
+        padding: 1rem 0;
+        margin: 0;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* Hide scrollbar for cleaner look, but keep functionality */
+      .carousel-items::-webkit-scrollbar {
+        display: none;
+      }
+      .carousel-items {
+        scrollbar-width: none;
+      }
+
+      .carousel-item {
+        flex: 0 0 var(--carousel-item-width);
+        scroll-snap-align: center;
+        background: #f4f4f4;
+        border-radius: 8px;
+        padding: 2rem;
+        box-sizing: border-box;
+        border: 1px solid #ddd;
+        transition: opacity 0.3s;
+      }
+
+      .carousel-item[aria-hidden='true'] {
+        opacity: 0.3;
+      }
+
+      .carousel-controls {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .control-button {
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+      }
+
+      .control-button:focus {
+        outline: 3px solid #ff0000;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <section
+      class="carousel-container"
+      aria-roledescription="carousel"
+      aria-label="Featured Products"
+    >
+      <!-- Live region for announcing slide changes -->
+      <div class="sr-only" aria-live="polite" id="carousel-status"></div>
+
+      <ul class="carousel-items" id="carousel-items">
+        <li
+          class="carousel-item"
+          role="group"
+          aria-roledescription="slide"
+          aria-label="1 of 3"
+        >
+          <h3>Product One</h3>
+          <p>Description for the first featured product.</p>
+          <a href="#"
+            >Learn More <span class="sr-only">about Product One</span></a
+          >
+        </li>
+        <li
+          class="carousel-item"
+          role="group"
+          aria-roledescription="slide"
+          aria-label="2 of 3"
+        >
+          <h3>Product Two</h3>
+          <p>Description for the second featured product.</p>
+          <a href="#"
+            >Learn More <span class="sr-only">about Product Two</span></a
+          >
+        </li>
+        <li
+          class="carousel-item"
+          role="group"
+          aria-roledescription="slide"
+          aria-label="3 of 3"
+        >
+          <h3>Product Three</h3>
+          <p>Description for the third featured product.</p>
+          <a href="#"
+            >Learn More <span class="sr-only">about Product Three</span></a
+          >
+        </li>
+      </ul>
+
+      <div class="carousel-controls">
+        <button
+          class="control-button"
+          id="prev-btn"
+          aria-label="Previous Slide"
+        >
+          Previous
+        </button>
+        <button class="control-button" id="next-btn" aria-label="Next Slide">
+          Next
+        </button>
+      </div>
+    </section>
+
+    <script>
+      const container = document.getElementById('carousel-items')
+      const prevBtn = document.getElementById('prev-btn')
+      const nextBtn = document.getElementById('next-btn')
+      const status = document.getElementById('carousel-status')
+      const items = document.querySelectorAll('.carousel-item')
+
+      // Scroll to next/prev
+      const scrollCarousel = (direction) => {
+        const itemWidth = items[0].offsetWidth + 16 // width + gap
+        container.scrollBy({
+          left: direction * itemWidth,
+          behavior: 'smooth'
+        })
+      }
+
+      prevBtn.addEventListener('click', () => scrollCarousel(-1))
+      nextBtn.addEventListener('click', () => scrollCarousel(1))
+
+      // Use IntersectionObserver to manage aria-hidden and focus
+      const observerOptions = {
+        root: container,
+        threshold: 0.6
+      }
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          const item = entry.target
+          const links = item.querySelectorAll('a, button')
+
+          if (entry.isIntersecting) {
+            item.setAttribute('aria-hidden', 'false')
+            links.forEach((link) => link.removeAttribute('tabindex'))
+
+            // Update live region status
+            const label = item.getAttribute('aria-label')
+            status.textContent = `Showing ${label}`
+          } else {
+            item.setAttribute('aria-hidden', 'true')
+            links.forEach((link) => link.setAttribute('tabindex', '-1'))
+          }
+        })
+      }, observerOptions)
+
+      items.forEach((item) => observer.observe(item))
+    </script>
+  </body>
+</html>
