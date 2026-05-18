@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Accessible Combobox Template</title>
+    <style>
+      .combobox-wrapper {
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        max-width: 300px;
+        position: relative;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+      }
+
+      input {
+        width: 100%;
+        padding: 0.5rem;
+        border: 2px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+
+      input:focus {
+        outline: none;
+        border-color: #005a9c;
+        box-shadow: 0 0 0 2px rgba(0, 90, 156, 0.2);
+      }
+
+      .listbox {
+        position: absolute;
+        width: 100%;
+        background: white;
+        border: 2px solid #ccc;
+        border-top: none;
+        border-radius: 0 0 4px 4px;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 10;
+      }
+
+      .listbox.hidden {
+        display: none;
+      }
+
+      .option {
+        padding: 0.5rem;
+        cursor: pointer;
+      }
+
+      .option:hover,
+      .option.highlighted {
+        background-color: #005a9c;
+        color: white;
+      }
+
+      .option[aria-selected='true'] {
+        background-color: #e6f0ff;
+        color: #005a9c;
+        font-weight: bold;
+      }
+
+      .option[aria-selected='true'].highlighted {
+        background-color: #005a9c;
+        color: white;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="combobox-wrapper">
+      <label for="cb-input" id="cb-label">Select an option:</label>
+
+      <input
+        type="text"
+        id="cb-input"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-expanded="false"
+        aria-haspopup="listbox"
+        aria-controls="cb-listbox"
+        aria-labelledby="cb-label"
+        placeholder="Start typing..."
+      />
+
+      <ul
+        id="cb-listbox"
+        role="listbox"
+        aria-labelledby="cb-label"
+        class="listbox hidden"
+      >
+        <!-- Options go here -->
+      </ul>
+
+      <div id="cb-status" class="sr-only" aria-live="polite"></div>
+    </div>
+
+    <script>
+      /**
+       * Accessible Combobox Template Logic
+       * Handles: ARIA attributes, Keyboard navigation, Focus management
+       */
+      class AccessibleCombobox {
+        constructor(inputId, listboxId, statusId, data) {
+          this.input = document.getElementById(inputId)
+          this.listbox = document.getElementById(listboxId)
+          this.status = document.getElementById(statusId)
+          this.data = data
+          this.highlightedIndex = -1
+          this.filteredItems = []
+
+          this.init()
+        }
+
+        init() {
+          this.input.addEventListener('input', () => this.onInput())
+          this.input.addEventListener('keydown', (e) => this.onKeyDown(e))
+          this.input.addEventListener('blur', () => this.onBlur())
+
+          // Close on click outside
+          document.addEventListener('click', (e) => {
+            if (!this.input.parentElement.contains(e.target)) {
+              this.closeListbox()
+            }
+          })
+        }
+
+        onInput() {
+          const value = this.input.value.toLowerCase()
+          this.filteredItems = this.data.filter((item) =>
+            item.toLowerCase().includes(value)
+          )
+
+          this.renderListbox()
+          this.openListbox()
+          this.updateStatus()
+        }
+
+        onKeyDown(e) {
+          switch (e.key) {
+            case 'ArrowDown':
+              e.preventDefault()
+              this.moveHighlight(1)
+              break
+            case 'ArrowUp':
+              e.preventDefault()
+              this.moveHighlight(-1)
+              break
+            case 'Enter':
+              if (this.highlightedIndex >= 0) {
+                e.preventDefault()
+                this.selectItem(this.filteredItems[this.highlightedIndex])
+              }
+              break
+            case 'Escape':
+              this.closeListbox()
+              break
+          }
+        }
+
+        onBlur() {
+          // Delay to allow click events on options
+          setTimeout(() => this.closeListbox(), 200)
+        }
+
+        renderListbox() {
+          this.listbox.innerHTML = ''
+          this.filteredItems.forEach((item, index) => {
+            const li = document.createElement('li')
+            li.id = `opt-${index}`
+            li.role = 'option'
+            li.className = 'option'
+            li.textContent = item
+            li.addEventListener('click', () => this.selectItem(item))
+            this.listbox.appendChild(li)
+          })
+          this.highlightedIndex = -1
+        }
+
+        moveHighlight(delta) {
+          if (this.filteredItems.length === 0) return
+
+          this.highlightedIndex =
+            (this.highlightedIndex + delta + this.filteredItems.length) %
+            this.filteredItems.length
+
+          // Update visual highlight
+          const options = this.listbox.querySelectorAll('.option')
+          options.forEach((opt, idx) => {
+            opt.classList.toggle('highlighted', idx === this.highlightedIndex)
+          })
+
+          // Update ARIA activedescendant
+          const highlightedOption = options[this.highlightedIndex]
+          this.input.setAttribute('aria-activedescendant', highlightedOption.id)
+
+          // Scroll into view
+          highlightedOption.scrollIntoView({ block: 'nearest' })
+        }
+
+        selectItem(item) {
+          this.input.value = item
+          this.closeListbox()
+          this.input.focus()
+        }
+
+        openListbox() {
+          if (this.filteredItems.length > 0) {
+            this.listbox.classList.remove('hidden')
+            this.input.setAttribute('aria-expanded', 'true')
+          } else {
+            this.closeListbox()
+          }
+        }
+
+        closeListbox() {
+          this.listbox.classList.add('hidden')
+          this.input.setAttribute('aria-expanded', 'false')
+          this.input.removeAttribute('aria-activedescendant')
+          this.highlightedIndex = -1
+        }
+
+        updateStatus() {
+          const count = this.filteredItems.length
+          this.status.textContent =
+            count === 0
+              ? 'No results found.'
+              : `${count} results available. Use up and down arrows to review.`
+        }
+      }
+
+      // Example usage
+      const data = [
+        'Apple',
+        'Banana',
+        'Cherry',
+        'Date',
+        'Elderberry',
+        'Fig',
+        'Grape'
+      ]
+      new AccessibleCombobox('cb-input', 'cb-listbox', 'cb-status', data)
+    </script>
+  </body>
+</html>
