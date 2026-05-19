@@ -36,6 +36,8 @@ website-design/      Category: design system skills
 website-development/ Category: implementation skills
 website-growth/      Category: conversion + CRO skills
 AGENT.md             Operating rules for agents working in this repo
+AGENTS.md            Shared agent guide for release, review, and standards
+CODEX.md             Codex release and review guide
 CLAUDE.md            This file
 ```
 
@@ -48,8 +50,8 @@ CLAUDE.md            This file
 | `npm run lint` | ESLint over `src/` |
 | `npm run dev` | Run MCP server directly via tsx |
 
-**Always run `npm run build` and `npm run lint` before committing any `src/`
-changes.** Skill-only changes never require a rebuild.
+**Always run `npm run typecheck`, `npm run lint`, and `npm run build` before
+committing any `src/` changes.** Skill-only changes never require a rebuild.
 
 ## Skill structure
 
@@ -84,11 +86,12 @@ Optional support folders: `examples/`, `templates/`, `references/`, `assets/`,
 
 ## Before committing
 
-1. `npm run build` — must be clean
+1. `npm run typecheck` — must be clean
 2. `npm run lint` — must be clean
-3. Update `CHANGELOG.md` under `[Unreleased]` for every meaningful change
-4. Confirm skill frontmatter has valid `name` and `description` fields
-5. No placeholder files, no TODO-heavy drafts, no shallow skills
+3. `npm run build` — must be clean
+4. Update `CHANGELOG.md` under `[Unreleased]` for every meaningful change
+5. Confirm skill frontmatter has valid `name` and `description` fields
+6. No placeholder files, no TODO-heavy drafts, no shallow skills
 
 ## Key conventions
 

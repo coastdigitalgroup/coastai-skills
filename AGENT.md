@@ -264,7 +264,8 @@ The server exposes three tools:
 
 The MCP server reads skills directly from the category folders at the repo
 root. Editing skill content never requires a rebuild. Only changes to
-TypeScript source in `src/` require `npm run build`.
+TypeScript source in `src/` require `npm run typecheck`, `npm run lint`, and
+`npm run build`.
 
 The installer (`--install` flag) auto-detects supported editors on the
 machine and writes the MCP config entry to each, including Codex when
@@ -346,7 +347,8 @@ Claude Code acts as the primary developer. When working in this repository,
 Claude Code:
 
 - Follows all contribution, naming, and structure rules in this file
-- Runs `npm run build` and `npm run lint` before committing any `src/` changes
+- Runs `npm run typecheck`, `npm run lint`, and `npm run build` before
+  committing any `src/` changes
 - Keeps `CHANGELOG.md` current under `[Unreleased]` for every meaningful change
 - Does not create shallow or placeholder skills
 - Does not add dependencies without a concrete use
@@ -355,4 +357,5 @@ Claude Code:
 All task context lives in conversation with the operator. Claude Code does not
 rely on TODO comments, draft files, or placeholders to track in-progress work.
 
-For project-specific operating context, see [CLAUDE.md](CLAUDE.md).
+For project-specific operating context, see [CLAUDE.md](CLAUDE.md). For
+Codex-specific release and review guidance, see [CODEX.md](CODEX.md).

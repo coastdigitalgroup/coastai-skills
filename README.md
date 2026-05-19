@@ -67,13 +67,16 @@ Skills are never injected into context upfront. The agent fetches exactly what i
 
 | Skill | Description |
 | ----- | ----------- |
-| `accessible-color-system` | Design a systematic color palette that meets WCAG 2.1 contrast requirements |
-| `card-ui-system` | Design modular content cards with consistent hierarchy and responsive layouts |
-| `fluid-spacing-system` | Build a fluid spacing scale using CSS `clamp()` for consistent white space across viewports |
-| `fluid-typography-system` | Build a typographic scale that scales smoothly across viewports using CSS `clamp()` |
-| `interactive-state-system` | Define hover, focus, active, and disabled states for all interactive elements |
-| `responsive-grid-system` | Design a flexible column-based layout system that scales across devices |
-| `site-navigation-system` | Design a structured, accessible, and responsive navigation framework |
+| `accessible-color-system` | Design and implement a systematic color palette that ensures WCAG 2.1 accessibility compliance |
+| `card-ui-system` | Design and implement modular content containers with consistent hierarchy, structure, and action alignment |
+| `empty-state-system` | Design and implement purposeful zero-data screens that guide users toward clear actions |
+| `fluid-spacing-system` | Design and implement a fluid spacing scale using CSS `clamp()` for consistent white space and rhythm |
+| `fluid-typography-system` | Design and implement responsive typography that scales smoothly across viewports using CSS `clamp()` |
+| `form-design-system` | Design and document systematic form interfaces with consistent anatomy, spacing, affordances, and accessibility |
+| `interactive-state-system` | Define visual behavior for hover, focus, active, disabled, and other interaction states |
+| `overlay-and-dialog-system` | Design modals, drawers, popovers, and toasts with clear focus, context, and interruption rules |
+| `responsive-grid-system` | Design and implement a flexible column-based layout system that scales across devices |
+| `site-navigation-system` | Design and implement a structured, accessible, and responsive navigation framework |
 | `visual-hierarchy-system` | Establish a clear order of importance using scale, color, contrast, and spacing |
 
 ### website-development
@@ -81,10 +84,13 @@ Skills are never injected into context upfront. The agent fetches exactly what i
 | Skill | Description |
 | ----- | ----------- |
 | `accessible-accordion-implementation` | Implement accessible, animatable accordion and disclosure components |
+| `accessible-carousel-implementation` | Implement accessible, high-performance carousel and slider components using CSS Scroll Snap and WAI-ARIA |
+| `accessible-combobox-implementation` | Implement accessible comboboxes, custom selects, and autocompletes with robust focus and keyboard behavior |
 | `accessible-main-navigation` | Build accessible, responsive main navigation with skip links and keyboard support |
 | `accessible-modal-dialog` | Implement accessible modal dialogs with focus trapping and keyboard interactions |
 | `accessible-responsive-navigation` | Build fully accessible responsive navigation systems |
 | `accessible-tabs-implementation` | Implement accessible tabbed interfaces using WAI-ARIA roles and keyboard patterns |
+| `container-queries-implementation` | Implement layout-aware components that respond to container dimensions rather than viewport size |
 | `css-stacking-contexts` | Debug and manage CSS layering with stacking contexts and z-index |
 | `dark-mode-implementation` | Implement a robust dark mode system that prevents flash and respects system preferences |
 | `responsive-data-tables` | Make data tables readable and accessible across all screen sizes |
@@ -99,7 +105,9 @@ Skills are never injected into context upfront. The agent fetches exactly what i
 | Skill | Description |
 | ----- | ----------- |
 | `checkout-flow-optimization` | Audit and optimize the checkout process to reduce abandonment |
+| `exit-intent-recovery` | Audit and optimize exit-intent interventions that recover abandoning users |
 | `hero-section-optimization` | Audit and optimize hero sections for clarity and conversion |
+| `internal-search-optimization` | Audit and optimize site search to improve findability and reduce zero-results scenarios |
 | `landing-page-content-hierarchy` | Optimize the logical flow and information architecture of landing pages |
 | `lead-capture-form-optimization` | Reduce friction and increase conversion rates on lead generation forms |
 | `message-match-optimization` | Align traffic sources with destination landing pages to reduce bounce rates |
@@ -107,6 +115,7 @@ Skills are never injected into context upfront. The agent fetches exactly what i
 | `product-listing-page-optimization` | Reduce discovery friction on e-commerce category and listing pages |
 | `product-page-optimization` | Optimize product detail pages to improve add-to-cart rates |
 | `social-proof-optimization` | Audit and optimize trust signals to build credibility and reduce user anxiety |
+| `upsell-cross-sell-optimization` | Audit and optimize upsell and cross-sell strategies to increase AOV and CLV |
 
 ---
 
@@ -165,7 +174,7 @@ The MCP server source lives in `src/`. Skills live in the category folders at th
 
 Contributions should prioritize portability, reuse, and execution quality over volume. Strengthen an existing skill before creating a near-duplicate.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow and [AGENT.md](AGENT.md) for repository structure and quality standards.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow, [AGENT.md](AGENT.md) for repository structure and quality standards, [AGENTS.md](AGENTS.md) for shared agent operations, [CODEX.md](CODEX.md) for Codex release and review guidance, and [RELEASE.md](RELEASE.md) for the release checklist.
 
 ---
 

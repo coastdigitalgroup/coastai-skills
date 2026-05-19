@@ -7,6 +7,14 @@ All notable changes to this project will be documented here. The format follows
 
 ### Added
 
+- `AGENTS.md` Codex operating guide for release, review, and documentation
+  stewardship alongside Claude Code
+- `CODEX.md` Codex-specific release agent guide for validation,
+  documentation standardization, changelog support, and git boundaries
+- `.codex/` workspace templates for change-watch notes and release-readiness
+  review
+- `RELEASE.md` release checklist covering skill validation, MCP behavior,
+  documentation alignment, and package publishing gates
 - `typecheck` npm script (`tsc --noEmit`) for type-checking without emitting
 
 ### Changed
@@ -15,6 +23,10 @@ All notable changes to this project will be documented here. The format follows
   rather than hardcoded — version only needs to be maintained in one place
 - `lint` script simplified from `eslint src/**/*.ts` to `eslint src` for
   reliable cross-shell glob behavior
+- README and contributing guidance now reference the Codex release-agent files
+  and list the current skill catalogue
+- Root agent docs and package metadata now agree on source validation commands
+  and the three MCP tools
 
 ### Removed
 

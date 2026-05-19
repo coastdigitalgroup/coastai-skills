@@ -90,10 +90,12 @@ If you change anything in `src/`:
 
 ```bash
 npm install
+npm run typecheck
+npm run lint
 npm run build
 ```
 
-Confirm the build is clean before submitting. Editing skill content never requires a rebuild — only TypeScript source changes in `src/` do.
+Confirm the validation is clean before submitting. Editing skill content never requires a rebuild - only TypeScript source changes in `src/` do.
 
 ## Quality bar
 
@@ -105,6 +107,12 @@ A good contribution has:
 - a workflow another agent can follow without additional context
 - references or scripts only where they add real execution value
 - examples grounded in realistic work
+
+## Agent and release guidance
+
+See [AGENT.md](AGENT.md) for repository skill standards, [AGENTS.md](AGENTS.md)
+for shared agent operations, [CODEX.md](CODEX.md) for Codex release and review
+guidance, and [RELEASE.md](RELEASE.md) for package publication checks.
 
 ## License
 
