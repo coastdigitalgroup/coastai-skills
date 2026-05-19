@@ -1,0 +1,42 @@
+<!--
+  Accessible Tooltip Boilerplate
+  Trigger: Use aria-describedby for extra info or aria-label for icon buttons.
+  Tooltip: Use role="tooltip" and a unique ID.
+-->
+
+<div class="tooltip-wrapper">
+  <!-- Trigger -->
+  <button
+    type="button"
+    class="tooltip-trigger"
+    aria-describedby="tooltip-unique-id"
+  >
+    <!-- For icon-only buttons, use aria-label="Button Name" here instead -->
+    Help
+  </button>
+
+  <!-- Tooltip Content -->
+  <div id="tooltip-unique-id" role="tooltip" class="tooltip-content" hidden>
+    Detailed explanation goes here.
+  </div>
+</div>
+
+<style>
+  /*
+    Ensure the tooltip is hidden by default and
+    shown only on hover/focus of the trigger.
+  */
+  .tooltip-content[hidden] {
+    display: none;
+  }
+
+  /*
+    Hovering the wrapper or the content keeps it visible (WCAG 2.2 SC 1.4.13).
+  */
+  .tooltip-wrapper:hover .tooltip-content,
+  .tooltip-content:hover,
+  .tooltip-trigger:focus + .tooltip-content {
+    display: block;
+    /* Add positioning styles here */
+  }
+</style>

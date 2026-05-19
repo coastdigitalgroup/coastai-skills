@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple CSS-Based Tooltip</title>
+    <style>
+      .tooltip-container {
+        position: relative;
+        display: inline-block;
+        margin: 50px;
+      }
+
+      .tooltip-trigger {
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      /* The Tooltip */
+      .tooltip-content {
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-bottom: 8px;
+        padding: 4px 8px;
+        background: #333;
+        color: #fff;
+        border-radius: 4px;
+        font-size: 14px;
+        white-space: nowrap;
+        pointer-events: none; /* Prevents interference with the trigger */
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease-in-out;
+        z-index: 100;
+      }
+
+      /* Tooltip Arrow */
+      .tooltip-content::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #333 transparent transparent transparent;
+      }
+
+      /* Show on Hover and Focus */
+      /* Container hover ensures the tooltip stays visible when the mouse moves over it (WCAG 2.2 SC 1.4.13) */
+      .tooltip-container:hover .tooltip-content,
+      .tooltip-trigger:focus + .tooltip-content {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      /* Keep visible when tooltip itself is hovered */
+      .tooltip-content:hover {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      /* Accessibility: Ensure focus ring is visible */
+      .tooltip-trigger:focus {
+        outline: 2px solid #005fcc;
+        outline-offset: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>CSS Tooltip Example</h1>
+    <p>
+      This example uses <code>aria-describedby</code> to link the trigger to the
+      tooltip.
+    </p>
+
+    <div class="tooltip-container">
+      <button class="tooltip-trigger" aria-describedby="tooltip-info">
+        Hover or Focus Me
+      </button>
+
+      <div id="tooltip-info" role="tooltip" class="tooltip-content">
+        This is additional information.
+      </div>
+    </div>
+  </body>
+</html>

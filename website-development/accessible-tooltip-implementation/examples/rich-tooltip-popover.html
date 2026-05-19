@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JS-Enhanced Accessible Tooltip</title>
+    <style>
+      .tooltip-trigger {
+        padding: 10px;
+        margin: 100px;
+      }
+
+      .tooltip {
+        position: absolute;
+        background-color: #333;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 14px;
+        z-index: 1000;
+        display: none; /* Controlled by JS */
+      }
+
+      /* Keep tooltip visible when hovered */
+      .tooltip:hover {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>JS-Enhanced Tooltip</h1>
+    <p>
+      This version handles <code>Escape</code> key to dismiss and
+      "hover-over-content" persistence.
+    </p>
+
+    <button id="trigger" aria-describedby="tooltip-content">
+      Interactive Trigger
+    </button>
+
+    <div id="tooltip-content" role="tooltip" class="tooltip">
+      I stay open if you hover over me!
+    </div>
+
+    <script>
+      const trigger = document.getElementById("trigger");
+      const tooltip = document.getElementById("tooltip-content");
+
+      function showTooltip() {
+        tooltip.style.display = "block";
+        // Basic positioning logic
+        const rect = trigger.getBoundingClientRect();
+        tooltip.style.top = `${rect.top - tooltip.offsetHeight - 10 + window.scrollY}px`;
+        tooltip.style.left = `${rect.left + rect.width / 2 - tooltip.offsetWidth / 2 + window.scrollX}px`;
+      }
+
+      function hideTooltip() {
+        tooltip.style.display = "none";
+      }
+
+      // Trigger events
+      trigger.addEventListener("mouseenter", showTooltip);
+      trigger.addEventListener("mouseleave", (e) => {
+        // Small delay to allow moving mouse to tooltip
+        setTimeout(() => {
+          if (!tooltip.matches(":hover")) {
+            hideTooltip();
+          }
+        }, 100);
+      });
+
+      trigger.addEventListener("focus", showTooltip);
+      trigger.addEventListener("blur", hideTooltip);
+
+      // Ensure tooltip closes when mouse leaves it
+      tooltip.addEventListener("mouseleave", () => {
+        if (!trigger.matches(":hover")) {
+          hideTooltip();
+        }
+      });
+
+      // Escape key dismissal
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && tooltip.style.display === "block") {
+          hideTooltip();
+        }
+      });
+    </script>
+  </body>
+</html>
