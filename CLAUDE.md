@@ -134,4 +134,4 @@ Optional support folders: `examples/`, `templates/`, `references/`, `assets/`,
 ## Package context
 
 Package: `@coastdigitalgroup/coastai-skills` on npm
-Repo: github.com/coastdigitalgroup/coast-ai-skills
+Repo: github.com/coastdigitalgroup/coastai-skills

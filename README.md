@@ -1,8 +1,8 @@
 # @coastdigitalgroup/coastai-skills
 
 [![npm](https://img.shields.io/npm/v/@coastdigitalgroup/coastai-skills)](https://www.npmjs.com/package/@coastdigitalgroup/coastai-skills)
-[![GitHub issues](https://img.shields.io/github/issues/coastdigitalgroup/coast-ai-skills)](https://github.com/coastdigitalgroup/coast-ai-skills/issues)
-[![License](https://img.shields.io/github/license/coastdigitalgroup/coast-ai-skills)](LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/coastdigitalgroup/coastai-skills)](https://github.com/coastdigitalgroup/coastai-skills/issues)
+[![License](https://img.shields.io/github/license/coastdigitalgroup/coastai-skills)](LICENSE)
 
 A portable, agent-friendly skill library served as an MCP server. Drop it into
 any project and AI agents across Codex, Claude Code, Cursor, Windsurf, Zed, and
@@ -219,8 +219,8 @@ Optional support folders alongside `SKILL.md`:
 ## Development
 
 ```bash
-git clone https://github.com/coastdigitalgroup/coast-ai-skills.git
-cd coast-ai-skills
+git clone https://github.com/coastdigitalgroup/coastai-skills.git
+cd coastai-skills
 npm install
 npm run check
 ```
@@ -251,8 +251,8 @@ cross-doc consistency.
 ## Local setup
 
 ```bash
-git clone https://github.com/coastdigitalgroup/coast-ai-skills.git
-cd coast-ai-skills
+git clone https://github.com/coastdigitalgroup/coastai-skills.git
+cd coastai-skills
 npm install
 npm run check
 ```

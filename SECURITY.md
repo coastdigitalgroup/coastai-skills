@@ -14,7 +14,7 @@ Always use the most recent published version of `@coastdigitalgroup/coastai-skil
 
 Do not open a public issue for security vulnerabilities.
 
-**Preferred:** Use [GitHub Security Advisories](https://github.com/coastdigitalgroup/coast-ai-skills/security/advisories/new) to report privately.
+**Preferred:** Use [GitHub Security Advisories](https://github.com/coastdigitalgroup/coastai-skills/security/advisories/new) to report privately.
 
 **Alternative:** Email the maintainers or send a direct message through GitHub.
 
@@ -64,4 +64,4 @@ This policy does not cover:
 
 ## Contact
 
-For non-vulnerability security questions, open a [GitHub Discussion](https://github.com/coastdigitalgroup/coast-ai-skills/discussions).
+For non-vulnerability security questions, open a [GitHub Discussion](https://github.com/coastdigitalgroup/coastai-skills/discussions).

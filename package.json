@@ -1,15 +1,15 @@
 {
   "name": "@coastdigitalgroup/coastai-skills",
   "version": "0.1.0",
-  "description": "MCP server for the coast-ai-skills library. Exposes website design, development, and growth skills to AI agents via search_skills, list_skills, and get_skill tools.",
+  "description": "MCP server for the coastai-skills library. Exposes website design, development, and growth skills to AI agents via search_skills, list_skills, and get_skill tools.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/coastdigitalgroup/coast-ai-skills.git"
+    "url": "git+https://github.com/coastdigitalgroup/coastai-skills.git"
   },
   "bugs": {
-    "url": "https://github.com/coastdigitalgroup/coast-ai-skills/issues"
+    "url": "https://github.com/coastdigitalgroup/coastai-skills/issues"
   },
-  "homepage": "https://github.com/coastdigitalgroup/coast-ai-skills#readme",
+  "homepage": "https://github.com/coastdigitalgroup/coastai-skills#readme",
   "type": "module",
   "bin": {
     "coastai-skills": "./dist/index.js"

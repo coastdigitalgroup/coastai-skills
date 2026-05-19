@@ -3,7 +3,7 @@ import { homedir } from 'os'
 import { dirname, join } from 'path'
 
 const PACKAGE_NAME = '@coastdigitalgroup/coastai-skills'
-const SERVER_NAME = 'coast-ai-skills'
+const SERVER_NAME = 'coastai-skills'
 
 const STANDARD_ENTRY = {
   command: 'npx',
@@ -265,7 +265,7 @@ export async function install(): Promise<void> {
     console.log('  Created .mcp.json for Claude Code in the current directory.\n')
     console.log('  To add to other editors manually, insert this into their MCP config:\n')
     console.log(
-      `  "coast-ai-skills": ${JSON.stringify(STANDARD_ENTRY, null, 4).replace(/\n/g, '\n  ')}\n`
+      `  "coastai-skills": ${JSON.stringify(STANDARD_ENTRY, null, 4).replace(/\n/g, '\n  ')}\n`
     )
   } else {
     const word = installed === 1 ? 'target' : 'targets'

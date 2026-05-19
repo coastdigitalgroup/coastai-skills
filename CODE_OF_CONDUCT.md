@@ -62,7 +62,7 @@ Instances of abusive, harassing, or otherwise unacceptable behavior may be
 reported to the community leaders responsible for enforcement via:
 
 - GitHub Issues:
-  [coast-ai-gemini-gems/issues](https://github.com/coastdigitalgroup/coast-ai-gemini-gems/issues)
+  [coastai-gemini-gems/issues](https://github.com/coastdigitalgroup/coastai-gemini-gems/issues)
 - Email:
   [Contact maintainers through GitHub](https://github.com/coastdigitalgroup)
 
