@@ -40,9 +40,7 @@ category traversal.
 For `src/**`, package, or tooling changes, expect:
 
 ```bash
-npm run typecheck
-npm run lint
-npm run build
+npm run check
 ```
 
 For skill-only or documentation-only changes, check frontmatter, names, links,

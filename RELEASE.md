@@ -31,9 +31,7 @@ For each changed skill:
 Run these when source, package configuration, or release packaging changes:
 
 ```bash
-npm run typecheck
-npm run lint
-npm run build
+npm run check
 ```
 
 For skill-only or documentation-only changes, record why these checks were not

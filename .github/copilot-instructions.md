@@ -49,9 +49,7 @@ If guidance conflicts, defer to `CLAUDE.md` for implementation behavior and
 
 For changes in `src/**` or package/tooling config:
 
-1. `npm run typecheck`
-2. `npm run lint`
-3. `npm run build`
+1. `npm run check`
 
 For skill-only or docs-only changes:
 

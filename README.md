@@ -166,12 +166,13 @@ Optional support folders alongside `SKILL.md`:
 git clone https://github.com/coastdigitalgroup/coast-ai-skills.git
 cd coast-ai-skills
 npm install
-npm run build
+npm run check
 ```
 
 | Command             | What it does                         |
 | ------------------- | ------------------------------------ |
 | `npm run build`     | Compiles TypeScript to `dist/`       |
+| `npm run check`     | Runs typecheck, lint, and build      |
 | `npm run typecheck` | Type-check without emitting files    |
 | `npm run lint`      | ESLint over `src/`                   |
 | `npm run dev`       | Runs the MCP server directly via tsx |

@@ -99,9 +99,7 @@ If you change anything in `src/`:
 
 ```bash
 npm install
-npm run typecheck
-npm run lint
-npm run build
+npm run check
 ```
 
 Confirm the validation is clean before submitting. Editing skill content never

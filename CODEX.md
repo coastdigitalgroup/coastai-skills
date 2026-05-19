@@ -1,4 +1,4 @@
-# CODEX.md - CoastAi Skills Release Agent
+# CODEX.md - CoastAi Skills Codex Operating Guide
 
 ## Role
 
@@ -15,6 +15,8 @@ Human final review, version decisions, tagging, publishing, and merge authority
 remain with the repository owner. GitHub Copilot assists without owning
 decisions. Google Jules handles bounded automated maintenance and must not take
 on large feature work.
+
+Codex is not the primary feature-building agent unless explicitly assigned.
 
 ## Operating Principles
 
@@ -33,6 +35,10 @@ on large feature work.
    editing.
 9. Do not weaken Claude Code's lead developer role, assign release ownership to
    Copilot, or expand Jules beyond small automated maintenance.
+10. Make the smallest safe improvement that leaves the repository clearer,
+    easier to validate, or more release-ready.
+11. Prevent scope creep. Do not broaden the skill library into an app framework
+    or platform-specific prompt collection.
 
 ## Primary Responsibilities
 
@@ -49,10 +55,35 @@ on large feature work.
   support files drift from the factory operating model.
 - Refactor only when the change reduces concrete maintenance risk or aligns the
   repo with an existing pattern.
-- Confirm source and package changes pass `npm run typecheck`,
-  `npm run lint`, and `npm run build`.
+- Confirm source and package changes pass `npm run check`.
 - For skill-only or documentation-only changes, run targeted checks and explain
   why TypeScript validation was not necessary.
+
+## Required Behavior Before Changes
+
+Before editing, identify:
+
+1. The requested task and expected handoff.
+2. The files likely affected.
+3. Whether the work is documentation, configuration, validation, release,
+   skill, source, package, or generated-output work.
+4. Whether Claude Code, a human, Copilot, or Jules already made changes that
+   need review.
+5. Which validation checks must run afterward.
+6. Whether the change affects public package behavior, MCP tool behavior,
+   install behavior, skill portability, or release metadata.
+
+## Required Behavior After Changes
+
+After editing, report:
+
+- Files changed.
+- Why the changes were made.
+- Validation commands run and results.
+- Any skipped checks and why they were skipped.
+- Any release impact.
+- Any documentation or changelog updates.
+- Any follow-up risks before publication or merge.
 
 ## Skill Review Checklist
 
@@ -74,10 +105,11 @@ For each changed skill:
 Run the full gate before reporting source, package, or release work as ready:
 
 ```bash
-npm run typecheck
-npm run lint
-npm run build
+npm run check
 ```
+
+`npm run check` runs `npm run typecheck`, `npm run lint`, and
+`npm run build`.
 
 For skill-only or documentation-only changes, use targeted validation:
 
@@ -92,16 +124,23 @@ If validation cannot run, record the exact command and reason in the handoff.
 
 Use this checklist before a release handoff:
 
+- `README.md` accurately describes install behavior, supported editors, MCP
+  tools, and available skills.
 - `package.json` version matches the intended SemVer bump.
+- `package.json` metadata, `bin`, `files`, dependencies, and scripts match the
+  package contract.
 - `CHANGELOG.md [Unreleased]` notes are moved into the new version heading with
   the release date.
 - `package-lock.json` is consistent if package metadata changed.
 - Public docs match actual MCP tools: `search_skills`, `list_skills`, and
   `get_skill`.
+- Build output and package contents are current when preparing a package-ready
+  release.
 - New top-level folders are intended skill categories or excluded from
   discovery in `src/skills.ts`.
-- Package contents are current and do not omit required skill folders.
+- Package `files` entries do not omit required skill folders.
 - No unrelated local changes were reverted, absorbed, or hidden.
+- Breaking changes are clearly marked and justified.
 
 ## Documentation Standardization
 
@@ -122,6 +161,36 @@ Keep these source-of-truth boundaries clear:
 Documentation updates should clarify skill-library behavior or maintenance
 workflow without turning this repository into an app framework or
 platform-specific prompt collection.
+
+Root documentation should generally keep this flow:
+
+1. Package name and purpose.
+2. Install and supported editors.
+3. MCP tools and how agents use them.
+4. Available skills or skill catalogue.
+5. Adding skills and skill structure.
+6. Development commands.
+7. Contribution workflow.
+8. AI-agent boundaries and release guidance.
+9. License.
+
+Do not over-document internal implementation details. Public docs should explain
+the user-facing package contract and the portable skill contract.
+
+## Configuration Standardization
+
+Codex keeps configuration simple, current, and non-duplicative.
+
+- Prefer the existing TypeScript and ESM toolchain.
+- Keep `eslint.config.ts`, `tsconfig.json`, `package.json`, and
+  `package-lock.json` aligned when package or validation behavior changes.
+- Keep AI-agent config aligned across `AGENTS.md`, `CODEX.md`, `.codex/`,
+  `.github/copilot-instructions.md`, `.claude/settings.json`, `COPILOT.md`,
+  and `JULES.md`.
+- Do not create duplicate config files for the same tool.
+- Keep generated files clearly separated from source files.
+- Do not add dependencies or new tooling unless the repository clearly needs
+  them and validation proves the change.
 
 ## Git Boundaries
 

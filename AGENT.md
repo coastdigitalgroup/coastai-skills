@@ -263,9 +263,8 @@ The server exposes three tools:
 - `get_skill(name)` — returns full `SKILL.md` content by skill name
 
 The MCP server reads skills directly from the category folders at the repo root.
-Editing skill content never requires a rebuild. Only changes to TypeScript
-source in `src/` require `npm run typecheck`, `npm run lint`, and
-`npm run build`.
+Editing skill content never requires a rebuild. Changes to TypeScript source,
+package metadata, or tooling config require `npm run check`.
 
 The installer (`--install` flag) auto-detects supported editors on the machine
 and writes the MCP config entry to each, including Codex when `~/.codex` exists.

@@ -45,9 +45,7 @@ strategy.
 For source, package, or tooling changes:
 
 ```bash
-npm run typecheck
-npm run lint
-npm run build
+npm run check
 ```
 
 For documentation-only or skill-only maintenance, validate the changed
