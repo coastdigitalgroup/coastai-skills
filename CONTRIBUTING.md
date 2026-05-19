@@ -13,16 +13,22 @@ Contribute skills that are:
 
 ## How the library works
 
-Skills are served to AI agents via an MCP server. When an agent calls `search_skills("some topic")`, it scans every skill's `name` and `description` frontmatter. When it calls `get_skill("skill-name")`, it loads the full `SKILL.md` content.
+Skills are served to AI agents via an MCP server. When an agent calls
+`search_skills("some topic")`, it scans every skill's `name` and `description`
+frontmatter. When it calls `get_skill("skill-name")`, it loads the full
+`SKILL.md` content.
 
 This means two things matter most when writing a skill:
 
-1. **The `description` field** — this is how agents discover your skill. Write it as a trigger: what task should cause an agent to load this skill?
-2. **The `SKILL.md` body** — this is what the agent actually executes. Make it procedural, complete, and decision-ready.
+1. **The `description` field** — this is how agents discover your skill. Write
+   it as a trigger: what task should cause an agent to load this skill?
+2. **The `SKILL.md` body** — this is what the agent actually executes. Make it
+   procedural, complete, and decision-ready.
 
 ## Skill structure
 
-Each skill lives at `/<category>/<skill-name>/SKILL.md`. The category is the top-level folder.
+Each skill lives at `/<category>/<skill-name>/SKILL.md`. The category is the
+top-level folder.
 
 ```text
 /<category>/<skill-name>/
@@ -34,7 +40,8 @@ Each skill lives at `/<category>/<skill-name>/SKILL.md`. The category is the top
   scripts/          ← optional
 ```
 
-Only `SKILL.md` is required. Add support folders only when they materially improve execution quality or portability.
+Only `SKILL.md` is required. Add support folders only when they materially
+improve execution quality or portability.
 
 ## Writing a good SKILL.md
 
@@ -62,11 +69,13 @@ A strong `SKILL.md` body includes:
 - **Common Failure Patterns** — what goes wrong and how to avoid it
 - **Validation** — how to confirm the output is correct
 
-Keep the body lean and procedural. Link to `references/` files instead of stuffing everything into `SKILL.md`.
+Keep the body lean and procedural. Link to `references/` files instead of
+stuffing everything into `SKILL.md`.
 
 ## Adding a new category
 
-If no existing category fits your skill, create a new top-level folder. Use a name that is:
+If no existing category fits your skill, create a new top-level folder. Use a
+name that is:
 
 - lowercase and hyphen-separated
 - broad enough to group multiple future skills
@@ -95,7 +104,8 @@ npm run lint
 npm run build
 ```
 
-Confirm the validation is clean before submitting. Editing skill content never requires a rebuild - only TypeScript source changes in `src/` do.
+Confirm the validation is clean before submitting. Editing skill content never
+requires a rebuild - only TypeScript source changes in `src/` do.
 
 ## Quality bar
 
@@ -112,8 +122,11 @@ A good contribution has:
 
 See [AGENT.md](AGENT.md) for repository skill standards, [AGENTS.md](AGENTS.md)
 for shared agent operations, [CODEX.md](CODEX.md) for Codex release and review
-guidance, and [RELEASE.md](RELEASE.md) for package publication checks.
+guidance, [.github/copilot-instructions.md](.github/copilot-instructions.md) for
+GitHub Copilot support behavior, and [RELEASE.md](RELEASE.md) for package
+publication checks.
 
 ## License
 
-By contributing, you agree that your contributions are licensed under the MIT License.
+By contributing, you agree that your contributions are licensed under the MIT
+License.

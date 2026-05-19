@@ -253,8 +253,8 @@ Avoid vague names like:
 
 ## MCP Server
 
-This repository includes an MCP server in `src/` that serves skills to AI
-agents via the Model Context Protocol.
+This repository includes an MCP server in `src/` that serves skills to AI agents
+via the Model Context Protocol.
 
 The server exposes three tools:
 
@@ -262,15 +262,15 @@ The server exposes three tools:
 - `list_skills(category?)` — lists all skills with dynamic category discovery
 - `get_skill(name)` — returns full `SKILL.md` content by skill name
 
-The MCP server reads skills directly from the category folders at the repo
-root. Editing skill content never requires a rebuild. Only changes to
-TypeScript source in `src/` require `npm run typecheck`, `npm run lint`, and
+The MCP server reads skills directly from the category folders at the repo root.
+Editing skill content never requires a rebuild. Only changes to TypeScript
+source in `src/` require `npm run typecheck`, `npm run lint`, and
 `npm run build`.
 
-The installer (`--install` flag) auto-detects supported editors on the
-machine and writes the MCP config entry to each, including Codex when
-`~/.codex` exists. It also writes a `CLAUDE.md` instruction so Claude agents
-know to search for skills before acting.
+The installer (`--install` flag) auto-detects supported editors on the machine
+and writes the MCP config entry to each, including Codex when `~/.codex` exists.
+It also writes a `CLAUDE.md` instruction so Claude agents know to search for
+skills before acting.
 
 Keep the MCP server as a thin translation layer. All execution value lives in
 the skill files, not in the server code.
@@ -343,6 +343,19 @@ Every file should support that goal.
 This repository is maintained by Claude Code (claude-sonnet-4-6) on behalf of
 Coast Digital Group.
 
+## Agent Role Boundaries
+
+- Claude Code is the primary implementation owner.
+- OpenAI Codex owns release readiness, documentation standardization, production
+  stabilization, and repository hygiene.
+- GitHub Copilot is the general development support assistant (inline
+  suggestions, small refactors, test help, TypeScript help, and API hints).
+- Google Jules handles automated micro-maintenance such as small fixes and
+  dependency updates.
+
+GitHub Copilot, Codex, and Jules do not replace Claude Code's implementation
+leadership in this repository.
+
 Claude Code acts as the primary developer. When working in this repository,
 Claude Code:
 
@@ -358,4 +371,6 @@ All task context lives in conversation with the operator. Claude Code does not
 rely on TODO comments, draft files, or placeholders to track in-progress work.
 
 For project-specific operating context, see [CLAUDE.md](CLAUDE.md). For
-Codex-specific release and review guidance, see [CODEX.md](CODEX.md).
+Codex-specific release and review guidance, see [CODEX.md](CODEX.md). For GitHub
+Copilot support behavior, see
+[.github/copilot-instructions.md](.github/copilot-instructions.md).

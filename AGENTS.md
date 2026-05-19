@@ -15,6 +15,12 @@ or package configuration.
 - Codex keeps the repository production ready by reviewing changes, checking
   release readiness, tightening documentation, and making focused refactors when
   they reduce risk.
+- GitHub Copilot provides general development support inside the IDE
+  (completions, small suggestions, refactors, tests, and API usage hints).
+- Google Jules handles automated micro-maintenance (small fixes, dependency
+  bumps, and targeted upkeep tasks).
+- GitHub Copilot and Jules do not own architecture direction, implementation
+  leadership, release coordination, or repository governance.
 - Codex uses `CODEX.md` for role-specific operating guidance and `.codex/` for
   review and release-readiness working templates.
 - Do not overwrite Claude or human work. Inspect the current diff before edits
@@ -41,8 +47,8 @@ Zed, Continue, and other agent runtimes.
 ### Release Readiness
 
 - Keep `CHANGELOG.md` current under `[Unreleased]` for meaningful changes.
-- Check version-sensitive edits in `package.json`, `README.md`,
-  `src/server.ts`, and generated package contents together.
+- Check version-sensitive edits in `package.json`, `README.md`, `src/server.ts`,
+  and generated package contents together.
 - Confirm source changes pass `npm run typecheck`, `npm run lint`, and
   `npm run build`.
 - For skill-only or documentation-only changes, run targeted validation and
@@ -61,8 +67,8 @@ Zed, Continue, and other agent runtimes.
 ### Documentation Standardization
 
 - Keep root docs consistent: `README.md`, `CONTRIBUTING.md`, `AGENT.md`,
-  `AGENTS.md`, `CLAUDE.md`, `CODEX.md`, `RELEASE.md`, and `CHANGELOG.md`
-  should not contradict each other.
+  `AGENTS.md`, `CLAUDE.md`, `CODEX.md`, `RELEASE.md`, and `CHANGELOG.md` should
+  not contradict each other.
 - Use clear, procedural language written for agents and human maintainers.
 - Keep skill descriptions trigger-focused because agents use them for search.
 - Avoid placeholder sections, TODO-heavy drafts, and generic filler.
@@ -79,13 +85,13 @@ Zed, Continue, and other agent runtimes.
 
 Use this matrix to choose checks before handing work back.
 
-| Change type | Minimum validation |
-| --- | --- |
-| `src/**`, `package.json`, `tsconfig.json`, ESLint config | `npm run typecheck`, `npm run lint`, `npm run build` |
-| Skill `SKILL.md` | Check frontmatter, structure, trigger clarity, and portability |
-| Skill support files | Confirm folder names are standard and links/references are accurate |
-| Root documentation | Check consistency with `README.md`, `AGENT.md`, `CLAUDE.md`, `CODEX.md`, and this file |
-| Release metadata | Check `CHANGELOG.md`, package version intent, and release checklist |
+| Change type                                              | Minimum validation                                                                     |
+| -------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `src/**`, `package.json`, `tsconfig.json`, ESLint config | `npm run typecheck`, `npm run lint`, `npm run build`                                   |
+| Skill `SKILL.md`                                         | Check frontmatter, structure, trigger clarity, and portability                         |
+| Skill support files                                      | Confirm folder names are standard and links/references are accurate                    |
+| Root documentation                                       | Check consistency with `README.md`, `AGENT.md`, `CLAUDE.md`, `CODEX.md`, and this file |
+| Release metadata                                         | Check `CHANGELOG.md`, package version intent, and release checklist                    |
 
 ## Skill Quality Checklist
 
