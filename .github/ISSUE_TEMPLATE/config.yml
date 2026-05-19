@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Process or ownership question
+    url: https://github.com/coastdigitalgroup/coast-ai-skills/discussions
+    about: Use discussions for process questions that are not bugs, docs updates, or release-readiness checks.
