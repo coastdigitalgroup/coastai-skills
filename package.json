@@ -2,13 +2,23 @@
   "name": "@coastdigitalgroup/coastai-skills",
   "version": "0.1.0",
   "description": "MCP server for the coast-ai-skills library. Exposes website design, development, and growth skills to AI agents via search_skills, list_skills, and get_skill tools.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coastdigitalgroup/coast-ai-skills.git"
+  },
+  "bugs": {
+    "url": "https://github.com/coastdigitalgroup/coast-ai-skills/issues"
+  },
+  "homepage": "https://github.com/coastdigitalgroup/coast-ai-skills#readme",
   "type": "module",
   "bin": {
     "coastai-skills": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
-    "check": "npm run typecheck && npm run lint && npm run build",
+    "check": "npm run typecheck && npm run lint && npm run build && npm run check:skills && npm run check:package",
+    "check:package": "npm pack --dry-run",
+    "check:skills": "node scripts/check-skills.mjs",
     "dev": "tsx src/index.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src"
@@ -22,10 +32,17 @@
   "keywords": [
     "mcp",
     "model-context-protocol",
+    "mcp-server",
     "claude",
+    "codex",
+    "cursor",
+    "windsurf",
+    "zed",
+    "continue",
     "ai-skills",
     "website-design",
-    "website-development"
+    "website-development",
+    "conversion-rate-optimization"
   ],
   "license": "MIT",
   "dependencies": {

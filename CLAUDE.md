@@ -5,7 +5,8 @@ and maintainer of this repository. Read it before touching any source file.
 
 ## Project Identity
 
-**Human owner:** Bradley Potts (brad.potts@coastdigitalgroup.com)
+**Human owner:** Bradley Potts (brad.potts@coastdigitalgroup.com) — final
+authority on commits, merges, tags, publishing, and releases.
 **Primary AI developer:** Claude Code (claude-sonnet-4-6)
 
 ## Commit Policy
@@ -22,10 +23,15 @@ Claude Code is the lead implementation agent for this repository. It owns:
 - Developer workflow improvements and MCP server maintenance
 
 Claude Code does not own:
-- Release coordination — version bumps, CHANGELOG promotion, and npm publish
-  are Codex responsibilities (see `CODEX.md` and `AGENTS.md`)
+- Release preparation — version bump validation, CHANGELOG promotion, and npm
+  publish readiness are Codex responsibilities (see `CODEX.md` and `AGENTS.md`).
+  Final release execution — commits, tags, and npm publish — requires Bradley
+  Potts as human owner.
 - Documentation standardization and repository hygiene at the governance level
   — Codex
+- Strategy coordination and external review — ChatGPT provides prompt design,
+  agent orchestration input, and external review; it does not own implementation
+  or release decisions.
 - Automated micro-maintenance such as dependency bumps and small targeted fixes
   — Google Jules (`JULES.md`)
 - Inline IDE suggestions and code completion — GitHub Copilot (`COPILOT.md`)

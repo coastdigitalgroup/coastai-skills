@@ -9,6 +9,29 @@ any project and AI agents across Codex, Claude Code, Cursor, Windsurf, Zed, and
 Continue instantly have access to structured guidance for website design,
 development, and growth tasks — without copying a single file.
 
+## At a glance
+
+- **What this is:** An MCP package that serves portable `SKILL.md` content to AI
+  agents on demand.
+- **Who it is for:** Teams using AI coding/design agents that need reusable
+  website design, development, and growth workflows.
+- **What this package owns:** Skill discovery, skill search, and skill retrieval
+  over three MCP tools.
+- **What this package does not own:** Application runtime logic, framework
+  scaffolding, or replacing your product architecture.
+
+## When to use this package
+
+- You want AI agents to discover and apply reusable skills by topic.
+- You want one shared skill library across editors and agent runtimes.
+- You want a thin MCP layer with most value kept in portable Markdown skills.
+
+## When not to use this package
+
+- You need a web framework starter or full application boilerplate.
+- You need a domain-specific business app instead of a reusable skill library.
+- You want dynamic runtime orchestration beyond skill lookup and retrieval.
+
 [Contributing](CONTRIBUTING.md) | [Changelog](CHANGELOG.md) |
 [Security](SECURITY.md)
 
@@ -51,6 +74,39 @@ Agent: executes with skill guidance
 
 Skills are never injected into context upfront. The agent fetches exactly what
 it needs, when it needs it.
+
+## Package contract
+
+### Runtime interface
+
+| Surface      | Contract                                                     |
+| ------------ | ------------------------------------------------------------ |
+| CLI binary   | `coastai-skills` (published from `dist/index.js`)            |
+| Install mode | `coastai-skills --install` auto-configures supported editors |
+| Server mode  | `coastai-skills` runs MCP over stdio                         |
+| MCP tools    | `search_skills`, `list_skills`, `get_skill`                  |
+
+This package is CLI-first. There is no documented stable JavaScript API.
+
+### Source-of-truth and edit boundaries
+
+- **Source-of-truth:** Skill content in `/<category>/<skill-name>/SKILL.md` and
+  discovery behavior in `src/skills.ts`.
+- **Generated output:** `dist/` is build output and should not be hand-edited
+  for routine changes.
+- **Protected boundaries:** Keep `src/` as a thin transport/discovery layer and
+  avoid moving execution logic out of skills.
+- **Unsafe direct edits:** Do not hand-edit packaged artifacts for release
+  behavior changes; update source and rebuild instead.
+
+### AI boundaries snapshot
+
+- `CLAUDE.md`: lead implementation authority.
+- `CODEX.md`: release-readiness, docs consistency, stabilization, and validation
+  stewardship.
+- `COPILOT.md`: IDE support guidance.
+- `JULES.md`: bounded automation and micro-maintenance.
+- `AGENTS.md`: shared coordination and ownership boundaries.
 
 ---
 
@@ -169,16 +225,48 @@ npm install
 npm run check
 ```
 
-| Command             | What it does                         |
-| ------------------- | ------------------------------------ |
-| `npm run build`     | Compiles TypeScript to `dist/`       |
-| `npm run check`     | Runs typecheck, lint, and build      |
-| `npm run typecheck` | Type-check without emitting files    |
-| `npm run lint`      | ESLint over `src/`                   |
-| `npm run dev`       | Runs the MCP server directly via tsx |
+| Command                 | What it does                                                   |
+| ----------------------- | -------------------------------------------------------------- |
+| `npm run build`         | Compiles TypeScript to `dist/`                                 |
+| `npm run check`         | Runs typecheck, lint, and build                                |
+| `npm run check:skills`  | Validates skill frontmatter, naming, and support-folder policy |
+| `npm run check:package` | Validates packability with `npm pack --dry-run`                |
+| `npm run typecheck`     | Type-check without emitting files                              |
+| `npm run lint`          | ESLint over `src/`                                             |
+| `npm run dev`           | Runs the MCP server directly via tsx                           |
 
 The MCP server source lives in `src/`. Skills live in the category folders at
 the repo root. They are independent — editing skills never requires a rebuild.
+
+## Validation and release notes
+
+- Full validation gate: `npm run check`
+- Release process: follow `RELEASE.md`
+- Release-facing history: `CHANGELOG.md`
+
+For `src/`, package, or tooling changes, run the full gate before handoff. For
+skill-only or docs-only changes, validate frontmatter, links, naming, and
+cross-doc consistency.
+
+## Local setup
+
+```bash
+git clone https://github.com/coastdigitalgroup/coast-ai-skills.git
+cd coast-ai-skills
+npm install
+npm run check
+```
+
+## Troubleshooting
+
+- **No skills are found:** confirm category folders are top-level directories
+  and each skill has `SKILL.md` with valid `name` and `description` frontmatter.
+- **Validation fails on skills:** run `npm run check:skills` and fix reported
+  folder/frontmatter errors.
+- **Editor does not detect the server after install:** rerun
+  `npx @coastdigitalgroup/coastai-skills --install` and restart the editor.
+- **Version mismatch in server metadata:** update `package.json`;
+  `src/server.ts` reads version from package metadata.
 
 ---
 
@@ -189,11 +277,11 @@ volume. Strengthen an existing skill before creating a near-duplicate.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow,
 [AGENT.md](AGENT.md) for repository structure and quality standards,
-[AGENTS.md](AGENTS.md) for shared agent coordination, [CLAUDE.md](CLAUDE.md)
-for Claude Code implementation authority, [CODEX.md](CODEX.md) for Codex
-release and review guidance, [COPILOT.md](COPILOT.md) for GitHub Copilot
-support guidance, [JULES.md](JULES.md) for Google Jules maintenance boundaries,
-and [RELEASE.md](RELEASE.md) for the release checklist.
+[AGENTS.md](AGENTS.md) for shared agent coordination, [CLAUDE.md](CLAUDE.md) for
+Claude Code implementation authority, [CODEX.md](CODEX.md) for Codex release and
+review guidance, [COPILOT.md](COPILOT.md) for GitHub Copilot support guidance,
+[JULES.md](JULES.md) for Google Jules maintenance boundaries, and
+[RELEASE.md](RELEASE.md) for the release checklist.
 
 GitHub Copilot support behavior is defined in
 [.github/copilot-instructions.md](.github/copilot-instructions.md).

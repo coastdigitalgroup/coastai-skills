@@ -22,6 +22,11 @@ All notable changes to this project will be documented here. The format follows
   repository-specific coding, validation, and boundary expectations
 - `COPILOT.md` and `JULES.md` role-specific root guides for support assistance
   and bounded automated maintenance
+- `scripts/check-skills.mjs` to validate skill frontmatter, folder-name
+  alignment, and allowed support-folder policy
+- `check:skills` npm script for skill quality contract validation
+- `check:package` npm script using `npm pack --dry-run` to validate package
+  packability
 
 ### Changed
 
@@ -38,12 +43,21 @@ All notable changes to this project will be documented here. The format follows
 - `README.md` and `CONTRIBUTING.md` now link GitHub Copilot instruction guidance
   for contributor visibility
 - Central AI-agent coordination now follows the factory model across
-  `AGENTS.md`, `CLAUDE.md`, `CODEX.md`, `COPILOT.md`, `JULES.md`, `.codex/`,
-  and `.github/copilot-instructions.md`
+  `AGENTS.md`, `CLAUDE.md`, `CODEX.md`, `COPILOT.md`, `JULES.md`, `.codex/`, and
+  `.github/copilot-instructions.md`
 - Codex templates now include AI-agent config drift, production stabilization,
   changelog support, and role-boundary checks
-- `CODEX.md` now follows the production-readiness operating-guide structure
-  used across the broader AI-maintained repository pattern
+- `CODEX.md` now follows the production-readiness operating-guide structure used
+  across the broader AI-maintained repository pattern
+- `check` npm script now runs typecheck, lint, build, skill validation, and
+  package packability checks as the full gate
+- `README.md` now includes first-30-seconds positioning, package contract,
+  when-to-use/when-not-to-use guidance, AI boundaries snapshot, local setup,
+  troubleshooting, and validation/release sections
+- `AGENTS.md` now includes explicit source-of-truth, generated, protected, and
+  unsafe-to-edit file boundaries
+- `package.json` now includes `repository`, `bugs`, and `homepage` metadata and
+  expanded discovery keywords for public package clarity
 
 ### Removed
 

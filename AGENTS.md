@@ -11,17 +11,25 @@ or package configuration.
 
 ## AI Operating Model
 
-| Agent | Role | Authority |
-| ----- | ---- | --------- |
-| Claude Code | Lead developer responsible for primary implementation | `CLAUDE.md` |
-| OpenAI Codex | Documentation, releases, production stabilization, repo hygiene, changelog support, and config standardization | `CODEX.md` and `.codex/` |
-| GitHub Copilot | General development assistance | `COPILOT.md` and `.github/copilot-instructions.md` |
-| Google Jules | Automated maintenance for small fixes, dependency updates, and micro-updates | `JULES.md` |
+| Agent          | Role                                                                                                                        | Authority                                          |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| Bradley Potts  | Human owner — final authority on commits, merges, tags, publishing, and releases                                            | —                                                  |
+| Claude Code    | Lead developer responsible for primary implementation                                                                       | `CLAUDE.md`                                        |
+| OpenAI Codex   | Backup/release-readiness agent: validates changes, prepares releases, standardizes docs, and keeps the repo production-safe | `CODEX.md` and `.codex/`                           |
+| ChatGPT        | Strategy, coordination, prompt design, and external review                                                                  | —                                                  |
+| GitHub Copilot | General development assistance                                                                                              | `COPILOT.md` and `.github/copilot-instructions.md` |
+| Google Jules   | Automated maintenance for small fixes, dependency updates, and micro-updates                                                | `JULES.md`                                         |
 
+- Bradley Potts is the final release authority. No commits, merges, tags, or npm
+  publishes are made without human approval.
 - Claude Code leads feature implementation and routine maintenance.
 - Codex keeps the repository production ready by reviewing changes, checking
   release readiness, tightening documentation, standardizing config, and making
-  focused refactors when they reduce risk.
+  focused refactors when they reduce risk. Codex prepares and validates
+  releases; it does not execute them.
+- ChatGPT provides strategic coordination, prompt design input, and external
+  review. It does not own implementation, release decisions, or production
+  control.
 - GitHub Copilot provides support inside the IDE through completions, small
   suggestions, refactors, tests, and API usage hints.
 - Google Jules handles automated micro-maintenance only; it does not take on
@@ -41,14 +49,31 @@ or package configuration.
 - `AGENT.md` defines portable skill and contribution standards for every agent.
 - `CLAUDE.md` is authoritative for implementation behavior and development
   workflow.
-- `CODEX.md` is authoritative for release readiness, documentation
+- `CODEX.md` is authoritative for release preparation, validation, documentation
   standardization, production stabilization, repository hygiene, changelog
-  support, and config cleanup.
+  support, and config cleanup. Final release execution requires Bradley Potts.
 - `COPILOT.md` and `.github/copilot-instructions.md` define Copilot's support
   behavior.
 - `JULES.md` defines Jules' automated maintenance boundaries.
 - `RELEASE.md` is the release checklist.
 - `.codex/` contains Codex working templates for review and release handoff.
+
+## File Boundaries
+
+- Source of truth:
+  - Skill behavior and execution guidance in `/<category>/<skill-name>/SKILL.md`
+  - Discovery and traversal behavior in `src/skills.ts`
+  - Public package metadata and version intent in `package.json`
+- Generated:
+  - `dist/` build output generated from `src/` via TypeScript build
+- Protected:
+  - Keep `src/` as thin MCP transport/discovery code, not feature-heavy app
+    logic
+  - Keep skill execution value in skill folders rather than moving it into
+    server code
+- Unsafe to edit directly:
+  - Hand-editing generated `dist/` files for behavior changes
+  - Changing release outcome without updating `CHANGELOG.md` and release docs
 
 ## Project Contract
 
@@ -106,13 +131,13 @@ Zed, Continue, and other agent runtimes.
 
 Use this matrix to choose checks before handing work back.
 
-| Change type                                              | Minimum validation                                                                     |
-| -------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `src/**`, `package.json`, `tsconfig.json`, ESLint config | `npm run check`                                                                        |
-| Skill `SKILL.md`                                         | Check frontmatter, structure, trigger clarity, and portability                         |
-| Skill support files                                      | Confirm folder names are standard and links/references are accurate                    |
+| Change type                                              | Minimum validation                                                                                               |
+| -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `src/**`, `package.json`, `tsconfig.json`, ESLint config | `npm run check`                                                                                                  |
+| Skill `SKILL.md`                                         | Check frontmatter, structure, trigger clarity, and portability                                                   |
+| Skill support files                                      | Confirm folder names are standard and links/references are accurate                                              |
 | Root documentation                                       | Check consistency with `README.md`, `AGENT.md`, `CLAUDE.md`, `CODEX.md`, `COPILOT.md`, `JULES.md`, and this file |
-| Release metadata                                         | Check `CHANGELOG.md`, package version intent, and release checklist                    |
+| Release metadata                                         | Check `CHANGELOG.md`, package version intent, and release checklist                                              |
 
 ## Skill Quality Checklist
 
