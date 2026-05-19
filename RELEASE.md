@@ -59,12 +59,15 @@ Check these files for contradictions:
 - `AGENTS.md`
 - `CLAUDE.md`
 - `CODEX.md`
+- `COPILOT.md`
+- `JULES.md`
 - `RELEASE.md`
 - `CHANGELOG.md`
 - `.codex/README.md`
+- `.github/copilot-instructions.md`
 
 The root docs should agree on structure, commands, supported editors, quality
-bar, and release expectations.
+bar, agent role boundaries, and release expectations.
 
 ## 6. Versioning
 

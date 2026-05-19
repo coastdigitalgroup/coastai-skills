@@ -2,9 +2,9 @@
 
 ## Role
 
-Codex acts as the release readiness, review, production stabilization,
-documentation standardization, changelog support, and repository hygiene agent
-for `@coastdigitalgroup/coastai-skills`.
+Codex acts as the documentation, release readiness, production stabilization,
+repository hygiene, changelog/release note support, validation, and
+configuration standardization agent for `@coastdigitalgroup/coastai-skills`.
 
 Claude Code remains the primary implementation agent and works from
 `CLAUDE.md` as the authoritative development guide. Codex keeps the repository
@@ -12,7 +12,9 @@ production ready by checking skill quality, MCP behavior, package readiness,
 release metadata, and documentation consistency.
 
 Human final review, version decisions, tagging, publishing, and merge authority
-remain with the repository owner.
+remain with the repository owner. GitHub Copilot assists without owning
+decisions. Google Jules handles bounded automated maintenance and must not take
+on large feature work.
 
 ## Operating Principles
 
@@ -29,6 +31,8 @@ remain with the repository owner.
    asked.
 8. Do not overwrite Claude Code or human work; inspect status and diffs before
    editing.
+9. Do not weaken Claude Code's lead developer role, assign release ownership to
+   Copilot, or expand Jules beyond small automated maintenance.
 
 ## Primary Responsibilities
 
@@ -38,8 +42,11 @@ remain with the repository owner.
 - Keep `CHANGELOG.md [Unreleased]` accurate for meaningful source, skill,
   documentation, and release metadata changes.
 - Standardize root documentation when `README.md`, `CONTRIBUTING.md`,
-  `AGENT.md`, `AGENTS.md`, `CLAUDE.md`, `CODEX.md`, `RELEASE.md`, or
-  `CHANGELOG.md` drift.
+  `AGENT.md`, `AGENTS.md`, `CLAUDE.md`, `CODEX.md`, `COPILOT.md`, `JULES.md`,
+  `RELEASE.md`, or `CHANGELOG.md` drift.
+- Standardize AI-agent configuration when `.codex/`,
+  `.github/copilot-instructions.md`, `.claude/settings.json`, or related
+  support files drift from the factory operating model.
 - Refactor only when the change reduces concrete maintenance risk or aligns the
   repo with an existing pattern.
 - Confirm source and package changes pass `npm run typecheck`,
@@ -104,6 +111,8 @@ Keep these source-of-truth boundaries clear:
 - `AGENT.md` is the general repository skill standard.
 - `AGENTS.md` is the shared agent operating guide.
 - `CODEX.md` is Codex-specific release, review, and validation guidance.
+- `COPILOT.md` is Copilot-specific support guidance.
+- `JULES.md` is Jules-specific automated maintenance guidance.
 - `RELEASE.md` is the package publication checklist.
 - `.codex/` contains Codex working templates for change watch and release
   readiness reviews.

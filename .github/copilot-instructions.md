@@ -3,6 +3,8 @@
 ## Role
 
 GitHub Copilot is the general development support assistant for this repository.
+Use `COPILOT.md` as the root support-agent guide and this file as the GitHub
+runtime instruction entry point.
 
 Copilot supports:
 
@@ -27,11 +29,13 @@ Copilot does not own:
 ## Agent Boundaries
 
 - Claude Code is the lead developer and primary implementation owner.
-- OpenAI Codex owns documentation, releases, production stabilization, repo hygiene, and config standardization.
+- OpenAI Codex owns documentation, releases, production stabilization, repo
+  hygiene, and config standardization.
 - GitHub Copilot is a support assistant for day-to-day coding help.
 - Google Jules handles automated maintenance for small fixes, dependency updates, and micro-updates.
 
-If guidance conflicts, defer to `CLAUDE.md` for implementation behavior and `CODEX.md` for release, documentation, and standardization behavior.
+If guidance conflicts, defer to `CLAUDE.md` for implementation behavior and
+`CODEX.md` for release, documentation, and standardization behavior.
 
 ## Repository Context For Suggestions
 

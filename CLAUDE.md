@@ -27,8 +27,8 @@ Claude Code does not own:
 - Documentation standardization and repository hygiene at the governance level
   — Codex
 - Automated micro-maintenance such as dependency bumps and small targeted fixes
-  — Google Jules
-- Inline IDE suggestions and code completion — GitHub Copilot
+  — Google Jules (`JULES.md`)
+- Inline IDE suggestions and code completion — GitHub Copilot (`COPILOT.md`)
 
 When agent guidance conflicts, this file (`CLAUDE.md`) is authoritative for
 implementation behavior. `CODEX.md` is authoritative for release and
@@ -60,6 +60,8 @@ website-growth/      Category: conversion + CRO skills
 AGENT.md             General skill and contribution standards for all agents
 AGENTS.md            OpenAI Codex operating guide (release, review, hygiene)
 CODEX.md             Codex-specific release readiness and validation guidance
+COPILOT.md           GitHub Copilot support-agent guidance
+JULES.md             Google Jules automated maintenance guidance
 CLAUDE.md            This file — authoritative guide for Claude Code
 ```
 

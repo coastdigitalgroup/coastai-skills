@@ -347,11 +347,12 @@ Coast Digital Group.
 
 - Claude Code is the primary implementation owner.
 - OpenAI Codex owns release readiness, documentation standardization, production
-  stabilization, and repository hygiene.
+  stabilization, repository hygiene, changelog support, and config
+  standardization.
 - GitHub Copilot is the general development support assistant (inline
   suggestions, small refactors, test help, TypeScript help, and API hints).
 - Google Jules handles automated micro-maintenance such as small fixes and
-  dependency updates.
+  dependency updates. Jules does not own large feature work.
 
 GitHub Copilot, Codex, and Jules do not replace Claude Code's implementation
 leadership in this repository.
@@ -362,4 +363,6 @@ structure rules defined in this file (`AGENT.md`).
 For Claude Code's full operating context, agent scope, and coordination rules,
 see [CLAUDE.md](CLAUDE.md). For Codex release and review guidance, see
 [CODEX.md](CODEX.md) and [AGENTS.md](AGENTS.md). For GitHub Copilot behavior,
-see [.github/copilot-instructions.md](.github/copilot-instructions.md).
+see [COPILOT.md](COPILOT.md) and
+[.github/copilot-instructions.md](.github/copilot-instructions.md). For Google
+Jules maintenance behavior, see [JULES.md](JULES.md).

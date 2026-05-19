@@ -2,31 +2,53 @@
 
 ## Purpose
 
-This file is the OpenAI Codex operating guide for this repository. Codex works
-as the release, review, and standardization agent for CoastAi Skills while
-Claude Code remains the primary implementation agent.
+This file is the central AI coordination guide for this repository. Codex uses
+it as the repo-level operating guide, while Claude Code, GitHub Copilot, and
+Google Jules use it to confirm role boundaries before acting.
 
 Read this file before changing source, skills, documentation, release metadata,
 or package configuration.
 
-## Collaboration Model
+## AI Operating Model
+
+| Agent | Role | Authority |
+| ----- | ---- | --------- |
+| Claude Code | Lead developer responsible for primary implementation | `CLAUDE.md` |
+| OpenAI Codex | Documentation, releases, production stabilization, repo hygiene, changelog support, and config standardization | `CODEX.md` and `.codex/` |
+| GitHub Copilot | General development assistance | `COPILOT.md` and `.github/copilot-instructions.md` |
+| Google Jules | Automated maintenance for small fixes, dependency updates, and micro-updates | `JULES.md` |
 
 - Claude Code leads feature implementation and routine maintenance.
 - Codex keeps the repository production ready by reviewing changes, checking
-  release readiness, tightening documentation, and making focused refactors when
-  they reduce risk.
-- GitHub Copilot provides general development support inside the IDE
-  (completions, small suggestions, refactors, tests, and API usage hints).
-- Google Jules handles automated micro-maintenance (small fixes, dependency
-  bumps, and targeted upkeep tasks).
+  release readiness, tightening documentation, standardizing config, and making
+  focused refactors when they reduce risk.
+- GitHub Copilot provides support inside the IDE through completions, small
+  suggestions, refactors, tests, and API usage hints.
+- Google Jules handles automated micro-maintenance only; it does not take on
+  broad feature work or architecture changes.
 - GitHub Copilot and Jules do not own architecture direction, implementation
-  leadership, release coordination, or repository governance.
+  leadership, release coordination, production stabilization strategy, or
+  repository governance.
 - Codex uses `CODEX.md` for role-specific operating guidance and `.codex/` for
   review and release-readiness working templates.
 - Do not overwrite Claude or human work. Inspect the current diff before edits
   and work with any existing changes.
 - Prefer small, reviewable changes. This repository is mostly Markdown, but the
   Markdown is product surface area and should be treated as production content.
+
+## Source Of Truth
+
+- `AGENT.md` defines portable skill and contribution standards for every agent.
+- `CLAUDE.md` is authoritative for implementation behavior and development
+  workflow.
+- `CODEX.md` is authoritative for release readiness, documentation
+  standardization, production stabilization, repository hygiene, changelog
+  support, and config cleanup.
+- `COPILOT.md` and `.github/copilot-instructions.md` define Copilot's support
+  behavior.
+- `JULES.md` defines Jules' automated maintenance boundaries.
+- `RELEASE.md` is the release checklist.
+- `.codex/` contains Codex working templates for review and release handoff.
 
 ## Project Contract
 

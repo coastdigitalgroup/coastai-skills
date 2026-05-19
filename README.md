@@ -188,9 +188,11 @@ volume. Strengthen an existing skill before creating a near-duplicate.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow,
 [AGENT.md](AGENT.md) for repository structure and quality standards,
-[AGENTS.md](AGENTS.md) for shared agent operations, [CODEX.md](CODEX.md) for
-Codex release and review guidance, and [RELEASE.md](RELEASE.md) for the release
-checklist.
+[AGENTS.md](AGENTS.md) for shared agent coordination, [CLAUDE.md](CLAUDE.md)
+for Claude Code implementation authority, [CODEX.md](CODEX.md) for Codex
+release and review guidance, [COPILOT.md](COPILOT.md) for GitHub Copilot
+support guidance, [JULES.md](JULES.md) for Google Jules maintenance boundaries,
+and [RELEASE.md](RELEASE.md) for the release checklist.
 
 GitHub Copilot support behavior is defined in
 [.github/copilot-instructions.md](.github/copilot-instructions.md).

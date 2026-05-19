@@ -18,6 +18,8 @@ All notable changes to this project will be documented here. The format follows
 - `typecheck` npm script (`tsc --noEmit`) for type-checking without emitting
 - `.github/copilot-instructions.md` GitHub Copilot support-role guidance with
   repository-specific coding, validation, and boundary expectations
+- `COPILOT.md` and `JULES.md` role-specific root guides for support assistance
+  and bounded automated maintenance
 
 ### Changed
 
@@ -32,6 +34,11 @@ All notable changes to this project will be documented here. The format follows
 - `AGENT.md` and `AGENTS.md` now explicitly define Claude Code, Codex, GitHub
   Copilot, and Jules role boundaries to avoid ownership overlap
 - `README.md` and `CONTRIBUTING.md` now link GitHub Copilot instruction guidance
+- Central AI-agent coordination now follows the factory model across
+  `AGENTS.md`, `CLAUDE.md`, `CODEX.md`, `COPILOT.md`, `JULES.md`, `.codex/`,
+  and `.github/copilot-instructions.md`
+- Codex templates now include AI-agent config drift, production stabilization,
+  changelog support, and role-boundary checks
   for contributor visibility
 
 ### Removed

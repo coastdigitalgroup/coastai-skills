@@ -1,15 +1,18 @@
 # Codex Release Readiness
 
-Use this checklist when Codex is asked to review, prepare, or validate a
-release for `@coastdigitalgroup/coastai-skills`.
+Use this checklist when Codex is asked to review, prepare, stabilize, or
+validate a release for `@coastdigitalgroup/coastai-skills`.
 
 ## Scope
 
-- [ ] Read `CLAUDE.md`, `AGENT.md`, `AGENTS.md`, and `CODEX.md`.
+- [ ] Read `CLAUDE.md`, `AGENT.md`, `AGENTS.md`, `CODEX.md`, `COPILOT.md`,
+      and `JULES.md`.
 - [ ] Review `git status --short` and identify unrelated existing changes.
 - [ ] Confirm `CHANGELOG.md [Unreleased]` covers meaningful changes.
 - [ ] Confirm generated `dist/` output is only changed intentionally for a
       package-ready release.
+- [ ] Confirm Claude Code, Codex, Copilot, and Jules role boundaries still agree
+      across agent docs and config.
 
 ## Skill Checks
 
@@ -31,6 +34,17 @@ release for `@coastdigitalgroup/coastai-skills`.
 - [ ] Public README behavior matches the MCP tools.
 - [ ] `package.json` version and `files` list match release intent.
 - [ ] `package-lock.json` is consistent if package metadata changed.
+
+## Documentation And Config Checks
+
+- [ ] `README.md`, `CONTRIBUTING.md`, `AGENT.md`, `AGENTS.md`, `CLAUDE.md`,
+      `CODEX.md`, `COPILOT.md`, `JULES.md`, `RELEASE.md`, and `CHANGELOG.md`
+      do not contradict each other.
+- [ ] `.github/copilot-instructions.md` matches `COPILOT.md`.
+- [ ] `.codex/` templates match `CODEX.md` responsibilities.
+- [ ] `.claude/settings.json` supports Claude Code's role without giving it
+      release ownership or destructive git permissions.
+- [ ] Jules remains limited to small automated maintenance and micro-updates.
 
 ## Validation
 

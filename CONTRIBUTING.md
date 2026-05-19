@@ -121,10 +121,12 @@ A good contribution has:
 ## Agent and release guidance
 
 See [AGENT.md](AGENT.md) for repository skill standards, [AGENTS.md](AGENTS.md)
-for shared agent operations, [CODEX.md](CODEX.md) for Codex release and review
-guidance, [.github/copilot-instructions.md](.github/copilot-instructions.md) for
-GitHub Copilot support behavior, and [RELEASE.md](RELEASE.md) for package
-publication checks.
+for shared agent coordination, [CLAUDE.md](CLAUDE.md) for Claude Code
+implementation authority, [CODEX.md](CODEX.md) for Codex release and review
+guidance, [COPILOT.md](COPILOT.md) and
+[.github/copilot-instructions.md](.github/copilot-instructions.md) for GitHub
+Copilot support behavior, [JULES.md](JULES.md) for Google Jules maintenance
+boundaries, and [RELEASE.md](RELEASE.md) for package publication checks.
 
 ## License
 
