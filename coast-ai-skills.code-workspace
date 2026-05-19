@@ -7,6 +7,8 @@
 	"settings": {
 		"workbench.colorTheme": "Solarized Dark",
 		"workbench.iconTheme": "material-icon-theme",
+		"workbench.startupEditor": "none",
+		"workbench.editor.enablePreview": false,
 		"editor.fontFamily": "'Fira Code', 'Cascadia Code', 'JetBrains Mono', Consolas, 'Courier New', monospace",
 		"editor.fontLigatures": true,
 		"editor.fontSize": 14,
@@ -18,10 +20,7 @@
 		"editor.renderWhitespace": "boundary",
 		"editor.bracketPairColorization.enabled": true,
 		"editor.guides.bracketPairs": "active",
-		"workbench.startupEditor": "none",
-		"workbench.editor.enablePreview": false,
 		"breadcrumbs.enabled": true,
-		"antigravity.autoStartContainer": true,
 		"editor.codeActionsOnSave": {
 			"source.fixAll.eslint": "explicit",
 			"source.organizeImports": "always"
@@ -30,8 +29,8 @@
 		"editor.linkedEditing": true,
 		"editor.formatOnSave": true,
 		"editor.formatOnPaste": false,
-		"editor.tabSize": 4,
-		"editor.insertSpaces": false,
+		"editor.tabSize": 2,
+		"editor.insertSpaces": true,
 		"editor.detectIndentation": true,
 		"editor.trimAutoWhitespace": true,
 		"files.trimTrailingWhitespace": true,
@@ -40,20 +39,6 @@
 		"search.smartCase": true,
 		"[typescript]": {
 			"editor.defaultFormatter": "vscode.typescript-language-features",
-			"editor.formatOnSave": true,
-			"editor.tabSize": 2,
-			"editor.insertSpaces": true,
-			"editor.wordWrap": "off"
-		},
-		"[typescriptreact]": {
-			"editor.defaultFormatter": "vscode.typescript-language-features",
-			"editor.formatOnSave": true,
-			"editor.tabSize": 2,
-			"editor.insertSpaces": true,
-			"editor.wordWrap": "off"
-		},
-		"[css]": {
-			"editor.defaultFormatter": "vscode.css-language-features",
 			"editor.formatOnSave": true,
 			"editor.tabSize": 2,
 			"editor.insertSpaces": true,
@@ -69,28 +54,15 @@
 				"other": "off"
 			}
 		},
-		"files.associations": {
-			"*.css": "css",
-			"*.ts": "typescript",
-			"*.tsx": "typescriptreact",
-			"*.astro": "astro"
-		},
-		"tailwindCSS.includeLanguages": {
-			"astro": "html"
-		},
-		"tailwindCSS.emmetCompletions": true,
 		"files.exclude": {
 			"**/.git": true,
 			"**/.DS_Store": true,
 			"**/node_modules": true,
-			"**/vendor": true,
-			"**/dist": true,
-			"**/.astro": true
+			"**/dist": true
 		},
 		"files.watcherExclude": {
 			"**/node_modules/*/**": true,
-			"**/dist/**": true,
-			"**/.astro/**": true
+			"**/dist/**": true
 		},
 		"explorer.confirmDelete": false,
 		"explorer.confirmDragAndDrop": false,
@@ -106,52 +78,30 @@
 		"git.enableSmartCommit": true,
 		"scm.defaultViewMode": "tree"
 	},
-	"launch": {
-		"version": "0.2.0",
-		"configurations": [
-			{
-				"command": "./node_modules/.bin/astro dev",
-				"name": "Development server",
-				"request": "launch",
-				"type": "node-terminal"
-			}
-		]
-	},
 	"extensions": {
 		"recommendations": [
 			"github.copilot",
 			"github.copilot-chat",
-			"openai.chatgpt",
 			"dbaeumer.vscode-eslint",
-			"esbenp.prettier-vscode",
 			"editorconfig.editorconfig",
 			"yzhang.markdown-all-in-one",
 			"davidanson.vscode-markdownlint",
 			"streetsidesoftware.code-spell-checker",
 			"usernamehw.errorlens",
 			"yoavbls.pretty-ts-errors",
-			"wix.vscode-import-cost",
-			"zhuangtongfa.material-theme",
-			"pkief.material-icon-theme",
+			"christian-kohler.path-intellisense",
 			"eamodio.gitlens",
 			"mhutchie.git-graph",
-			"ms-playwright.playwright",
-			"pnpm.pnpm-vscode",
-			"unifiedjs.vscode-mdx",
-			"tamasfe.even-better-toml",
-			"astro-build.astro-vscode",
-			"christian-kohler.path-intellisense",
-			"zignd.html-css-class-completion",
-			"formulahendry.auto-rename-tag",
-			"bradlc.vscode-tailwindcss"
+			"pkief.material-icon-theme",
+			"zhuangtongfa.material-theme"
 		]
 	},
 	"tasks": {
 		"version": "2.0.0",
 		"tasks": [
 			{
-				"label": "dev",
-				"command": "npm run dev",
+				"label": "check",
+				"command": "npm run check",
 				"type": "shell",
 				"group": {
 					"kind": "build",
@@ -159,13 +109,8 @@
 				}
 			},
 			{
-				"label": "build",
-				"command": "npm run build",
-				"type": "shell"
-			},
-			{
-				"label": "preview",
-				"command": "npm run preview",
+				"label": "typecheck",
+				"command": "npm run typecheck",
 				"type": "shell"
 			},
 			{
@@ -174,8 +119,13 @@
 				"type": "shell"
 			},
 			{
-				"label": "format",
-				"command": "npm run format",
+				"label": "build",
+				"command": "npm run build",
+				"type": "shell"
+			},
+			{
+				"label": "dev",
+				"command": "npm run dev",
 				"type": "shell"
 			}
 		]
