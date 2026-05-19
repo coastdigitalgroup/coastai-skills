@@ -49,7 +49,7 @@ If guidance conflicts, defer to `CLAUDE.md` for implementation behavior and
 
 For changes in `src/**` or package/tooling config:
 
-1. `npm run check`
+1. `npm run validate`
 
 For skill-only or docs-only changes:
 

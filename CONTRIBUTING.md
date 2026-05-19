@@ -99,7 +99,7 @@ If you change anything in `src/`:
 
 ```bash
 npm install
-npm run check
+npm run validate
 ```
 
 Confirm the validation is clean before submitting. Editing skill content never

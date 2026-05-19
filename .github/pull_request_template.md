@@ -23,7 +23,7 @@
 - [ ] Description is written to trigger correctly in agent searches
 - [ ] No duplicate skills — checked for overlapping existing skills
 - [ ] Support files only included where they add real execution value
-- [ ] If `src/` was changed: `npm run check` passes
+- [ ] If `src/` was changed: `npm run validate` passes
 - [ ] `CHANGELOG.md` updated
 
 ## Documentation Updated

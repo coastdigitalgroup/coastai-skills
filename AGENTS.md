@@ -96,7 +96,7 @@ Zed, Continue, and other agent runtimes.
 - Keep `CHANGELOG.md` current under `[Unreleased]` for meaningful changes.
 - Check version-sensitive edits in `package.json`, `README.md`, `src/server.ts`,
   and generated package contents together.
-- Confirm source changes pass `npm run check`.
+- Confirm source changes pass `npm run validate`.
 - For skill-only or documentation-only changes, run targeted validation and
   explain why a TypeScript build was not necessary.
 
@@ -133,7 +133,7 @@ Use this matrix to choose checks before handing work back.
 
 | Change type                                              | Minimum validation                                                                                               |
 | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `src/**`, `package.json`, `tsconfig.json`, ESLint config | `npm run check`                                                                                                  |
+| `src/**`, `package.json`, `tsconfig.json`, ESLint config | `npm run validate`                                                                                                  |
 | Skill `SKILL.md`                                         | Check frontmatter, structure, trigger clarity, and portability                                                   |
 | Skill support files                                      | Confirm folder names are standard and links/references are accurate                                              |
 | Root documentation                                       | Check consistency with `README.md`, `AGENT.md`, `CLAUDE.md`, `CODEX.md`, `COPILOT.md`, `JULES.md`, and this file |

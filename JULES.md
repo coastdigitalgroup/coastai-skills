@@ -45,7 +45,7 @@ strategy.
 For source, package, or tooling changes:
 
 ```bash
-npm run check
+npm run validate
 ```
 
 For documentation-only or skill-only maintenance, validate the changed

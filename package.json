@@ -16,7 +16,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "check": "npm run typecheck && npm run lint && npm run build && npm run check:skills && npm run check:package",
+    "validate": "npm run typecheck && npm run lint && npm run build && npm run check:skills && npm run check:package",
     "check:package": "npm pack --dry-run",
     "check:skills": "node scripts/check-skills.mjs",
     "dev": "tsx src/index.ts",
@@ -49,12 +49,12 @@
     "@modelcontextprotocol/sdk": "^1.29.0"
   },
   "devDependencies": {
-    "@types/node": "^25.7.0",
-    "eslint": "^10.3.0",
+    "@types/node": "^25.9.1",
+    "eslint": "^10.4.0",
     "jiti": "^2.7.0",
-    "tsx": "^4.21.0",
+    "tsx": "^4.22.3",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.3"
+    "typescript-eslint": "^8.59.4"
   },
   "engines": {
     "node": ">=18"

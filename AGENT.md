@@ -264,7 +264,7 @@ The server exposes three tools:
 
 The MCP server reads skills directly from the category folders at the repo root.
 Editing skill content never requires a rebuild. Changes to TypeScript source,
-package metadata, or tooling config require `npm run check`.
+package metadata, or tooling config require `npm run validate`.
 
 The installer (`--install` flag) auto-detects supported editors on the machine
 and writes the MCP config entry to each, including Codex when `~/.codex` exists.

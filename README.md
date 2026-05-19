@@ -222,13 +222,13 @@ Optional support folders alongside `SKILL.md`:
 git clone https://github.com/coastdigitalgroup/coastai-skills.git
 cd coastai-skills
 npm install
-npm run check
+npm run validate
 ```
 
 | Command                 | What it does                                                   |
 | ----------------------- | -------------------------------------------------------------- |
 | `npm run build`         | Compiles TypeScript to `dist/`                                 |
-| `npm run check`         | Runs typecheck, lint, and build                                |
+| `npm run validate`         | Runs typecheck, lint, and build                                |
 | `npm run check:skills`  | Validates skill frontmatter, naming, and support-folder policy |
 | `npm run check:package` | Validates packability with `npm pack --dry-run`                |
 | `npm run typecheck`     | Type-check without emitting files                              |
@@ -240,7 +240,7 @@ the repo root. They are independent — editing skills never requires a rebuild.
 
 ## Validation and release notes
 
-- Full validation gate: `npm run check`
+- Full validation gate: `npm run validate`
 - Release process: follow `RELEASE.md`
 - Release-facing history: `CHANGELOG.md`
 
@@ -254,7 +254,7 @@ cross-doc consistency.
 git clone https://github.com/coastdigitalgroup/coastai-skills.git
 cd coastai-skills
 npm install
-npm run check
+npm run validate
 ```
 
 ## Troubleshooting

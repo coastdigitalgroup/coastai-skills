@@ -55,7 +55,7 @@ Codex is not the primary feature-building agent unless explicitly assigned.
   support files drift from the factory operating model.
 - Refactor only when the change reduces concrete maintenance risk or aligns the
   repo with an existing pattern.
-- Confirm source and package changes pass `npm run check`.
+- Confirm source and package changes pass `npm run validate`.
 - For skill-only or documentation-only changes, run targeted checks and explain
   why TypeScript validation was not necessary.
 
@@ -105,10 +105,10 @@ For each changed skill:
 Run the full gate before reporting source, package, or release work as ready:
 
 ```bash
-npm run check
+npm run validate
 ```
 
-`npm run check` runs `npm run typecheck`, `npm run lint`, and
+`npm run validate` runs `npm run typecheck`, `npm run lint`, and
 `npm run build`.
 
 For skill-only or documentation-only changes, use targeted validation:

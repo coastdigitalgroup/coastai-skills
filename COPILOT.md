@@ -40,7 +40,7 @@ category traversal.
 For `src/**`, package, or tooling changes, expect:
 
 ```bash
-npm run check
+npm run validate
 ```
 
 For skill-only or documentation-only changes, check frontmatter, names, links,

@@ -51,7 +51,7 @@ validate a release for `@coastdigitalgroup/coastai-skills`.
 For source, package, or release packaging changes:
 
 ```bash
-npm run check
+npm run validate
 ```
 
 For skill-only or documentation-only changes, record the targeted checks used

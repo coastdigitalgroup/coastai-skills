@@ -31,7 +31,7 @@ For each changed skill:
 Run these when source, package configuration, or release packaging changes:
 
 ```bash
-npm run check
+npm run validate
 ```
 
 For skill-only or documentation-only changes, record why these checks were not

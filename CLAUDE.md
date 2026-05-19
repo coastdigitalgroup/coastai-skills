@@ -76,12 +76,12 @@ CLAUDE.md            This file — authoritative guide for Claude Code
 | Command | What it does |
 | ------- | ------------ |
 | `npm run build` | Compiles TypeScript to `dist/` |
-| `npm run check` | Runs typecheck, lint, and build |
+| `npm run validate` | Runs typecheck, lint, and build |
 | `npm run typecheck` | Type-check without emitting files |
 | `npm run lint` | ESLint over `src/` |
 | `npm run dev` | Run MCP server directly via tsx |
 
-**Always run `npm run check` before handing off any `src/`, package, or tooling
+**Always run `npm run validate` before handing off any `src/`, package, or tooling
 changes.** Skill-only changes never require a rebuild.
 
 ## Skill structure
@@ -117,7 +117,7 @@ Optional support folders: `examples/`, `templates/`, `references/`, `assets/`,
 
 ## Before committing
 
-1. `npm run check` — must be clean for source, package, or tooling changes
+1. `npm run validate` — must be clean for source, package, or tooling changes
 2. Update `CHANGELOG.md` under `[Unreleased]` for every meaningful change
 3. Confirm skill frontmatter has valid `name` and `description` fields
 4. No placeholder files, no TODO-heavy drafts, no shallow skills

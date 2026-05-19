@@ -9,7 +9,7 @@ labels: release, quality
 
 ## Checklist
 
-- [ ] Validation command and result documented (`npm run check`)
+- [ ] Validation command and result documented (`npm run validate`)
 - [ ] Changelog reviewed and updated if needed
 - [ ] README/CONTRIBUTING/agent docs reviewed for drift
 - [ ] Package metadata and scripts reviewed
