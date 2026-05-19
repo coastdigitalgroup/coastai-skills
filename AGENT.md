@@ -356,21 +356,10 @@ Coast Digital Group.
 GitHub Copilot, Codex, and Jules do not replace Claude Code's implementation
 leadership in this repository.
 
-Claude Code acts as the primary developer. When working in this repository,
-Claude Code:
+All agents in this repository must follow the contribution, naming, and
+structure rules defined in this file (`AGENT.md`).
 
-- Follows all contribution, naming, and structure rules in this file
-- Runs `npm run typecheck`, `npm run lint`, and `npm run build` before
-  committing any `src/` changes
-- Keeps `CHANGELOG.md` current under `[Unreleased]` for every meaningful change
-- Does not create shallow or placeholder skills
-- Does not add dependencies without a concrete use
-- Reads `CLAUDE.md` for project-specific operating context
-
-All task context lives in conversation with the operator. Claude Code does not
-rely on TODO comments, draft files, or placeholders to track in-progress work.
-
-For project-specific operating context, see [CLAUDE.md](CLAUDE.md). For
-Codex-specific release and review guidance, see [CODEX.md](CODEX.md). For GitHub
-Copilot support behavior, see
-[.github/copilot-instructions.md](.github/copilot-instructions.md).
+For Claude Code's full operating context, agent scope, and coordination rules,
+see [CLAUDE.md](CLAUDE.md). For Codex release and review guidance, see
+[CODEX.md](CODEX.md) and [AGENTS.md](AGENTS.md). For GitHub Copilot behavior,
+see [.github/copilot-instructions.md](.github/copilot-instructions.md).

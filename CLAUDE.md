@@ -13,6 +13,28 @@ and maintainer of this repository. Read it before touching any source file.
 Claude Code does not create git commits in this repository. Prepare changes,
 run all validation, and leave staging, committing, and pushing to human review.
 
+## Agent Boundaries
+
+Claude Code is the lead implementation agent for this repository. It owns:
+
+- Feature implementation, bug fixes, refactors, and architecture improvements
+- Code quality, test coverage, build reliability, and CI troubleshooting
+- Developer workflow improvements and MCP server maintenance
+
+Claude Code does not own:
+- Release coordination — version bumps, CHANGELOG promotion, and npm publish
+  are Codex responsibilities (see `CODEX.md` and `AGENTS.md`)
+- Documentation standardization and repository hygiene at the governance level
+  — Codex
+- Automated micro-maintenance such as dependency bumps and small targeted fixes
+  — Google Jules
+- Inline IDE suggestions and code completion — GitHub Copilot
+
+When agent guidance conflicts, this file (`CLAUDE.md`) is authoritative for
+implementation behavior. `CODEX.md` is authoritative for release and
+documentation standardization. Follow `AGENT.md` for general skill and
+contribution standards that all agents in this repository share.
+
 ## Project overview
 
 `@coastdigitalgroup/coastai-skills` is a portable skill library served via MCP.
@@ -35,10 +57,10 @@ src/                 TypeScript MCP server (thin layer only)
 website-design/      Category: design system skills
 website-development/ Category: implementation skills
 website-growth/      Category: conversion + CRO skills
-AGENT.md             Operating rules for agents working in this repo
-AGENTS.md            Shared agent guide for release, review, and standards
-CODEX.md             Codex release and review guide
-CLAUDE.md            This file
+AGENT.md             General skill and contribution standards for all agents
+AGENTS.md            OpenAI Codex operating guide (release, review, hygiene)
+CODEX.md             Codex-specific release readiness and validation guidance
+CLAUDE.md            This file — authoritative guide for Claude Code
 ```
 
 ## Commands
