@@ -1,0 +1,95 @@
+/*
+   Viewport & Safe Area Utility Template
+   This template provides a robust way to handle mobile viewport dynamics
+   and hardware safe areas (notches/home indicators).
+*/
+
+:root {
+    /*
+       Safe Area CSS Variables
+       We provide sensible defaults (0px) and then attempt to use
+       the browser-provided environment variables.
+    */
+    --safe-area-inset-top: 0px;
+    --safe-area-inset-right: 0px;
+    --safe-area-inset-bottom: 0px;
+    --safe-area-inset-left: 0px;
+
+    @supports (padding: env(safe-area-inset-top)) {
+        --safe-area-inset-top: env(safe-area-inset-top);
+        --safe-area-inset-right: env(safe-area-inset-right);
+        --safe-area-inset-bottom: env(safe-area-inset-bottom);
+        --safe-area-inset-left: env(safe-area-inset-left);
+    }
+}
+
+/**
+ * Height Utilities
+ * Solving the 100vh problem on mobile.
+ */
+
+/* Exactly fills the visible area, resizing as toolbars move. */
+.u-h-screen-dynamic {
+    height: 100dvh;
+}
+
+/* Fills the area when toolbars are fully expanded (smallest visible area). */
+.u-h-screen-small {
+    height: 100svh;
+}
+
+/* Fills the area when toolbars are retracted (largest visible area). */
+.u-h-screen-large {
+    height: 100lvh;
+}
+
+/**
+ * Safe Area Padding Utilities
+ * Use these on containers to prevent content clipping.
+ */
+
+.u-p-safe-top {
+    padding-top: var(--safe-area-inset-top);
+}
+
+.u-p-safe-right {
+    padding-right: var(--safe-area-inset-right);
+}
+
+.u-p-safe-bottom {
+    padding-bottom: var(--safe-area-inset-bottom);
+}
+
+.u-p-safe-left {
+    padding-left: var(--safe-area-inset-left);
+}
+
+.u-p-safe-all {
+    padding-top: var(--safe-area-inset-top);
+    padding-right: var(--safe-area-inset-right);
+    padding-bottom: var(--safe-area-inset-bottom);
+    padding-left: var(--safe-area-inset-left);
+}
+
+/**
+ * Sticky/Fixed Safe Area Adjustments
+ * Use calc() to add safe area on top of existing spacing.
+ */
+
+.u-fixed-bottom-safe {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    /* Assumes a base 1rem padding plus the home indicator gap */
+    padding-bottom: calc(1rem + var(--safe-area-inset-bottom));
+}
+
+.u-fixed-top-safe {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    /* Assumes a base 1rem padding plus the notch/status bar gap */
+    padding-top: calc(1rem + var(--safe-area-inset-top));
+}
