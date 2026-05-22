@@ -1,0 +1,111 @@
+<!--
+  Generic Embed Facade Template
+  A reusable pattern for lazy-loading any iFrame-based third-party widget.
+-->
+
+<style>
+  .facade-container {
+    position: relative;
+    width: 100%;
+    /* Update with your specific aspect ratio */
+    aspect-ratio: 16 / 9;
+    background-color: #f0f0f0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ddd;
+  }
+
+  .facade-trigger {
+    width: 100%;
+    height: 100%;
+    border: none;
+    padding: 0;
+    background-color: transparent;
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1rem;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .facade-icon {
+    width: 64px;
+    height: 64px;
+    background-color: #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+  }
+
+  .facade-trigger:hover .facade-icon {
+    transform: scale(1.1);
+    transition: transform 0.2s ease-in-out;
+  }
+</style>
+
+<div class="facade-container" id="facade-parent">
+  <button
+    id="load-embed"
+    class="facade-trigger"
+    aria-label="Load Interactive Content"
+    style="background-image: url('placeholder-image.jpg');"
+  >
+    <div class="facade-icon">
+      <!-- Icon placeholder (e.g., SVG Play or Map pin) -->
+      <svg width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+        <path d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z"/>
+      </svg>
+    </div>
+    <span>Click to load interactive content</span>
+  </button>
+</div>
+
+<script>
+  (function() {
+    const trigger = document.getElementById('load-embed');
+    const parent = document.getElementById('facade-parent');
+
+    // Configurable embed settings
+    const embedConfig = {
+      src: 'https://example.com/embed-url',
+      title: 'Interactive Content',
+      width: '100%',
+      height: '100%'
+    };
+
+    trigger.addEventListener('click', function() {
+      const iframe = document.createElement('iframe');
+
+      iframe.src = embedConfig.src;
+      iframe.title = embedConfig.title;
+      iframe.width = embedConfig.width;
+      iframe.height = embedConfig.height;
+      iframe.frameBorder = "0";
+      iframe.allow = "autoplay; encrypted-media; picture-in-picture";
+      iframe.allowFullscreen = true;
+
+      // Maintain aspect ratio during swap
+      iframe.style.position = 'absolute';
+      iframe.style.top = '0';
+      iframe.style.left = '0';
+
+      // Clear the container and append iframe
+      parent.innerHTML = '';
+      parent.appendChild(iframe);
+
+      // Optional: Log performance gain
+      console.log('Third-party embed loaded on demand.');
+    });
+  })();
+</script>
