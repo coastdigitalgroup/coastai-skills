@@ -1,0 +1,107 @@
+/**
+ * Print Style Optimization Boilerplate
+ *
+ * Use this stylesheet within a @media print block or as a separate
+ * <link media="print"> stylesheet to provide a clean printing experience.
+ */
+
+@media print {
+  /* 1. Reset and Ink Saving */
+  *,
+  *::before,
+  *::after {
+    background: transparent !important;
+    color: #000 !important; /* Black text for best contrast */
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  body {
+    background: #fff !important;
+    margin: 0;
+    padding: 0;
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+
+  /* 2. Hide Non-Essential UI */
+  header,
+  footer,
+  nav,
+  aside,
+  .sidebar,
+  .no-print,
+  .ads,
+  .social-media,
+  .cookie-banner,
+  .popup,
+  .modal,
+  button,
+  .btn {
+    display: none !important;
+  }
+
+  /* 3. Typography and Spacing */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid; /* Legacy support */
+    break-after: avoid;
+  }
+
+  p, h2, h3 {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* 4. Flatten Layouts */
+  .container,
+  .wrapper,
+  main {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    float: none !important;
+    display: block !important;
+  }
+
+  /* 5. Images and Tables */
+  img {
+    max-width: 100% !important;
+    break-inside: avoid;
+  }
+
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    break-inside: auto;
+  }
+
+  tr {
+    break-inside: avoid;
+    break-after: auto;
+  }
+
+  thead {
+    display: table-header-group; /* Repeats header on every page */
+  }
+
+  /* 6. Link Decoration */
+  a[href]:after {
+    content: " (" attr(href) ")";
+  }
+
+  abbr[title]:after {
+    content: " (" attr(title) ")";
+  }
+
+  /* Don't show links that are fragments or javascript */
+  a[href^="#"]:after,
+  a[href^="javascript:"]:after {
+    content: "";
+  }
+
+  /* 7. Page Setup */
+  @page {
+    margin: 1cm;
+  }
+}
