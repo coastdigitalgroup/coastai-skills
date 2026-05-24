@@ -1,0 +1,43 @@
+/* 1. Header Offset - Prevents content from being hidden under sticky headers */
+:target {
+  scroll-margin-top: 2rem; /* Default buffer */
+}
+
+/* If you have a specific sticky header height (e.g., 64px) */
+h1[id], h2[id], h3[id] {
+  scroll-margin-top: calc(64px + 1.5rem);
+}
+
+/* 2. Sticky ToC Container */
+.toc-container {
+  position: sticky;
+  top: 2rem;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+}
+
+/* 3. Visual State Styles */
+.toc-link {
+  display: block;
+  padding: 0.25rem 0;
+  text-decoration: none;
+  color: var(--text-muted, #666);
+  transition: color 0.2s ease;
+}
+
+.toc-link:hover,
+.toc-link:focus {
+  color: var(--primary-color, #007bff);
+}
+
+.toc-link[aria-current="location"] {
+  color: var(--primary-color, #007bff);
+  font-weight: 600;
+}
+
+/* 4. Smooth Scrolling */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
