@@ -1,0 +1,144 @@
+<!--
+  Accessible Toast Manager Template
+  A vanilla JS/CSS boilerplate for managing non-blocking notifications.
+-->
+
+<style>
+  .toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none; /* Allow clicks to pass through container */
+  }
+
+  .toast {
+    pointer-events: auto; /* Enable clicks for the toast itself */
+    min-width: 250px;
+    max-width: 400px;
+    padding: 12px 16px;
+    background: #333;
+    color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: toast-slide-in 0.3s ease-out forwards;
+  }
+
+  /* Support for reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .toast {
+      animation: toast-fade-in 0.3s ease-out forwards;
+    }
+  }
+
+  .toast-success { background: #1b5e20; }
+  .toast-error { background: #b71c1c; }
+  .toast-info { background: #01579b; }
+
+  .toast-close {
+    background: transparent;
+    border: none;
+    color: inherit;
+    font-size: 20px;
+    cursor: pointer;
+    margin-left: 12px;
+    padding: 4px;
+    line-height: 1;
+    opacity: 0.8;
+  }
+
+  .toast-close:hover,
+  .toast-close:focus {
+    opacity: 1;
+    outline: 2px solid currentColor;
+    outline-offset: -2px;
+  }
+
+  @keyframes toast-slide-in {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  @keyframes toast-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .toast.fade-out {
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+  }
+</style>
+
+<div id="toast-manager" class="toast-container" role="status" aria-live="polite">
+  <!-- Toasts will be injected here -->
+</div>
+
+<script>
+  /**
+   * Simple Accessible Toast Manager
+   */
+  const ToastManager = {
+    container: document.getElementById('toast-manager'),
+
+    /**
+     * @param {string} message - Text to display
+     * @param {string} type - 'success' | 'error' | 'info'
+     * @param {number} duration - Time in ms before auto-dismiss
+     */
+    show(message, type = 'info', duration = 5000) {
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+
+      const text = document.createElement('span');
+      text.textContent = message;
+
+      const closeBtn = document.createElement('button');
+      closeBtn.className = 'toast-close';
+      closeBtn.innerHTML = '&times;';
+      closeBtn.setAttribute('aria-label', 'Dismiss notification');
+
+      toast.appendChild(text);
+      toast.appendChild(closeBtn);
+      this.container.appendChild(toast);
+
+      let timerId;
+
+      const dismiss = () => {
+        toast.classList.add('fade-out');
+        toast.addEventListener('transitionend', () => toast.remove());
+      };
+
+      const startTimer = () => {
+        if (duration > 0) {
+          timerId = setTimeout(dismiss, duration);
+        }
+      };
+
+      const stopTimer = () => clearTimeout(timerId);
+
+      // Accessibility: Pause timer on hover/focus
+      toast.addEventListener('mouseenter', stopTimer);
+      toast.addEventListener('mouseleave', startTimer);
+      toast.addEventListener('focusin', stopTimer);
+      toast.addEventListener('focusout', startTimer);
+
+      closeBtn.onclick = () => {
+        stopTimer();
+        dismiss();
+      };
+
+      startTimer();
+    }
+  };
+
+  // Usage Examples:
+  // ToastManager.show('Data saved successfully!', 'success');
+  // ToastManager.show('Failed to connect to server.', 'error', 0); // 0 = persistent
+</script>
