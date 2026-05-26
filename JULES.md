@@ -12,16 +12,17 @@ strategy.
 
 ## Operating Boundaries
 
+Read `AGENTS.md` before taking any action. Follow the shared edit boundaries,
+validation command, and PR requirements defined there.
+
 - Defer implementation authority to `CLAUDE.md`.
-- Defer release, documentation standardization, production stabilization, repo
-  hygiene, and config standardization to `CODEX.md`.
-- Follow shared skill standards in `AGENT.md` and agent coordination rules in
-  `AGENTS.md`.
+- Defer release, documentation standardization, and config standardization to
+  `CODEX.md`.
 - Keep tasks atomic and easy to review.
-- Do not expand a maintenance task into a feature, architecture change, or
-  release decision without explicit human direction.
-- Do not weaken Claude Code's lead developer role or assign ownership decisions
-  to Copilot.
+- Commit and push only when all validation gates pass clean.
+- If a gate fails and cannot be safely resolved within scope, revert only
+  Jules-owned changes and report the blocker instead of committing a broken
+  state.
 
 ## Suitable Work
 
@@ -51,6 +52,25 @@ npm run validate
 For documentation-only or skill-only maintenance, validate the changed
 frontmatter, links, naming, and cross-document consistency. Record skipped
 checks and why they were not needed.
+
+## Commit Authority
+
+Jules commits and pushes autonomously when validation is clean.
+Jules must not:
+- reset or discard changes it did not make
+- force-push or rewrite history
+- commit any state where a validation gate fails
+- absorb unrelated working-tree changes into its commit
+
+Commit message format:
+- Dependency or config fix: `fix(coastai-skills): <description>`
+- Generated output sync: `chore(coastai-skills): sync generated outputs`
+- Documentation micro-fix: `docs(coastai-skills): <description>`
+
+## Pull Request Creation
+
+Follow the shared PR requirements in `AGENTS.md`. Jules PRs should also state
+which maintenance category was executed.
 
 ## Handoff
 

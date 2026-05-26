@@ -1,174 +1,123 @@
-# AGENTS.md
+# CoastAi Skills Agent Guide
 
-## Purpose
+This repository is maintained by Coast Digital Group and contains the
+`@coastdigitalgroup/coastai-skills` MCP package -- a portable skill library
+that serves structured guidance to AI agents for website design, development,
+and growth tasks.
 
-This file is the central AI coordination guide for this repository. Codex uses
-it as the repo-level operating guide, while Claude Code, GitHub Copilot, and
-Google Jules use it to confirm role boundaries before acting.
+## Primary AI Developer
 
-Read this file before changing source, skills, documentation, release metadata,
-or package configuration.
+**Claude Code** (`claude-sonnet-4-6`) is the designated primary AI developer
+for this repository, maintained on behalf of Bradley Potts
+(brad.potts@coastdigitalgroup.com) at Coast Digital Group. All development is
+driven through Claude Code operating from `CLAUDE.md` as the authoritative
+working guide. Human final review and commit authority rests with Bradley Potts.
+
+Claude Code does not create git commits. Changes are prepared and validated,
+then handed off for human review and commit.
 
 ## AI Operating Model
 
-| Agent          | Role                                                                                                                        | Authority                                          |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| Bradley Potts  | Human owner — final authority on commits, merges, tags, publishing, and releases                                            | —                                                  |
-| Claude Code    | Lead developer responsible for primary implementation                                                                       | `CLAUDE.md`                                        |
-| OpenAI Codex   | Backup/release-readiness agent: validates changes, prepares releases, standardizes docs, and keeps the repo production-safe | `CODEX.md` and `.codex/`                           |
-| ChatGPT        | Strategy, coordination, prompt design, and external review                                                                  | —                                                  |
-| GitHub Copilot | General development assistance                                                                                              | `COPILOT.md` and `.github/copilot-instructions.md` |
-| Google Jules   | Automated maintenance for small fixes, dependency updates, and micro-updates                                                | `JULES.md`                                         |
+| Agent | Role | Authority |
+| ----- | ---- | --------- |
+| Bradley Potts | Human owner -- final authority on commits, merges, tags, publishing, and releases | -- |
+| Claude Code | Lead developer responsible for primary implementation | `CLAUDE.md` |
+| OpenAI Codex | Documentation, releases, production stabilization, repo hygiene, and config standardization | `CODEX.md` |
+| ChatGPT | Strategy, coordination, prompt design, and external review -- support layer only, no implementation ownership | -- |
+| GitHub Copilot | General development assistance | `COPILOT.md` and `.github/copilot-instructions.md` |
+| Google Jules | Automated maintenance for small fixes, dependency updates, and micro-updates | `JULES.md` |
 
-- Bradley Potts is the final release authority. No commits, merges, tags, or npm
-  publishes are made without human approval.
-- Claude Code leads feature implementation and routine maintenance.
-- Codex keeps the repository production ready by reviewing changes, checking
-  release readiness, tightening documentation, standardizing config, and making
-  focused refactors when they reduce risk. Codex prepares and validates
-  releases; it does not execute them.
-- ChatGPT provides strategic coordination, prompt design input, and external
-  review. It does not own implementation, release decisions, or production
-  control.
-- GitHub Copilot provides support inside the IDE through completions, small
-  suggestions, refactors, tests, and API usage hints.
-- Google Jules handles automated micro-maintenance only; it does not take on
-  broad feature work or architecture changes.
-- GitHub Copilot and Jules do not own architecture direction, implementation
-  leadership, release coordination, production stabilization strategy, or
-  repository governance.
-- Codex uses `CODEX.md` for role-specific operating guidance and `.codex/` for
-  review and release-readiness working templates.
-- Do not overwrite Claude or human work. Inspect the current diff before edits
-  and work with any existing changes.
-- Prefer small, reviewable changes. This repository is mostly Markdown, but the
-  Markdown is product surface area and should be treated as production content.
+Claude Code keeps implementation leadership. Codex keeps release and
+stabilization work production-ready. ChatGPT provides strategy and coordination
+only. Copilot assists without owning decisions. Jules handles bounded automated
+maintenance and must not take on large feature or architecture work.
 
-## Source Of Truth
+**Bradley Potts** holds final authority for all commits, merges, tags,
+publishing, and releases. No AI agent holds commit authority except Jules, which
+may commit bounded automated maintenance when all validation gates pass.
 
-- `AGENT.md` defines portable skill and contribution standards for every agent.
-- `CLAUDE.md` is authoritative for implementation behavior and development
-  workflow.
-- `CODEX.md` is authoritative for release preparation, validation, documentation
-  standardization, production stabilization, repository hygiene, changelog
-  support, and config cleanup. Final release execution requires Bradley Potts.
-- `COPILOT.md` and `.github/copilot-instructions.md` define Copilot's support
-  behavior.
-- `JULES.md` defines Jules' automated maintenance boundaries.
-- `RELEASE.md` is the release checklist.
-- `.codex/` contains Codex working templates for review and release handoff.
+## Shared Edit Boundaries
 
-## File Boundaries
+These boundaries apply to every agent without exception.
 
-- Source of truth:
-  - Skill behavior and execution guidance in `/<category>/<skill-name>/SKILL.md`
-  - Discovery and traversal behavior in `src/skills.ts`
-  - Public package metadata and version intent in `package.json`
-- Generated:
-  - `dist/` build output generated from `src/` via TypeScript build
-- Protected:
-  - Keep `src/` as thin MCP transport/discovery code, not feature-heavy app
-    logic
-  - Keep skill execution value in skill folders rather than moving it into
-    server code
-- Unsafe to edit directly:
-  - Hand-editing generated `dist/` files for behavior changes
-  - Changing release outcome without updating `CHANGELOG.md` and release docs
+| Path | Status | Notes |
+|---|---|---|
+| `/<category>/<skill-name>/SKILL.md` | **May edit** | Source of execution value; all skill content lives here |
+| `src/skills.ts` | **May edit** | Single owner of skill discovery and category traversal; do not duplicate this logic |
+| `src/index.ts`, `src/server.ts`, `src/install.ts` | **May edit** | MCP transport layer; keep thin |
+| `package.json` | **May edit** | Public metadata and version; bump only here for version changes |
+| `README.md`, `CONTRIBUTING.md`, `CHANGELOG.md`, other docs | **May edit** | Keep aligned with actual package behavior |
+| `scripts/` | **May edit** | Skill validation and build tooling |
+| `dist/` | **Never edit directly** | Always regenerated by `npm run build`; edits are immediately overwritten |
 
-## Project Contract
+Full validation command: `npm run validate`
 
-`@coastdigitalgroup/coastai-skills` is an MCP-served skill library. The
-TypeScript code in `src/` is a thin discovery and transport layer. The real
-execution value lives in portable skill folders:
+Detailed implementation procedure lives in `CLAUDE.md`. Portable skill and
+contribution standards live in `AGENT.md`. Human contribution workflow lives in
+`CONTRIBUTING.md`. Strategic direction lives in `ROADMAP.md`.
 
-```text
-/<category>/<skill-name>/SKILL.md
-```
+## Agent-Specific Guides
 
-Do not turn this into an app framework or platform-specific prompt collection.
-Every skill should remain portable across Codex, Claude Code, Cursor, Windsurf,
-Zed, Continue, and other agent runtimes.
+- `CLAUDE.md` -- primary development authority and implementation workflow.
+- `CODEX.md` -- documentation, release, stabilization, and repo hygiene workflow.
+- `JULES.md` -- bounded automated maintenance workflow.
+- `COPILOT.md` and `.github/copilot-instructions.md` -- support-assistant workflow.
 
-## Codex Responsibilities
+## Pull Request Creation
 
-### Release Readiness
+Every agent that opens a PR must populate every section of the repo's PR
+template (`.github/pull_request_template.md`):
 
-- Keep `CHANGELOG.md` current under `[Unreleased]` for meaningful changes.
-- Check version-sensitive edits in `package.json`, `README.md`, `src/server.ts`,
-  and generated package contents together.
-- Confirm source changes pass `npm run validate`.
-- For skill-only or documentation-only changes, run targeted validation and
-  explain why a TypeScript build was not necessary.
+- **Linked issue** -- issue number (`#N`) or `N/A`.
+- **Summary of changes** -- one or two bullets describing what changed and why.
+- **Type of Change** -- check every box that applies.
+- **Validation** -- the exact command run and its result; explain skipped checks.
+- **Checklist** -- each completed item checked; blocked items left unchecked
+  with a brief inline note.
+- **Codex Review Needed** -- mark `Yes` if the change affects release metadata,
+  documentation consistency, or package behavior.
 
-### Review Guardrails
+Never submit a PR with an empty body or only the template headings left unfilled.
 
-- Look first for behavioral regressions, broken discovery, invalid frontmatter,
-  stale docs, missing changelog entries, and shallow or overlapping skills.
-- Treat generated `dist/` output carefully. Update it only when preparing a
-  package-ready release that requires built artifacts.
-- Do not add dependencies unless the repository clearly needs them.
-- Preserve the rule that `src/skills.ts` owns skill discovery and category
-  traversal.
+## Mission
 
-### Documentation Standardization
+Keep skills portable, discoverable, and execution-ready.
 
-- Keep root docs consistent: `README.md`, `CONTRIBUTING.md`, `AGENT.md`,
-  `AGENTS.md`, `CLAUDE.md`, `CODEX.md`, `COPILOT.md`, `JULES.md`, `RELEASE.md`,
-  and `CHANGELOG.md` should not contradict each other.
-- Use clear, procedural language written for agents and human maintainers.
-- Keep skill descriptions trigger-focused because agents use them for search.
-- Avoid placeholder sections, TODO-heavy drafts, and generic filler.
+This package delivers reusable, structured guidance for website design,
+development, and growth tasks to AI agents through three MCP tools:
+`search_skills`, `list_skills`, and `get_skill`. All execution value lives in
+portable skill files -- the TypeScript in `src/` is a thin discovery and
+transport layer.
 
-### Refactoring
+## Core Rules
 
-- Refactor only when it reduces concrete maintenance risk, removes real
-  duplication, clarifies ownership, or aligns code with an existing pattern.
-- Keep TypeScript changes narrow. This server should stay a thin MCP wrapper.
-- Keep Markdown changes scoped. Do not rewrite skills wholesale when a smaller
-  correction will solve the problem.
+1. Treat `/<category>/<skill-name>/SKILL.md` as the source of execution truth.
+2. Keep `src/` as a thin MCP discovery and transport layer only.
+3. Keep `src/skills.ts` as the single owner of skill discovery and category
+   traversal.
+4. Do not hand-edit generated `dist/` files for behavior changes; update source
+   and rebuild instead.
+5. Do not move execution logic out of skill files into server code.
+6. Keep skills portable across agent runtimes: Codex, Claude Code, Cursor,
+   Windsurf, Zed, Continue, and others.
+7. Do not turn this package into an app framework or platform-specific prompt
+   collection.
+8. Update `CHANGELOG.md` under `[Unreleased]` for every meaningful change.
+9. Do not overwrite Claude Code or human work; inspect the diff before editing.
+10. Prefer small, reviewable changes; Markdown skills are product surface area.
 
-## Validation Matrix
+## Working Boundaries
 
-Use this matrix to choose checks before handing work back.
-
-| Change type                                              | Minimum validation                                                                                               |
-| -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `src/**`, `package.json`, `tsconfig.json`, ESLint config | `npm run validate`                                                                                                  |
-| Skill `SKILL.md`                                         | Check frontmatter, structure, trigger clarity, and portability                                                   |
-| Skill support files                                      | Confirm folder names are standard and links/references are accurate                                              |
-| Root documentation                                       | Check consistency with `README.md`, `AGENT.md`, `CLAUDE.md`, `CODEX.md`, `COPILOT.md`, `JULES.md`, and this file |
-| Release metadata                                         | Check `CHANGELOG.md`, package version intent, and release checklist                                              |
-
-## Skill Quality Checklist
-
-Before approving or releasing skill changes, confirm:
-
-- `SKILL.md` has valid YAML frontmatter with `name` and `description`.
-- The folder name and frontmatter `name` match.
-- The description is one or two sentences written as a search trigger.
-- The body has purpose, use cases, non-goals, inputs, outputs, workflow,
-  decision rules, constraints, common failure patterns, and validation criteria.
-- Support folders use only standard names: `examples/`, `templates/`,
-  `references/`, `assets/`, or `scripts/`.
-- The skill is portable and does not depend on this repository unless that
-  dependency is clearly isolated.
-
-## Required Local Context
-
-When starting substantive work, read the relevant files instead of relying on
-memory:
-
-- `CLAUDE.md` for the primary-agent contract.
-- `CODEX.md` for Codex-specific release, review, and validation guidance.
-- `AGENT.md` for general repository skill standards.
-- `README.md` for public usage promises.
-- `CHANGELOG.md` for release history and pending changes.
-- The touched skill or source files.
-
-## Handoff Standard
-
-When handing work back, summarize:
-
-- What changed.
-- What validation ran.
-- Any release risk, skipped checks, or follow-up needed before publication.
+- Skill execution guidance belongs in skill files.
+- MCP discovery and transport belong in `src/`.
+- Public package metadata and version belong in `package.json`.
+- Consumer-facing documentation belongs in `README.md`.
+- Human contributor workflow belongs in `CONTRIBUTING.md`.
+- Strategic direction and rationale belong in `ROADMAP.md`.
+- Phased execution planning belongs in `TODO.md`.
+- This package does not own application runtime logic, framework scaffolding,
+  product architecture, or dynamic runtime orchestration beyond skill lookup.
+- This package does not own downstream UI structure, composition, or
+  framework-specific adapter behavior.
+- `example/` or illustrative fixtures exist to document usage; they are not
+  sources of truth and do not confer ownership of downstream concerns.

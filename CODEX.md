@@ -18,27 +18,27 @@ on large feature work.
 
 Codex is not the primary feature-building agent unless explicitly assigned.
 
+## Entry Point
+
+At the start of any Codex session:
+
+1. Read `AGENTS.md` for shared repository boundaries, edit limits, and PR
+   requirements.
+2. Read `CLAUDE.md` for development authority and project rules.
+3. Read this file for Codex-specific procedures.
+4. Check `CHANGELOG.md [Unreleased]` for pending changes requiring release
+   attention.
+
 ## Operating Principles
 
 1. Defer to `CLAUDE.md` for implementation leadership.
-2. Protect the portable skill contract before optimizing repository tooling.
-3. Treat each `/<category>/<skill-name>/SKILL.md` folder as reusable product
+2. Follow the shared edit boundaries, validation command, and PR requirements
+   in `AGENTS.md`.
+3. Protect the portable skill contract before optimizing repository tooling.
+4. Treat each `/<category>/<skill-name>/SKILL.md` folder as reusable product
    surface, not disposable prompt text.
-4. Keep `src/` a thin MCP discovery and transport layer.
-5. Keep `src/skills.ts` as the source of truth for skill discovery and category
-   traversal.
-6. Do not hand-edit generated `dist/` output unless preparing a package-ready
-   release that intentionally includes built artifacts.
-7. Do not create commits, tags, releases, or npm publishes unless explicitly
-   asked.
-8. Do not overwrite Claude Code or human work; inspect status and diffs before
-   editing.
-9. Do not weaken Claude Code's lead developer role, assign release ownership to
-   Copilot, or expand Jules beyond small automated maintenance.
-10. Make the smallest safe improvement that leaves the repository clearer,
-    easier to validate, or more release-ready.
-11. Prevent scope creep. Do not broaden the skill library into an app framework
-    or platform-specific prompt collection.
+5. Make the smallest safe improvement that leaves the repository clearer,
+   easier to validate, or more release-ready.
 
 ## Primary Responsibilities
 
@@ -144,25 +144,22 @@ Use this checklist before a release handoff:
 
 ## Documentation Standardization
 
-Keep these source-of-truth boundaries clear:
+Source-of-truth assignments live in `AGENTS.md`. When documentation drifts,
+audit in this order:
 
-- `CLAUDE.md` is the primary Claude Code implementation guide.
-- `AGENT.md` is the general repository skill standard.
-- `AGENTS.md` is the shared agent operating guide.
-- `CODEX.md` is Codex-specific release, review, and validation guidance.
-- `COPILOT.md` is Copilot-specific support guidance.
-- `JULES.md` is Jules-specific automated maintenance guidance.
-- `RELEASE.md` is the package publication checklist.
-- `.codex/` contains Codex working templates for change watch and release
-  readiness reviews.
-- `README.md` documents public usage and consumer promises.
-- `CHANGELOG.md` records release-facing changes.
+1. `AGENTS.md` -- shared boundaries; agent files must not contradict it.
+2. `README.md` -- public usage promises must match actual MCP tool behavior.
+3. `AGENT.md` -- portable skill quality standard for all contributors.
+4. `CLAUDE.md`, `CODEX.md`, `JULES.md`, `COPILOT.md` -- must stay internally
+   consistent with each other and with `AGENTS.md`.
+5. `CHANGELOG.md` -- must have `[Unreleased]` entries for every meaningful
+   pending change.
 
 Documentation updates should clarify skill-library behavior or maintenance
 workflow without turning this repository into an app framework or
 platform-specific prompt collection.
 
-Root documentation should generally keep this flow:
+`README.md` should generally follow this flow:
 
 1. Package name and purpose.
 2. Install and supported editors.
@@ -191,6 +188,18 @@ Codex keeps configuration simple, current, and non-duplicative.
 - Keep generated files clearly separated from source files.
 - Do not add dependencies or new tooling unless the repository clearly needs
   them and validation proves the change.
+
+## Validation Matrix
+
+Use this matrix to choose checks before handing work back.
+
+| Change type | Minimum validation |
+| ----------- | ------------------ |
+| `src/**`, `package.json`, `tsconfig.json`, ESLint config | `npm run validate` |
+| Skill `SKILL.md` | Check frontmatter, structure, trigger clarity, and portability |
+| Skill support files | Confirm folder names are standard and links/references are accurate |
+| Root documentation | Check consistency with `README.md`, `AGENT.md`, `AGENTS.md`, and agent files |
+| Release metadata | Check `CHANGELOG.md`, package version intent, and release checklist |
 
 ## Git Boundaries
 

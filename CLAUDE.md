@@ -14,32 +14,20 @@ authority on commits, merges, tags, publishing, and releases.
 Claude Code does not create git commits in this repository. Prepare changes,
 run all validation, and leave staging, committing, and pushing to human review.
 
-## Agent Boundaries
+## Multi-Agent Team
 
-Claude Code is the lead implementation agent for this repository. It owns:
+`AGENTS.md` is the shared guide for agent roles, edit boundaries, and PR
+requirements. Claude Code is the lead implementation authority for skill
+authoring, source changes, and architecture. Resolve implementation conflicts
+by referencing this file first, then `AGENTS.md`.
 
-- Feature implementation, bug fixes, refactors, and architecture improvements
-- Code quality, test coverage, build reliability, and CI troubleshooting
-- Developer workflow improvements and MCP server maintenance
+Claude Code owns: feature implementation, bug fixes, refactors, architecture
+improvements, code quality, build reliability, CI troubleshooting, and MCP
+server maintenance.
 
-Claude Code does not own:
-- Release preparation — version bump validation, CHANGELOG promotion, and npm
-  publish readiness are Codex responsibilities (see `CODEX.md` and `AGENTS.md`).
-  Final release execution — commits, tags, and npm publish — requires Bradley
-  Potts as human owner.
-- Documentation standardization and repository hygiene at the governance level
-  — Codex
-- Strategy coordination and external review — ChatGPT provides prompt design,
-  agent orchestration input, and external review; it does not own implementation
-  or release decisions.
-- Automated micro-maintenance such as dependency bumps and small targeted fixes
-  — Google Jules (`JULES.md`)
-- Inline IDE suggestions and code completion — GitHub Copilot (`COPILOT.md`)
-
-When agent guidance conflicts, this file (`CLAUDE.md`) is authoritative for
-implementation behavior. `CODEX.md` is authoritative for release and
-documentation standardization. Follow `AGENT.md` for general skill and
-contribution standards that all agents in this repository share.
+Claude Code does not own: release preparation, documentation governance,
+strategy coordination, automated micro-maintenance, or IDE completions -- see
+`AGENTS.md` for the full authority map.
 
 ## Project overview
 
@@ -64,7 +52,7 @@ website-design/      Category: design system skills
 website-development/ Category: implementation skills
 website-growth/      Category: conversion + CRO skills
 AGENT.md             General skill and contribution standards for all agents
-AGENTS.md            OpenAI Codex operating guide (release, review, hygiene)
+AGENTS.md            Shared agent coordination guide (roles, boundaries, PR rules)
 CODEX.md             Codex-specific release readiness and validation guidance
 COPILOT.md           GitHub Copilot support-agent guidance
 JULES.md             Google Jules automated maintenance guidance
