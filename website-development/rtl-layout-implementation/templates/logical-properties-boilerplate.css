@@ -1,0 +1,76 @@
+/*
+  CSS Logical Properties Boilerplate
+  Use these replacements to ensure your components are bi-directional by default.
+*/
+
+:root {
+  /* Layout Containers */
+  --container-padding: 1rem;
+}
+
+.component {
+  /* MARGINS */
+  /* Replace: margin-left / margin-right */
+  margin-inline-start: 1rem;
+  margin-inline-end: 1rem;
+
+  /* Replace: margin-top / margin-bottom */
+  margin-block-start: 1rem;
+  margin-block-end: 1rem;
+
+  /* PADDING */
+  /* Replace: padding-left / padding-right */
+  padding-inline-start: 1rem;
+  padding-inline-end: 1rem;
+
+  /* Replace: padding-top / padding-bottom */
+  padding-block-start: 1rem;
+  padding-block-end: 1rem;
+
+  /* BORDERS */
+  /* Replace: border-left / border-right */
+  border-inline-start: 1px solid var(--border-color);
+  border-inline-end: 1px solid var(--border-color);
+
+  /* BORDER RADIUS */
+  /* Top-Left (LTR) -> Start-Start */
+  border-start-start-radius: 8px;
+  /* Top-Right (LTR) -> Start-End */
+  border-start-end-radius: 8px;
+  /* Bottom-Left (LTR) -> End-Start */
+  border-end-start-radius: 8px;
+  /* Bottom-Right (LTR) -> End-End */
+  border-end-end-radius: 8px;
+
+  /* POSITIONING */
+  position: absolute;
+  /* Replace: left: 0 */
+  inset-inline-start: 0;
+  /* Replace: right: 0 */
+  inset-inline-end: 0;
+  /* Replace: top: 0 */
+  inset-block-start: 0;
+  /* Replace: bottom: 0 */
+  inset-block-end: 0;
+
+  /* TEXT ALIGNMENT */
+  /* Replace: text-align: left / right */
+  text-align: start;
+}
+
+/*
+  BIDIRECTIONAL ASSETS
+  Apply this to icons that should mirror in RTL modes.
+*/
+[dir="rtl"] .mirror-rtl {
+  transform: scaleX(-1);
+}
+
+/*
+  SPECIFIC LANGUAGE OVERRIDES
+  Use for typography adjustments (e.g., Arabic often needs more line-height).
+*/
+[lang="ar"] {
+  line-height: 1.6;
+  font-family: "IBM Plex Sans Arabic", sans-serif;
+}
