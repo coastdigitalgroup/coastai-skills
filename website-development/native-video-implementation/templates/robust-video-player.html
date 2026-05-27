@@ -1,0 +1,63 @@
+<!--
+  Robust Native Video Player Template
+
+  Use this template for primary video content (e.g., product demos).
+  It includes support for multiple formats, captions, and responsive layout.
+-->
+
+<div class="video-player-container">
+  <video
+    controls
+    preload="metadata"
+    poster="path/to/poster-image.jpg"
+    class="native-video-player"
+    width="1920"
+    height="1080"
+  >
+    <!-- 1. Modern WebM for high efficiency -->
+    <source src="path/to/video.webm" type="video/webm" />
+
+    <!-- 2. MP4 as the standard fallback -->
+    <source src="path/to/video.mp4" type="video/mp4" />
+
+    <!-- 3. Track for Accessibility (Captions/Subtitles) -->
+    <track
+      kind="captions"
+      label="English"
+      src="path/to/captions-en.vtt"
+      srclang="en"
+      default
+    />
+
+    <!-- 4. Fallback for very old browsers -->
+    <p>
+      Your browser doesn't support HTML5 video. Here is a
+      <a href="path/to/video.mp4">link to the video</a> instead.
+    </p>
+  </video>
+</div>
+
+<style>
+  .video-player-container {
+    width: 100%;
+    max-width: 800px; /* Adjust based on layout */
+    margin: 0 auto;
+    /* Prevent layout shift */
+    aspect-ratio: 16 / 9;
+    background-color: #000;
+  }
+
+  .native-video-player {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  /* Custom styling for the captions track if supported */
+  video::cue {
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    font-size: 1.2rem;
+  }
+</style>
