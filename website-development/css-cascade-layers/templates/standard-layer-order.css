@@ -1,0 +1,52 @@
+/*
+  Standard Layer Manifesto
+
+  Place this at the very top of your main CSS entry point.
+  Layers are listed from LOWEST priority to HIGHEST priority.
+*/
+
+@layer
+  reset,      /* Browser resets and normalize.css */
+  base,       /* Global styles (html, body, typography, links) */
+  library,    /* Third-party frameworks and components */
+  components, /* Your custom design system components */
+  utilities;  /* Atomic helper classes (e.g., .mt-4, .hidden) */
+
+/*
+  Usage examples:
+*/
+
+@layer reset {
+  /* Box sizing rules */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+}
+
+@layer base {
+  body {
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Importing a library into its layer */
+/* @import "some-ui-kit.css" layer(library); */
+
+@layer components {
+  /* Component styles go here */
+}
+
+@layer utilities {
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
