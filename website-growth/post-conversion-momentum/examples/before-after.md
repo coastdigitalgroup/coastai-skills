@@ -1,48 +1,67 @@
-# Example: Post-Conversion Momentum in SaaS Onboarding
+# Post-Conversion Momentum: Before and After
 
-This example shows how a SaaS company ("TaskFlow") optimized their registration confirmation page to increase immediate user activation and reduce day-zero churn.
+This example demonstrates the optimization of a SaaS "Thank You" page following
+a successful trial signup.
 
-## Scenario
+## Scenario: CloudTask B2B SaaS Trial Signup
 
-**Product:** TaskFlow (Project Management Tool)
-**Action:** User just signed up for a Free Trial.
-**Goal:** Get the user to create their first project immediately (Activation).
+**Product:** A project management tool for creative agencies.
+**Primary Conversion:** Free 14-day trial signup.
+**The Problem:** 85% of users land on the "Thank You" page and immediately
+close the tab. Only 5% of users invite a teammate during their first session,
+which is the primary indicator of long-term retention (Activation).
+
+---
 
 ## Before: The "Dead End" Confirmation
 
-The original page was a standard, transactional confirmation.
+The original success page followed a standard, administrative pattern.
 
-### Characteristics
-- **Headline:** "Registration Successful"
-- **Body:** "Check your email to verify your account. You can now log in to the dashboard."
-- **CTA:** None (User is expected to go to their inbox).
-- **Visuals:** A green checkmark icon.
+### The Experience
+- **Header:** "Thank You for Signing Up!"
+- **Sub-header:** "Please check your email to verify your account and get
+  started."
+- **Visuals:** A generic green checkmark icon.
+- **Action:** A "Go to Dashboard" button that leads to a login screen (forcing
+  the user to wait for an email).
 
-### Results
-- **Bounce Rate from Thank You Page:** 85%
-- **Day-Zero Activation (First Project Created):** 22%
-- **Friction:** Forces the user to leave the site immediately to check email, breaking the "momentum" of their interest in the tool.
+### The Metrics
+- **Success Page Bounce Rate:** 85%
+- **Teammate Invites (Day 1):** 5%
+- **Avg. Time to First Project:** 14 minutes
 
 ---
 
 ## After: The "Momentum Hub"
 
-The optimized page uses the "Post-Conversion Momentum" framework to guide the user into the product.
+The page was redesigned to leverage the post-signup "trust peak" and drive
+immediate activation and referral.
 
-### Characteristics
-- **Headline:** "You're in, Alex! Let's get your first project moving."
-- **Visuals:** A progress bar showing "50% Complete" (Sign up ✅ -> **Create Project** -> Invite Team).
-- **Primary CTA:** "Create Your First Project" (Opens a simple 3-field modal).
-- **Secondary Action:** "Watch 60-second Quickstart Video" (Embedded below the CTA).
-- **Zeigarnik Effect:** Uses the progress bar to signal that the "job" of setting up TaskFlow isn't quite finished yet.
+### The Experience
+1. **Immediate Validation:** "You're in! Your CloudTask workspace is ready."
+2. **Eliminated Friction:** "We've logged you in automatically. No need to wait
+   for that email."
+3. **Primary Secondary Action (Activation):** A prominent "Invite Your Team"
+   section with a pre-filled field: "Projects are better with friends. Add your
+   first collaborator now to unlock the 'Quick Start' template."
+4. **Secondary Momentum (Discovery):** A 1-minute "Pro Tips" video embedded directly
+   below the invite box to keep the user engaged while the dashboard loads.
+5. **Clear Expectation:** "A copy of your login details has been sent to your
+   inbox for your records."
 
-### Results
-- **Bounce Rate from Thank You Page:** 30% (a 55% reduction).
-- **Day-Zero Activation:** 64% (a 190% increase).
-- **Measured Outcome:** Users who created a project immediately were 3x more likely to become paying customers after the trial ended.
+### The Metrics
+- **Success Page Bounce Rate:** 42% (50% improvement)
+- **Teammate Invites (Day 1):** 22% (4x increase)
+- **Avg. Time to First Project:** 4 minutes (71% reduction)
 
-## Why it Worked
+---
 
-1. **Reduced Interaction Cost:** Instead of making the user wait for an email, they were given an immediate, high-value action inside the current session.
-2. **Emotional Connection:** Using the user's name and celebratory language maintained the "Peak" of the conversion experience.
-3. **Information Scent:** The "Quickstart Video" provided an easy path for users who weren't yet ready to build but wanted to learn more.
+## Key Lessons Applied
+
+1. **Confirmation First:** The user immediately knew they were successful.
+2. **Removed Hurdles:** By auto-logging them in, the "Momentum Window" wasn't
+   interrupted by an inbox-trip.
+3. **Value-Led Ask:** Teammate invites were framed as a way to "unlock a
+   template," not just a growth ask.
+4. **The Zeigarnik Effect:** Using the 1-minute video gave the user a small
+   task to complete while waiting, keeping them in the CloudTask environment.

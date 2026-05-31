@@ -1,40 +1,55 @@
-# Post-Conversion Momentum Audit Template
+# Post-Conversion Momentum Audit Checklist
 
-Use this checklist to evaluate and optimize the "Thank You" or confirmation page of any conversion funnel.
+Use this checklist to evaluate any "Thank You," success, or confirmation page
+to ensure it is maximizing user engagement and driving logical next steps.
 
-## 1. The Confirmation Baseline
-- [ ] **Instant Feedback:** Does the page load immediately after the action is taken?
-- [ ] **Clear Success Signal:** Is there an unambiguous headline (e.g., "Order Confirmed," "You're Registered")?
-- [ ] **Reference Data:** Does the page show necessary info (Order #, Webinar Time, Download Link) above the fold?
-- [ ] **Email Expectation:** Does it clearly state what the user should look for in their inbox (and from what sender)?
+## 1. The Confirmation (Core Utility)
+- [ ] **Instant Feedback:** Does the page load immediately after the action?
+- [ ] **Explicit Success:** Is there a clear "Success" or "Thank You" message
+      prominently displayed?
+- [ ] **Transaction Details:** Are relevant details (Order #, Email used, Date)
+      visible for the user's records?
+- [ ] **Expectation Setting:** Does the page state what happens next? (e.g.,
+      "Your download will start in 5 seconds" or "Expect a call within 24 hours")
 
-## 2. Emotional & Visual Impact (The "Peak")
-- [ ] **Celebratory Tone:** Does the copy sound human and appreciative rather than like a database log?
-- [ ] **Visual Validation:** Are there high-quality visuals (icons, photos, animations) that reinforce the value gained?
-- [ ] **Social Proof:** Does it briefly remind the user they are in good company ("Joined by 10,000+ others")?
+## 2. Friction Removal
+- [ ] **Auto-Login/Magic Links:** If it's a signup, is the user already logged
+      in? (Avoid the "Check your email" wall if possible).
+- [ ] **Immediate Value Delivery:** Can the user access the "thing" they just
+      bought/signed up for directly from this page?
+- [ ] **Zero Redundancy:** Are we asking for any information we already have?
+      (The answer should be No).
 
-## 3. Momentum & Next Steps
-- [ ] **The "No-Bounce" Rule:** Is there at least one clear, relevant action for the user to take *other* than leaving?
-- [ ] **Secondary CTA Clarity:** Is the next step visually distinct but secondary to the confirmation info?
-- [ ] **Friction Check:** Does the next step require less than 2 minutes or just a few clicks?
-- [ ] **Zeigarnik Effect:** If part of a process, is there a progress bar or "Step 2 of 3" indicator?
+## 3. Momentum & Secondary Actions
+- [ ] **The "Power Ask":** Is there one clear, dominant secondary call to action?
+- [ ] **Logical Sequencing:** Is the secondary action a natural next step for
+      the user's journey?
+- [ ] **Incentivized Next Steps:** If asking for a favor (referral/survey), is
+      there a clear "What's in it for me?" for the user?
+- [ ] **Social Proof/Reassurance:** Do we reinforce the user's decision one
+      last time to prevent buyer's remorse?
 
-## 4. Relevance & Value
-- [ ] **Intent Alignment:** Is the next step a "logical cousin" to the action just taken?
-- [ ] **Value Communication:** Is it clear *why* the user should take the next step (e.g., "Get started faster," "Save 10% next time")?
-- [ ] **Mobile Optimization:** Can the secondary CTA be easily tapped on a mobile device without zooming?
+## 4. Visual & Content Hierarchy
+- [ ] **The "5-Second Rule":** Can a user identify their next step within 5
+      seconds of landing on the page?
+- [ ] **Contrast:** Is the secondary CTA visually distinct but subservient to
+      the primary "Success" message?
+- [ ] **Brand Consistency:** Does the page look like the rest of the site, or
+      does it feel like a generic third-party confirmation?
 
-## 5. Audit Scoring Table
+## 5. Mobile Optimization
+- [ ] **Clickable Targets:** Are all sharing buttons and CTAs easily tappable
+      on mobile devices?
+- [ ] **Input Ease:** If there's a secondary form (e.g., "Add your birthdate"),
+      is it optimized for mobile keyboards?
 
-| Element | Current State (1-5) | Priority | Recommended Action |
-| :--- | :--- | :--- | :--- |
-| **Clarity** | | | |
-| **Emotion** | | | |
-| **Next Step** | | | |
-| **Mobile UX** | | | |
+---
 
-**Total Score: /20**
-
-- **15-20:** High Momentum - Keep testing small copy variations.
-- **10-14:** Leaky Momentum - Add a clear secondary CTA.
-- **Below 10:** Dead End - Complete redesign of the post-conversion experience required.
+## Audit Scoring
+- **0-3 Checkmarks:** **Dead End.** You are losing almost 100% of your post-
+  conversion value.
+- **4-7 Checkmarks:** **Basic.** You are confirming the action but missing
+  growth opportunities.
+- **8-11 Checkmarks:** **Engaging.** You are starting to leverage momentum.
+- **12+ Checkmarks:** **Growth Engine.** You are turning every customer into
+  an active participant or advocate.
