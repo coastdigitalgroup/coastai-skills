@@ -1,59 +1,34 @@
-# Example: Badges and Tags in Context
+# Example: Status Badge vs Category Tag
 
-This example demonstrates the distinct roles of Badges (status) and Tags
-(categorization) in two common web interfaces: a SaaS Dashboard and an
-E-commerce Product Card.
+## Scenario
+A SaaS dashboard displays projects with:
+- **Project Status** (e.g., Active, At Risk, Completed)
+- **Project Category** (e.g., Finance, Marketing, Platform)
 
-## 1. SaaS Dashboard: Invoice Management Table
+## Correct Component Mapping
 
-In this scenario, we use **Badges** to communicate the current lifecycle state
-of an invoice.
+- **Status** → Badge
+- **Category** → Tag (removable when used as filters)
 
-| Invoice ID | Client          | Amount   | Status (Badge)         | Category (Tags)             |
-| :--------- | :-------------- | :------- | :--------------------- | :-------------------------- |
-| #INV-001   | Acme Corp       | $1,200   | `[ Paid ]` (Green)     | `( Monthly )` `( Software )` |
-| #INV-002   | Globex Inc      | $850     | `[ Pending ]` (Yellow) | `( Consulting )`            |
-| #INV-003   | Stark Ind       | $3,400   | `[ Overdue ]` (Red)    | `( Hardware )` `( Urgent )`  |
+## UI Pattern
 
-### Design Breakdown:
-- **Badges (Status):** Uses a **Pill** shape (fully rounded) with a solid background. The color immediately signals the "health" of the invoice.
-- **Tags (Categories):** Uses a **Rounded** shape (4px radius) with an **Outline** or **Subtle Tonal** style. They provide metadata without competing with the high-priority status badge.
+- Card header includes a status badge (filled semantic color):
+  - Active → Green badge
+  - At Risk → Amber badge
+  - Completed → Gray/neutral badge
+- Metadata row includes category tags (outlined or subtle fill):
+  - Finance
+  - Marketing
+  - Platform
 
----
+## Accessibility Notes
 
-## 2. E-commerce: Product Card
+- Include icon + text for statuses with critical meaning (e.g., warning icon for “At Risk”).
+- Ensure 4.5:1 contrast ratio for text in both badge and tag variants.
+- Tags used for filtering should have visible focus states and an accessible `Remove tag: {name}` label if dismissible.
 
-In this scenario, we use **Badges** for time-sensitive highlights and **Tags**
-for product attributes.
+## Outcome
 
-```text
-+-----------------------+
-| [ NEW ] (Badge)       | <--- Overlaid on image (Blue)
-|                       |
-| [ IMAGE OF SHOE ]     |
-|                       |
-+-----------------------+
-| Trail Runner X1       |
-| $129.00               |
-|                       |
-| ( Waterproof ) ( 40% )| <--- Attribute Tags (Subtle Gray)
-| ( Eco-Friendly )      |
-+-----------------------+
-```
-
-### Design Breakdown:
-- **Promotion Badge:** Positioned in the top-left corner of the image. It uses a high-contrast color (Blue/White) to grab attention immediately.
-- **Attribute Tags:** Placed below the pricing. They are clickable, allowing the user to filter the catalog by that specific attribute (e.g., clicking "Waterproof" takes the user to all waterproof shoes).
-- **Hierarchy:** The Badge is the most prominent, signaling "Why you should look at this NOW." The Tags are secondary, signaling "What this product IS."
-
----
-
-## Key Differences Applied
-
-| Feature         | Badge (Status)                       | Tag (Category)                    |
-| :-------------- | :----------------------------------- | :-------------------------------- |
-| **Logic**       | Mutually Exclusive (One status)      | Additive (Many categories)        |
-| **Shape**       | Pill (Full round)                    | Rounded Rect (Small radius)       |
-| **Style**       | Solid or High-Contrast               | Subtle, Outline, or Tonal         |
-| **Interaction** | Usually Static                       | Often Clickable/Dismissible       |
-| **Placement**   | Near the title or in a specific col  | Bottom of content or in a cluster |
+This separation prevents semantic confusion:
+- Users scan status quickly via strong badges.
+- Users navigate categories with interactive, lower-emphasis tags.

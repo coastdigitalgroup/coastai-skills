@@ -1,55 +1,43 @@
-# Color and Accessibility Reference
+# Color and Accessibility Logic
 
-Using color in Badges and Tags is powerful but must be handled with strict
-adherence to accessibility (WCAG) standards. Never use color alone to convey
-meaning.
+## Why Color Alone Is Not Enough
 
-## 1. Semantic Color Mapping
+Color communicates intent quickly, but users with color vision deficiencies may miss distinctions. Badges and tags should combine:
+- Text labels
+- Optional iconography
+- Shape/border differences where useful
 
-| Category    | Background (Light) | Text Color         | Intent / Meaning                      |
-| :---------- | :----------------- | :----------------- | :------------------------------------ |
-| **Success** | `#DCFCE7` (Green)  | `#166534` (D-Green)| Completed, Paid, Verified, Active.    |
-| **Warning** | `#FEF9C3` (Yellow) | `#854D0E` (Brown)  | Pending, Expiring, Low Stock.         |
-| **Danger**  | `#FEE2E2` (Red)    | `#991B1B` (D-Red)  | Overdue, Error, Cancelled, Deleted.   |
-| **Info**    | `#DBEAFE` (Blue)   | `#1E40AF` (D-Blue) | New, Featured, Processing.            |
-| **Neutral** | `#F3F4F6` (Gray)   | `#374151` (D-Gray) | Category, Archived, Metadata.         |
+## WCAG Contrast Targets
 
-*Note: Hex codes based on Tailwind CSS 100/800 scale for guaranteed 4.5:1 contrast.*
+- Normal text: **4.5:1** minimum
+- Large text (18pt+ or 14pt bold+): **3:1** minimum
+- Non-text UI indicators/focus outlines: **3:1** against adjacent colors
 
----
+## Semantic Color Mapping Guidance
 
-## 2. Accessibility Checkpoints
+| Meaning | Recommended Hue | Notes |
+|---------|------------------|-------|
+| Success / Positive | Green | Pair with check icon when critical |
+| Warning / Attention | Amber/Yellow | Ensure sufficient text contrast |
+| Error / Destructive | Red | Avoid red-only distinction |
+| Info / Neutral | Blue or Gray | Prefer blue for info, gray for neutral states |
 
-### The "Color Plus" Rule
-Color should only reinforce what is already present in text or iconography.
-- **Fail:** Using a green circle and a red circle to indicate "Pass" vs "Fail" without text.
-- **Pass:** Using the word "Pass" in a green badge and "Fail" in a red badge.
+## Badge vs Tag Emphasis Strategy
 
-### Contrast Requirements (WCAG 2.1 AA)
-1. **Text Contrast:** The text inside a badge/tag must have a **4.5:1** ratio against the component's background.
-2. **UI Component Contrast:** The border or background of the badge/tag (if it provides critical info) should ideally have a **3:1** ratio against the page background.
-3. **Focus States:** For interactive tags, the focus ring must have a **3:1** contrast ratio against the background.
+- **Badge (status):** Higher emphasis; stronger fill and contrast.
+- **Tag (category/filter):** Lower emphasis; lighter tones or outlines.
+- Preserve hierarchy so status signals remain visually dominant.
 
----
+## Focus and Interaction Accessibility
 
-## 3. High-Contrast (Dark) Mode Patterns
+- Interactive tags must have:
+  - Keyboard focus ring with 3:1 contrast.
+  - Clear hover and pressed states.
+  - Screen-reader labels for remove actions (e.g., `Remove tag: Marketing`).
 
-When implementing Dark Mode, invert the logic:
-- **Style:** Use "Tonal" backgrounds (low opacity of the color) with high-vibrancy text.
-- **Example:**
-  - Background: `rgba(34, 197, 94, 0.2)` (Subtle Green)
-  - Text: `#4ADE80` (Bright Green)
+## Validation Steps
 
----
-
-## 4. Typography Scale for Small Components
-
-To ensure legibility at small sizes, use the following guidelines:
-
-| Size (rem) | Size (px) | Tracking (Letter Spacing) | Usage                           |
-| :--------- | :-------- | :------------------------ | :------------------------------ |
-| 0.875rem   | 14px      | Normal                    | Standard Tags                   |
-| 0.75rem    | 12px      | `+0.025em` (Wide)         | Standard Badges                 |
-| 0.625rem   | 10px      | `+0.05em` (Extra Wide)    | Micro-badges (Use sparingly!)   |
-
-*Wider letter-spacing (tracking) improves legibility for small, all-caps or semibold text.*
+1. Verify contrast ratios using automated tooling (e.g., browser DevTools contrast checker, axe DevTools, or WAVE).
+2. Simulate grayscale/color-blind views to confirm distinguishability.
+3. Test keyboard-only operation for removable/selectable tags.
+4. Confirm semantic text remains visible at all responsive sizes.
