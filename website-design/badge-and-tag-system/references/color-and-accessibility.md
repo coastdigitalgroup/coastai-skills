@@ -37,7 +37,7 @@ Color communicates intent quickly, but users with color vision deficiencies may 
 
 ## Validation Steps
 
-1. Verify contrast ratios using automated tooling (design plugin or accessibility checker).
+1. Verify contrast ratios using automated tooling (e.g., browser DevTools contrast checker, axe DevTools, or WAVE).
 2. Simulate grayscale/color-blind views to confirm distinguishability.
 3. Test keyboard-only operation for removable/selectable tags.
 4. Confirm semantic text remains visible at all responsive sizes.
