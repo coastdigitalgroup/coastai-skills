@@ -1,137 +1,137 @@
 ---
 name: post-conversion-momentum
 description:
-  Audit and optimize the "Thank You" page and post-conversion experience to
-  drive secondary actions, improve lead qualification, and maintain user
-  momentum. Trigger this skill when a site has successful primary conversions
-  but high drop-offs immediately afterward or underutilized success pages.
+  Audit and optimize the "Thank You" or success page experience to drive
+  secondary actions, maintain engagement, and leverage the post-conversion
+  "trust peak." Trigger this skill when users drop off immediately after a
+  primary conversion without taking logical next steps.
 ---
 
 # Post-Conversion Momentum
 
 ## Purpose
 
-The Post-Conversion Momentum skill provides a framework for transforming the
-"Thank You" page from a navigational dead-end into a high-value momentum
-engine. Most growth efforts stop at the point of conversion (the click or the
-submit), but this is precisely when user engagement and trust are at their
-highest. By strategically presenting secondary actions, qualification
-questions, or "Next Step" guidance, this skill maximizes the total value of
-every conversion and reduces the time-to-value for the user.
+The Post-Conversion Momentum skill provides a systematic framework for
+transforming the "Thank You" page from a dead-end into a discovery hub. When a
+user has just converted (signed up, purchased, or downloaded), their trust and
+engagement levels are at a peak. This skill focuses on capturing that momentum
+to drive secondary actions—such as referrals, social sharing, profile
+completion, or immediate product usage—thereby increasing Lifetime Value (LTV)
+and viral growth.
 
 ## Use Cases
 
-- **Lead Generation:** Moving users from a "Lead Magnet" download to a "Book a
-  Demo" or "Free Trial" action.
-- **E-commerce:** Driving newsletter signups, social follows, or "Refer a
-  Friend" actions immediately after a purchase.
-- **SaaS Signups:** Guiding users into the first step of onboarding or
-  collecting qualification data (e.g., company size, role).
-- **Webinar/Event Registration:** Encouraging users to add the event to their
-  calendar or share it with colleagues.
+- **E-commerce:** Driving repeat purchases or social sharing after a checkout.
+- **SaaS Signups:** Encouraging immediate profile setup, team invites, or
+  integration connection.
+- **Lead Generation:** Moving a user from a whitepaper download to a demo
+  request or webinar registration.
+- **Newsletter Subscriptions:** Prompting users to follow on social media or
+  whitelist the email address.
 
 ## When NOT to Use
 
-- **High-Anxiety Transactions:** On pages where the user needs immediate
-  reassurance and calm (e.g., a "Payment Failed" or "Account Compromised"
-  notice).
-- **Single-Interaction Utility Tools:** Simple one-off tools where the user has
-  zero reason to interact further (e.g., a "Privacy Policy Generator").
-- **Strict Compliance Environments:** Where showing "Marketing" offers
-  immediately after a legal/financial conversion might be regulated or seen as
-  coercive.
+- **High-Friction Primary Conversions:** If the primary conversion was
+  exhausting or difficult, avoid asking for more immediately; focus on
+  confirmation and reassurance first.
+- **Privacy-Sensitive Transactions:** In fields like healthcare or legal
+  services, social sharing or public-facing secondary actions may be
+  inappropriate.
+- **Transactional Confirmation Only:** For purely administrative changes (e.g.,
+  "Password Changed" or "Email Updated"), momentum building is often overkill.
 
 ## Inputs
 
-1. **The Primary Conversion Point:** What did the user just do? (Download,
-   Purchase, Signup).
-2. **Current Success Page:** The URL or screenshot of the existing "Thank You"
-   page.
-3. **Secondary Growth Goals:** What are the next-best actions? (Referrals, Social
-   Follows, Lead Qualification, Product Usage).
-4. **User Intent Context:** Why did they convert in the first place? What is
-   their likely emotional state (e.g., Relief, Excitement, Curiosity)?
+1. **Primary Conversion Data:** What action did the user just complete?
+2. **Desired Secondary Actions:** A prioritized list of next steps (e.g.,
+   referral, app download, survey).
+3. **User Success Path:** What is the most logical next step for the user to
+   get value from their recent conversion?
+4. **Current Post-Conversion Metrics:** Bounce rate on the "Thank You" page and
+   conversion rate for secondary actions.
 
 ## Outputs
 
-1. **Momentum Audit:** Identification of "dead-ends" and missed opportunities
-   for secondary engagement.
-2. **Success Page Wireframe/Spec:** A revised layout that includes a clear H1,
-   expectation setting, and the primary "Momentum CTA."
-3. **Qualification & Logic Plan:** Questions or triggers designed to segment the
-   user further.
-4. **Expectation Management Copy:** Messaging that clearly defines "What
-   happens next" to reduce support tickets and anxiety.
+1. **Momentum Audit:** Identification of friction points or "leaks" on the
+   existing success page.
+2. **Secondary Action Strategy:** A prioritized map of what to ask for and when.
+3. **Success Page UI Specs:** Recommendations for layout, copy, and visual
+   prompts for the optimized success page.
+4. **Tracking Plan:** Requirements for measuring the lift in secondary
+   conversions.
 
 ## Workflow
 
-### 1. Audit the "Success State"
+### 1. Identify the "Momentum Window"
 
-Perform the **Dead-End Test**:
-- Does the page only say "Thank You" and provide no further links?
-- Is there a clear path to the "next best action"?
-- Does the user know exactly what to expect in their inbox or on their screen?
+Recognize that the user is in a state of high dopamine and trust. Map the
+immediate psychological state (e.g., Relief, Excitement, or Curiosity).
 
-### 2. Define the Momentum Hierarchy
+### 2. Prioritize Secondary Actions
 
-Rank potential secondary actions by **Alignment** and **Value**:
-1. **The "Natural Next Step":** (e.g., Download complete -> Book a demo).
-2. **The "Social Expansion":** (e.g., Purchase complete -> Refer a friend).
-3. **The "Data Enrichment":** (e.g., Signup complete -> Answer 2 questions for a
-   customized experience).
+Don't ask for everything. Choose ONE primary secondary action and at most two
+tertiary ones.
 
-### 3. Implement the "Three-Block" Structure
+- **High Intent:** Move them deeper into the product (e.g., "Connect your
+  calendar").
+- **High Growth:** Leverage them for acquisition (e.g., "Invite a teammate").
+- **High Retention:** Build a community connection (e.g., "Join our Discord").
 
-- **Block 1: Confirmation & Gratitude:** Immediate H1 confirmation (e.g.,
-  "Success! Your guide is on its way").
-- **Block 2: Expectation Setting:** Explain the logistics (e.g., "Check your
-  inbox in 5 minutes. Sender: [Brand]").
-- **Block 3: The Momentum CTA:** The "While you're here..." offer (e.g., "Watch
-  this 2-minute video on how [Product] solves [Pain Point]").
+### 3. Apply the "Principle of Least Effort"
 
-### 4. Optimize for "Aha!" Discovery
+Make the next step easier than the last.
 
-If the product is complex, use the success page to show a "Shortcut to Value":
-- A "Getting Started" video.
-- A "Pro-Tip" related to the lead magnet they just downloaded.
-- A link to a high-value community or resource hub.
+- Use pre-filled fields.
+- Provide "One-Click" options for social sharing or invites.
+- Use "Magic Links" to bypass login if the user needs to go into an app.
+
+### 4. Optimize the Confirmation Narrative
+
+Move beyond "Success!"
+
+- **Validate the Decision:** Reiterate the value they are about to receive.
+- **Set Expectations:** Tell them exactly what happens next (e.g., "Your report
+  will arrive in 5 minutes").
+- **Bridge to Action:** Connect the confirmation to the next step (e.g., "While
+  you wait, why not invite your team?").
 
 ### 5. Review Against Decision Rules
 
-Ensure the secondary "ask" does not overwhelm or confuse the user.
+Ensure the momentum-building elements don't overshadow the primary
+confirmation.
 
 ## Decision Rules
 
-- **The "One-at-a-Time" Rule:** Offer exactly ONE primary secondary action.
-  Don't list 5 social icons and a demo link and a survey; pick the highest value
-  one.
-- **The Relevance Anchor:** The secondary offer must be a logical extension of
-  the first action. (e.g., If they downloaded a "SEO Guide," the next step
-  should be a "SEO Audit Tool," not a "Social Media Webinar").
-- **Confirmation First:** Never hide the confirmation message behind the
-  momentum offer. The user must feel "done" with the first task before starting
-   the next.
-- **Low-Friction Transition:** If asking for more data, use 1-click button
-  answers rather than text inputs.
+- **The "One Main Path" Rule:** The success page should have one clear,
+  dominant call to action for the secondary goal.
+- **The Relevance Rule:** The secondary action must be a logical extension of
+  the primary conversion (e.g., don't ask for a referral if they haven't seen
+  the product value yet; ask for profile setup instead).
+- **The "Confirmation First" Rule:** The user's primary need is to know the
+  action was successful. This must be the most prominent element on the page.
+- **Value Reciprocity:** If asking for a secondary action that benefits the
+  business (like a referral), offer immediate value in return (like a discount
+  or bonus content).
 
 ## Common Failure Patterns
 
-- **The "Dead-End":** A page that says "Thank you, we will be in touch" and
-  nothing else.
-- **The "Data Greedy" Success Page:** Asking for a 20-question survey
-  immediately after a simple signup.
-- **Missing Expectation:** Not telling the user the email might be in their
-  "Promotions" or "Spam" folder.
-- **The "Secondary Bait-and-Switch":** Making the secondary CTA look like part
-  of the first download, leading to confusion.
+- **The "Dead End":** A success page that only says "Thank you" and has no
+  further links.
+- **The "Ask Overload":** Presenting five different buttons for social sharing,
+  newsletters, and surveys simultaneously.
+- **Delayed Gratification:** Forcing the user to check their email to get the
+  value they just signed up for, instead of providing an immediate "Success
+  Download."
+- **Broken Context:** Asking the user to re-enter information they just
+  provided in the primary conversion form.
 
 ## Validation Methods
 
-- **Secondary Conversion Rate (SCR):** Percentage of success-page visitors who
-  complete the secondary action.
-- **Lead-to-Qualified Rate:** Measure if the qualification questions on the
-  success page help sales prioritize leads faster.
-- **Time-to-Onboarding:** For SaaS, measure how quickly users move from
-  "Thank You" to "First Key Action."
-- **Support Ticket Reduction:** A decrease in "Where is my [Asset]?" or "What
-  do I do now?" tickets.
+- **Secondary Conversion Rate:** The percentage of users who complete the
+  additional action on the success page.
+- **Bounce Rate on Success Page:** A high bounce rate indicates a missed
+  opportunity for momentum.
+- **Time to Activation:** Measure if post-conversion prompts (like profile
+  setup) decrease the time it takes for a user to reach their "Aha! Moment."
+- **Referral Volume:** Track the increase in organic invites originating
+  specifically from the "Thank You" page.

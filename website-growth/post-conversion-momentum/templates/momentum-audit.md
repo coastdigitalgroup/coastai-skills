@@ -1,44 +1,55 @@
-# Momentum Audit Checklist
+# Post-Conversion Momentum Audit Checklist
 
-Use this checklist to evaluate whether a post-conversion success page is
-maximizing user momentum or acting as a dead-end.
+Use this checklist to evaluate any "Thank You," success, or confirmation page
+to ensure it is maximizing user engagement and driving logical next steps.
 
-## 1. Immediate Confirmation (The "Anxiety Buffer")
-- [ ] Is the H1 a clear confirmation of the action just taken?
-- [ ] Is there a visual "success" indicator (green checkmark, success icon)?
-- [ ] Is the confirmation visible without scrolling?
+## 1. The Confirmation (Core Utility)
+- [ ] **Instant Feedback:** Does the page load immediately after the action?
+- [ ] **Explicit Success:** Is there a clear "Success" or "Thank You" message
+      prominently displayed?
+- [ ] **Transaction Details:** Are relevant details (Order #, Email used, Date)
+      visible for the user's records?
+- [ ] **Expectation Setting:** Does the page state what happens next? (e.g.,
+      "Your download will start in 5 seconds" or "Expect a call within 24 hours")
 
-## 2. Logistics & Expectations (The "Where is it?" Test)
-- [ ] Does the copy explicitly state where the asset/confirmation was sent?
-- [ ] Is the sender's name or email address mentioned?
-- [ ] Is there a "Check Spam/Promotions" reminder?
-- [ ] Is there an alternative way to access the asset immediately (e.g., "Click
-      here if your download doesn't start")?
+## 2. Friction Removal
+- [ ] **Auto-Login/Magic Links:** If it's a signup, is the user already logged
+      in? (Avoid the "Check your email" wall if possible).
+- [ ] **Immediate Value Delivery:** Can the user access the "thing" they just
+      bought/signed up for directly from this page?
+- [ ] **Zero Redundancy:** Are we asking for any information we already have?
+      (The answer should be No).
 
-## 3. The Momentum Trigger (The "While You're Here" Offer)
-- [ ] Is there exactly ONE primary secondary action?
-- [ ] Does the secondary action relate directly to the first (The Logical Bridge)?
-- [ ] Is the value of the secondary action higher than the effort required?
-- [ ] Is the momentum CTA visually distinct from the rest of the page?
+## 3. Momentum & Secondary Actions
+- [ ] **The "Power Ask":** Is there one clear, dominant secondary call to action?
+- [ ] **Logical Sequencing:** Is the secondary action a natural next step for
+      the user's journey?
+- [ ] **Incentivized Next Steps:** If asking for a favor (referral/survey), is
+      there a clear "What's in it for me?" for the user?
+- [ ] **Social Proof/Reassurance:** Do we reinforce the user's decision one
+      last time to prevent buyer's remorse?
 
-## 4. Qualification & Personalization (Optional)
-- [ ] Could you ask 1-2 "Low-Friction" questions to segment this lead? (e.g.,
-      "Which of these best describes your role?")
-- [ ] If asking questions, do they use 1-click button responses instead of
-      text inputs?
-- [ ] Does answering the question provide immediate value? (e.g., "Answer this
-      and we'll show you the most relevant case study").
+## 4. Visual & Content Hierarchy
+- [ ] **The "5-Second Rule":** Can a user identify their next step within 5
+      seconds of landing on the page?
+- [ ] **Contrast:** Is the secondary CTA visually distinct but subservient to
+      the primary "Success" message?
+- [ ] **Brand Consistency:** Does the page look like the rest of the site, or
+      does it feel like a generic third-party confirmation?
 
-## 5. Mobile & Shareability
-- [ ] Is the success page optimized for mobile viewports?
-- [ ] (For B2C) Are there "One-Tap" social sharing buttons with pre-filled
-      persuasive copy?
-- [ ] Is the page fast to load (under 1 second)?
+## 5. Mobile Optimization
+- [ ] **Clickable Targets:** Are all sharing buttons and CTAs easily tappable
+      on mobile devices?
+- [ ] **Input Ease:** If there's a secondary form (e.g., "Add your birthdate"),
+      is it optimized for mobile keyboards?
 
 ---
 
-## Scoring
-- **0-2 Points:** **Dead-End.** You are losing 90% of your potential secondary value.
-- **3-4 Points:** **Functional.** Users are confirmed, but momentum is stalling.
-- **5-6 Points:** **Momentum Engine.** You are successfully turning one conversion
-  into a deeper relationship.
+## Audit Scoring
+- **0-3 Checkmarks:** **Dead End.** You are losing almost 100% of your post-
+  conversion value.
+- **4-7 Checkmarks:** **Basic.** You are confirming the action but missing
+  growth opportunities.
+- **8-11 Checkmarks:** **Engaging.** You are starting to leverage momentum.
+- **12+ Checkmarks:** **Growth Engine.** You are turning every customer into
+  an active participant or advocate.
