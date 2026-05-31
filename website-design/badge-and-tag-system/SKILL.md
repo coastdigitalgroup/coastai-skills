@@ -10,137 +10,101 @@ description:
 
 ## Purpose
 
-The Badge and Tag System provides a methodology for designing small,
-high-context UI elements that communicate status, category, or metadata. It
-solves the problem of visual clutter by standardizing how information is
-weighted and grouped, ensuring that users can scan and differentiate between
-system-driven states (e.g., "Success", "Overdue") and user-driven
-classifications (e.g., "Personal", "Work").
+The Badge and Tag System provides a methodology for designing and implementing small, informational components that provide quick context, status, or categorization. This skill ensures that these elements remain secondary to primary content while being instantly scannable, accessible, and logically organized across a website.
 
 ## Use Cases
 
-- Communicating status in data tables (e.g., "Active", "Pending", "Failed").
-- Categorizing items in a list or library (e.g., "Tutorial", "Case Study").
-- Highlighting attributes in product cards (e.g., "Sale", "New Arrival").
-- Displaying numeric counts (e.g., unread messages in a navigation menu).
-- Organizing user-generated content labels (e.g., "Priority: High").
+- **Status Indicators:** Showing the state of an object (e.g., "Active," "Pending," "Sold Out").
+- **Categorization:** Labeling content by topic, type, or collection (e.g., "Productivity," "Tutorial," "New Arrival").
+- **Quantity/Counts:** Displaying numbers associated with an item (e.g., "12 Notifications," "5 Items in Cart").
+- **Filter Visibility:** Showing active filters that can be removed by the user.
+- **Priority Signaling:** Highlighting specific attributes like "Best Seller" or "Urgent."
 
 ## When NOT to Use
 
-- **Primary Actions:** Never use a badge or tag in place of a Button. If the
-  element is the primary way to trigger an action, it should be a Button.
-- **Large Content Blocks:** If the information requires more than 2-3 words or
-  includes complex formatting, use a Card or a Callout.
-- **Critical System Alerts:** For page-level errors or high-priority
-  interruptions, use a Toast or an Alert banner.
-- **Navigation:** Do not use badges/tags as primary navigation links unless they
-  are part of a filter/sort system.
+- **Primary Actions:** Do not use badges or tags as the main Call-to-Action (CTA); use buttons from the `interactive-state-system`.
+- **Large Content Blocks:** If the information requires more than 2-3 words, use a `card-ui-system` or standard typography.
+- **Navigation:** While tags can lead to filtered views, they should not replace the primary `site-navigation-system`.
+- **Decorative-only Icons:** If the element has no semantic meaning, it belongs in the `iconography-system`.
 
 ## Inputs
 
-1. **Information Type:** Is it a Status (state-driven), a Tag (categorization),
-   or a Badge (numeric/count)?
-2. **Semantic Meaning:** What is the intent? (e.g., Neutral, Success, Warning,
-   Error).
-3. **Visual Context:** Where will it live? (e.g., inside a Button, on a Card,
-   next to a Title).
-4. **Interaction Level:** Is it static (read-only) or interactive (removable,
-   clickable filter)?
+1. **Content Intent:** Is it a status (state), a category (metadata), or a count (number)?
+2. **Interactive Requirement:** Is the element static, or is it removable/clickable?
+3. **Hierarchy Context:** What is the parent element? (e.g., a card, a header, a table row).
+4. **Color Tokens:** Existing semantic color scale (Success, Warning, Error, Info).
 
 ## Outputs
 
-1. **Anatomy Spec:** Definition of the container (padding, border-radius) and
-   content (text, icons).
-2. **Color Logic Matrix:** Mapping of semantic meanings to specific color and
-   contrast pairings.
-3. **Hierarchy System:** Distinction between "Solid" (high emphasis) and
-   "Subtle/Outline" (low emphasis) variants.
-4. **Interactive States:** Design for hover, focus, and "Remove" (X) actions.
+1. **Visual Anatomy Spec:** Definitions for border-radius (pill vs. rounded), padding, and typography.
+2. **Semantic Color Matrix:** Mapping of colors to specific meanings (e.g., Green = Success).
+3. **Interactive Specs:** Visual treatments for hover, focus, and "remove" (X) actions.
+4. **Placement Rules:** Guidelines for where these elements sit relative to titles and images.
 
 ## Workflow
 
-### 1. Identify the Information Class
+### 1. Distinguish between Badge and Tag
 
-Distinguish between the three primary types:
-- **Status (Badge):** Communicates the current state of an object. Usually
-  follows a semantic color scheme.
-- **Tag:** Communicates categorization or attributes. Usually uses a varied or
-  neutral color scheme.
-- **Count (Badge):** Displays a numeric value (e.g., "+5"). Usually small,
-  circular, and positioned as an overlay.
+Define the functional role first:
+- **Badges:** Generally indicate **Status** (e.g., "Live") or **Counts** (e.g., "3"). They are usually non-interactive or link to a single state.
+- **Tags:** Generally indicate **Categorization** (e.g., "SaaS"). They are often interactive, allowing users to filter content or remove the tag.
 
-### 2. Define the Visual Anatomy
+### 2. Establish Visual Anatomy
 
-Apply the `visual-hierarchy-system`:
-- **Shape:** Use a high border-radius (often pill-shaped) to distinguish them
-  from buttons or square inputs.
-- **Sizing:** Keep them small. Ensure font size is readable but significantly
-  smaller than the primary body text.
-- **Icons:** Use icons to reinforce meaning (e.g., a checkmark for "Success") to
-  support accessibility and quick scanning.
+Define the base style to ensure they don't look like buttons:
+- **Typography:** Use a smaller, often all-caps or semibold font (e.g., 12px/0.75rem).
+- **Border Radius:**
+  - **Pill (Full Round):** Best for statuses and counts.
+  - **Rounded (4-8px):** Best for categorization and removable tags.
+- **Sizing:** Keep height consistent (e.g., 20px-24px) to ensure they align well with text.
 
-### 3. Establish Color and Emphasis Tiers
+### 3. Assign Semantic Logic (Color & Icons)
 
-Assign visual weight based on importance:
-- **High Emphasis (Solid):** Solid background with high-contrast text. Use for
-  critical statuses like "Error" or "Urgent".
-- **Medium Emphasis (Subtle):** Tinted background with dark text. Best for
-  general categorization and non-critical status.
-- **Low Emphasis (Outline):** Transparent background with a border. Best for
-  secondary metadata or user-generated tags.
+Use color to communicate meaning without forcing the user to read:
+- **Success (Green):** "Complete," "Active," "Verified."
+- **Warning (Yellow/Orange):** "Pending," "Low Stock," "Draft."
+- **Error (Red):** "Failed," "Critical," "Out of Stock."
+- **Info/Neutral (Blue/Gray):** "New," "Category," "Metadata."
 
-### 4. Determine Interaction Patterns
+*Rule:* Always pair color with text or an icon to ensure accessibility for colorblind users.
 
-- **Static:** Informational only.
-- **Removable:** Includes an "X" icon. Used in filters or multi-select inputs.
-- **Selectable:** Changes state when clicked. Used in filter chips.
+### 4. Define Interactive States
 
-### 5. Plan for Scaling and Truncation
+If the tag is interactive:
+- **Hover/Focus:** Apply a subtle background shift or border change.
+- **Removable:** Include a clear "X" icon with a minimum hit area (24px inside the tag or 44px total for the tag).
 
-- **Max Width:** Define a maximum width for tags to prevent layout breaks.
-- **Truncation:** Use ellipsis (...) if the tag text exceeds the max width, but
-  ensure the full text is available via a tooltip.
+### 5. Determine Placement and Hierarchy
+
+- **Overlay:** Placing a "New" badge in the top corner of an image.
+- **Inline:** Placing a status badge immediately after a title in a `page-header-system`.
+- **Grouped:** Stacking multiple tags below a description in a `card-ui-system`.
 
 ## Decision Rules
 
-- **The Color Rule:** Never use color alone to convey status. Always include
-  text or an icon to ensure users with color blindness can distinguish states.
-- **The Contrast Rule:** Text inside badges must meet WCAG AA contrast (4.5:1).
-  If the background is too light, use a darker border or text.
-- **Badge vs. Tag:** If it's about *what it is*, use a Tag. If it's about *what
-  it's doing*, use a Status Badge.
-- **Placement:** Status badges should be placed near the object's name or title.
-  Tags should be grouped together at the bottom or top of a container.
+- **The "Squint Test":** If a badge is so bright it distracts from the H1, reduce its saturation or use an outline style.
+- **Limit the Count:** Never use more than 3 tags on a single card to prevent visual clutter.
+- **Text Length:** Keep labels to 1-2 words. Truncate or use tooltips if data is dynamic and unpredictable.
+- **Button Distinction:** Badges should have a different visual treatment (e.g., smaller size, different radius) than the primary "Submit" or "Buy" buttons.
 
 ## Constraints
 
-- **Accessibility:** Interactive tags must have a focus state and a clear
-  `aria-label` (especially for "Remove" buttons).
-- **Responsiveness:** Badges must never cause horizontal overflow. Use flex-wrap
-  for tag groups.
-- **Touch Targets:** Removable/Interactive tags must ensure the clickable area
-  (especially the "X") is large enough (min 24px for the icon, inside a 44px
-  parent if possible).
+- **Accessibility:** Text inside badges/tags must meet WCAG AA (4.5:1 contrast). Interactive tags must be keyboard navigable.
+- **Responsiveness:** Tags in a group should wrap to the next line (`flex-wrap: wrap`) rather than overflowing the container.
+- **Touch Targets:** Removable tags must have a large enough target for the "close" action (min 44x44px for the interactive zone).
 
 ## Common Failure Patterns
 
-- **Button Mimicry:** Making tags look so much like buttons that users try to
-  click them to "submit" something.
-- **Color Overload:** Using too many different colors for tags, which makes the
-  page look messy and dilutes the meaning of semantic colors.
-- **Tiny Text:** Using font sizes below 11px, making them unreadable for many
-  users.
-- **No Contrast:** Putting white text on a light yellow badge, making it
-  invisible to users with low vision.
-- **Crowded Layouts:** Not providing enough gap between tags, causing them to
-  blend into a single unreadable mass.
+- **The "Button Mimic":** Making tags look exactly like buttons, leading users to expect a primary action.
+- **Color Over-reliance:** Using red/green/yellow without text labels, making it impossible for colorblind or screen-reader users to understand status.
+- **Tag Soup:** Crowding a card with 10+ tags, making none of them useful.
+- **Inconsistent Radius:** Mixing pill-shaped badges and square-cornered tags in the same UI.
 
 ## Validation Criteria
 
-- [ ] Status colors follow a consistent semantic logic (Green=Success, etc.).
-- [ ] Text-to-background contrast meets WCAG AA (4.5:1).
-- [ ] Tags and Badges are visually distinct from Buttons.
-- [ ] Icons are used to reinforce meaning in status badges.
-- [ ] Tag groups use `flex-wrap` to handle small screens.
-- [ ] Interactive elements have clearly defined focus states.
-- [ ] ARIA labels are present for removable tags.
+- [ ] Badges and tags are visually distinct from buttons.
+- [ ] Semantic colors are used consistently (e.g., Green always means Success).
+- [ ] Contrast ratios meet WCAG AA (4.5:1) for all color variations.
+- [ ] Interactive tags include focus states and appropriate touch targets.
+- [ ] Elements wrap gracefully on mobile viewports.
+- [ ] Icons are used alongside color for critical status indicators.

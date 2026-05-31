@@ -1,0 +1,44 @@
+/**
+ * Standard CSS Cascade Layer Order
+ *
+ * This template defines a recommended layer order for a modern web project.
+ * Place this declaration at the very top of your main CSS entry point.
+ */
+
+/* 1. Define the order of priority (Last layer wins) */
+@layer reset, vendor, base, components, utilities;
+
+/**
+ * Layer Descriptions:
+ * - reset: Global resets, normalize.css, or basic element resets.
+ * - vendor: Third-party libraries (Bootstrap, Tailwind, etc.).
+ * - base: Global typography, base spacing, and element-level styles.
+ * - components: Encapsulated UI components (Buttons, Cards, Modals).
+ * - utilities: Single-purpose helper classes (Margin, Padding, Visibility).
+ */
+
+/* Example implementation: */
+
+@layer reset {
+  /* Lowest priority: basic resets */
+  * { box-sizing: border-box; margin: 0; }
+}
+
+@layer base {
+  /* Typography and global defaults */
+  body { font-family: system-ui; line-height: 1.5; }
+}
+
+@layer components {
+  /* Component-specific styles */
+  .card { padding: 1rem; border: 1px solid #ccc; }
+}
+
+@layer utilities {
+  /* Highest priority (layered): overrides everything in previous layers */
+  .text-center { text-align: center; }
+  .hidden { display: none; }
+}
+
+/* NOTE: Unlayered styles (styles outside of any @layer) will override
+   all layered styles for normal declarations! */

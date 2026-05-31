@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Popover API Boilerplate</title>
+  <style>
+    :root {
+      --popover-bg: #ffffff;
+      --popover-text: #1a1a1a;
+      --popover-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      --backdrop-color: rgba(0, 0, 0, 0.2);
+    }
+
+    /* 1. Base Popover Styles */
+    [popover] {
+      padding: 1rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
+      background-color: var(--popover-bg);
+      color: var(--popover-text);
+      box-shadow: var(--popover-shadow);
+
+      /* Reset default browser styles */
+      margin: 0;
+      width: max-content;
+      max-width: 300px;
+
+      /* Positioning: Fallback to absolute relative to viewport if no anchoring */
+      position: fixed;
+      inset: auto;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+
+      /* Animation setup */
+      transition:
+        opacity 0.2s ease-out,
+        transform 0.2s ease-out,
+        display 0.2s allow-discrete,
+        overlay 0.2s allow-discrete;
+      opacity: 0;
+    }
+
+    /* 2. State: Open */
+    [popover]:popover-open {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    /* 3. Animation: Starting state for entry */
+    @starting-style {
+      [popover]:popover-open {
+        opacity: 0;
+        transform: translate(-50%, -45%) scale(0.95);
+      }
+    }
+
+    /* 4. Backdrop Styles */
+    [popover]::backdrop {
+      background-color: var(--backdrop-color);
+      backdrop-filter: blur(2px);
+      transition: display 0.2s allow-discrete, overlay 0.2s allow-discrete, opacity 0.2s;
+      opacity: 0;
+    }
+
+    [popover]:popover-open::backdrop {
+      opacity: 1;
+    }
+
+    @starting-style {
+      [popover]:popover-open::backdrop {
+        opacity: 0;
+      }
+    }
+
+    /* Utility to hide popover trigger if not supported (Optional) */
+    @supports not selector([popover]) {
+      .popover-warning {
+        display: block;
+        color: red;
+        padding: 1rem;
+      }
+    }
+
+    .popover-warning { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="popover-warning">
+    Your browser does not support the Popover API.
+  </div>
+
+  <!-- Trigger Button -->
+  <button popovertarget="demo-popover" id="popover-trigger">
+    Toggle Popover
+  </button>
+
+  <!-- Popover Element -->
+  <div id="demo-popover" popover="auto">
+    <h3>Popover Title</h3>
+    <p>This is a native HTML popover. It has "light-dismiss" behavior, meaning you can close it by:</p>
+    <ul>
+      <li>Clicking outside</li>
+      <li>Pressing the Escape key</li>
+      <li>Clicking the toggle button again</li>
+    </ul>
+    <button popovertarget="demo-popover" popovertargetaction="hide">
+      Close
+    </button>
+  </div>
+
+  <script>
+    const popover = document.getElementById('demo-popover');
+
+    // Optional: Log state changes
+    popover.addEventListener('toggle', (event) => {
+      if (event.newState === 'open') {
+        console.log('Popover is now visible');
+      } else {
+        console.log('Popover is now hidden');
+      }
+    });
+
+    // Optional: Dynamic Positioning (if not using Anchor Positioning API)
+    // In a real implementation, use Floating UI here to align to the trigger.
+  </script>
+</body>
+</html>

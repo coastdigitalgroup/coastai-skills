@@ -1,38 +1,59 @@
-# Template: Badge & Tag Anatomy
+# Badge and Tag Anatomy Template
 
-Use this template to define the structural components of badges and tags in your design system.
+Use this template to define the structure and styling for badges and tags in your design system.
 
-## Structural Anatomy
+## 1. Component Anatomy
 
-| Component | Specification | Description |
+| Zone | Description | Requirement |
 | :--- | :--- | :--- |
-| **Height** | 20px - 28px | Small size for metadata, large for overlaid badges. |
-| **Padding** | 4px (top/bottom), 8px (left/right) | Standard breathing room. |
-| **Border Radius** | 4px (Tag) / 999px (Badge) | Differentiation between categories and status. |
-| **Font Size** | 11px - 13px | Must be readable but smaller than body text. |
-| **Icon Size** | 12px - 14px | Should not exceed the font's x-height significantly. |
-| **Gap** | 4px | Space between icon and text. |
+| **Container** | The background shape (Pill or Rounded). | Must have at least 8px horizontal padding. |
+| **Leading Icon** | Optional icon for status clarity. | 12px-14px size; must be same color as text. |
+| **Label** | The 1-2 word text content. | WCAG AA Contrast (4.5:1 minimum). |
+| **Trailing Action** | The "X" for removable tags. | Minimum 24px interactive hit zone. |
 
-## Variants
+## 2. Structural Blueprint (CSS-ish)
 
-### 1. Solid (High Emphasis)
--   **Background:** `--color-brand-primary`
--   **Text:** `--color-white`
--   **Border:** None
+```css
+.badge-tag-base {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem; /* 4px */
+  padding: 0.125rem 0.5rem; /* 2px 8px */
+  font-size: 0.75rem; /* 12px */
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
 
-### 2. Subtle (Medium Emphasis)
--   **Background:** `--color-brand-light`
--   **Text:** `--color-brand-dark`
--   **Border:** None
+.badge--pill {
+  border-radius: 9999px;
+}
 
-### 3. Outline (Low Emphasis)
--   **Background:** Transparent
--   **Text:** `--color-grey-700`
--   **Border:** 1px solid `--color-grey-300`
+.tag--rounded {
+  border-radius: 4px;
+}
+```
 
-## Implementation Checklist
+## 3. Placement Template
 
-- [ ] Is the padding consistent across all variants?
-- [ ] Does the "pill" shape maintain its radius when text wraps? (Recommendation: Use `white-space: nowrap` for badges).
-- [ ] Is the focus ring visible when an interactive tag is tabbed?
-- [ ] Are icons vertically centered with the text?
+### Card Overlay
+- **Position:** Absolute (Top: 12px, Left: 12px).
+- **Z-Index:** 10 (ensure it sits above image).
+
+### Title Inline
+- **Position:** Relative.
+- **Vertical Alignment:** Middle or Baseline.
+- **Spacing:** `margin-left: 8px` from the title text.
+
+### Tag Group (Filter/Metadata)
+- **Container:** Flexbox.
+- **Gap:** 8px (Horizontal and Vertical).
+- **Behavior:** `flex-wrap: wrap`.
+
+## 4. Annotation Checklist
+
+When handing off to developers, annotate the following:
+- [ ] **Semantic Role:** Is this Success, Warning, Error, or Info?
+- [ ] **Interactive Type:** Is it Static, Link, or Removable?
+- [ ] **Dynamic Data:** How should it handle a label longer than 15 characters? (Truncate vs. Wrap).
+- [ ] **Alt Text:** Does the icon need a label for screen readers? (e.g., "Status: Active").
