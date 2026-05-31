@@ -1,141 +1,152 @@
 ---
 name: css-cascade-layers
 description:
-  Manage CSS specificity and source order issues using the native @layer API to
-  create predictable, maintainable style architectures.
+  Systematically manage CSS precedence independently of selector specificity
+  using the native @layer API to resolve style conflicts and manage large
+  codebases.
 ---
 
 # CSS Cascade Layers
 
 ## Purpose
 
-The CSS Cascade Layers skill provides a technical framework for controlling the
-CSS cascade independently of selector specificity. It allows developers to
-organize styles into explicit layers, ensuring that "Utility" styles always
-override "Component" styles, and "Component" styles always override "Base"
-styles, regardless of how specific the selectors are.
+The CSS Cascade Layers skill provides a technical protocol for controlling the
+CSS cascade (the "C" in CSS) without relying on selector specificity hacks (like
+`!important` or overly long selectors). By organizing styles into layers,
+developers can ensure that design system defaults, component styles, and
+third-party library overrides interact predictably, regardless of when they are
+loaded or how specific their selectors are.
 
 ## Use Cases
 
-- **Third-Party Integration:** Overriding styles from a component library (e.g.,
-  Bootstrap, Tailwind, or a proprietary UI kit) without using `!important` or
-  fighting high-specificity selectors.
-- **Architectural Organization:** Implementing a clear "ITCSS" or "SMACSS"
-  inspired hierarchy where layers like `reset`, `base`, `theme`, and `utilities`
-  have a guaranteed order of precedence.
-- **Micro-Frontends/Legacy Migration:** Protecting new styles from being
-  accidentally overridden by legacy "global" CSS by placing them in different
-  layers.
+- **Library Overrides:** Overriding styles from a heavy third-party framework
+  (like Bootstrap or Tailwind) with simple selectors.
+- **Design Systems:** Establishing a clear hierarchy between "reset" styles,
+  "base" typography, and "component" specifics.
+- **Theming:** Applying theme-specific overrides that are guaranteed to win over
+  default component styles.
+- **Micro-Frontends:** Preventing style leakage and conflicts between different
+  teams' CSS by isolating them into named layers.
 
 ## When NOT to Use
 
-- **Very Simple Sites:** For a small site with a single CSS file and low
-  selector complexity, layers may add unnecessary abstraction.
-- **Legacy Browser Support:** If the project must support browsers older than
-  early 2022 (e.g., IE11, Chrome < 99, Safari < 15.4) without a complex build
-  step polyfill.
+- **Legacy Browser Support:** Projects requiring support for browsers older than
+  2022 (e.g., Safari < 15.4, Chrome < 99, Firefox < 97) without a polyfill.
+- **Small Projects:** Where specificity is easily managed with standard
+  conventions like BEM.
+- **Specific Interaction States:** Standard pseudo-classes (like `:hover` or
+  `:focus`) should usually remain part of the component's natural specificity
+  unless the entire component is layered.
 
 ## Inputs
 
-1. **CSS Architecture Plan:** Definition of the required layers (e.g., `reset`,
-   `base`, `components`, `utilities`).
-2. **Conflict Points:** Identification of selectors that are currently fighting
-   for precedence.
-3. **Third-Party Assets:** CSS files or libraries that need to be "tamed" by
-   placing them in a specific cascade position.
+1. **CSS Architecture Plan:** A map of how styles should be prioritized (e.g.,
+   Reset > Base > Components > Utilities).
+2. **Conflict Inventory:** A list of existing specificity "wars" where
+   developers are forced to use `!important` or nested selectors.
+3. **Third-Party Styles:** External CSS files that need to be integrated but
+   potentially overridden.
 
 ## Outputs
 
-1. **Layer Definition:** A centralized `@layer` statement defining the project's
-   precedence order.
-2. **Layered CSS:** Refactored CSS blocks wrapped in `@layer` blocks.
-3. **Import Strategy:** A method for importing external files into specific
-   layers.
+1. **Layer Order Declaration:** A centralized `@layer` statement defining the
+   priority of all layers.
+2. **Layered CSS Blocks:** CSS rules wrapped in `@layer` blocks or imported into
+   specific layers.
+3. **Clean Selectors:** Simplified CSS selectors that no longer need high
+   specificity to function.
 
 ## Workflow
 
-### 1. Establish the Order of Precedence
+### 1. Establish the Layer Hierarchy
 
-At the very beginning of your main CSS entry point, define your layers in order
-of **lowest to highest** priority:
+At the very top of your main CSS file, declare the order of layers. The **last**
+layer in the list has the **highest** priority for normal styles.
 
 ```css
-@layer reset, base, library, components, utilities;
+@layer reset, base, components, utilities;
 ```
 
-### 2. Wrap Styles in Layers
+### 2. Assign Styles to Layers
 
-Assign existing or new styles to their respective layers:
+Wrap your existing CSS in the defined layers.
 
 ```css
+@layer base {
+  a { color: blue; }
+}
+
 @layer components {
-  .card {
-    padding: 1rem;
-    border: 1px solid silver;
-  }
-}
-
-@layer utilities {
-  .border-none {
-    border: none;
-  }
+  .nav-link { color: red; } /* Wins over 'base' even if specificity was equal */
 }
 ```
 
-### 3. Handle Third-Party Styles
+### 3. Handle External Libraries
 
-Import external libraries into a specific layer to ensure they don't overpower
-your custom overrides:
+Import third-party CSS into a low-priority layer to make them easier to
+override.
 
 ```css
-@import "bootstrap.css" layer(library);
+@import "bootstrap.css" layer(vendor);
 ```
 
-### 4. Verify the Cascade
+### 4. Manage Unlayered Styles
 
-Use browser DevTools (Styles pane) to see how layers are being applied. Layer
-precedence overrides selector specificity.
+Recognize that **unlayered styles** (styles outside any `@layer` block) have the
+highest priority for normal declarations. Use this for "one-off" overrides or
+styles that haven't been migrated yet.
+
+### 5. Refactor Specificity
+
+Remove redundant IDs or nested selectors (e.g., `.header .nav .item .link`) and
+replace them with simple classes, relying on the layer order for precedence.
 
 ## Decision Rules
 
-- **The "Unlayered" Rule:** Styles not in any `@layer` always have the
-  **highest** priority (except for `!important` rules). Use this for temporary
-  fixes or styles that must absolutely win.
-- **Ordering Strategy:** Always define the order explicitly at the top of the
-  file using `@layer name1, name2;`. Do not rely on the order in which layers
-  first appear in the code.
-- **Important Flag:** Be aware that `!important` in an **earlier** (lower
-  priority) layer will override `!important` in a **later** (higher priority)
-  layer. This is the opposite of standard layer behavior.
+- **Layer Order:** Place "Reset" and "Vendor" layers first. Place "Utilities"
+  last.
+- **Naming:** Use clear, semantic names for layers. For large teams, consider
+  prefixing (e.g., `brand-components`).
+- **Nesting:** You can nest layers (e.g., `@layer framework.theme`), but use
+  this sparingly to avoid over-complicating the hierarchy.
+- **!important:** Avoid using `!important` inside layers if possible. Remember
+  that layered `!important` styles override unlayered `!important` styles, and
+  **earlier** layers win over **later** layers in the `!important` context.
 
 ## Constraints
 
-- **Browser Support:** Requires modern browser support (Chrome 99+, Firefox 97+,
-  Safari 15.4+).
-- **Placement:** The `@layer` order definition should ideally be the first
-  thing in your CSS, after `@charset` and before any non-layer `@import`
-  statements.
+- **Order Matters:** The order of `@layer` declarations is the single source of
+  truth for precedence.
+- **Browser Support:** Always check the baseline support for `@layer`.
+- **Shadow DOM:** Cascade layers do not cross Shadow DOM boundaries; they must
+  be defined within each shadow root if needed.
 
 ## Non-Goals
 
-- Managing Z-index (use `css-stacking-contexts` for that).
-- Handling CSS-in-JS specific implementations (though principles apply).
-- Detailed styling of specific UI components.
+- Replacing CSS Modules or Scoped CSS (layers manage precedence, not scope).
+- Replacing CSS Custom Properties (Variables).
+- Solving layout issues (Flexbox/Grid).
 
 ## Common Failure Patterns
 
-- **Implicit Ordering:** Forgetting to define the layer order at the top,
-  leading to priority being determined by the file import order.
-- **Mixing Layered and Unlayered:** Being surprised when a simple `.btn` selector
-  (unlayered) overrides a `#header .nav-item .btn` selector (layered).
-- **The `!important` Flip:** Using `!important` inside layers and finding it
-  harder to override because layered `!important` precedence is inverted.
+- **Wrong Declaration Order:** Forgetting to declare the `@layer` order at the
+  top, leading to layers being prioritized by their first appearance in the
+  code.
+- **The Unlayered Surprise:** Expecting a layered utility to win over an
+  unlayered component style. (Unlayered always wins for normal styles).
+- **!important Reversal:** Being confused when an `!important` style in a
+  "lower" layer (like `reset`) overrides an `!important` style in a "higher"
+  layer (like `utilities`).
+- **Mixed Imports:** Mixing layered and unlayered `@import` statements in a
+  way that breaks the expected cascade.
 
 ## Validation Steps
 
-- [ ] **DevTools Audit:** Inspect an element in Chrome/Firefox and verify the
-      "Layers" view shows the expected precedence.
-- [ ] **Specificity Test:** Confirm that a utility class (in a high-priority
-      layer) overrides a complex ID/Class selector (in a lower-priority layer).
-- [ ] **Import Check:** Verify that `@import ... layer(name)` successfully
-      constrains the imported library.
+- [ ] **Cascade Audit:** Use the "Styles" tab in Browser DevTools to verify
+      which layer a property is coming from.
+- [ ] **Order Test:** Add a test property to the first and last layer for the
+      same element and verify the last layer wins.
+- [ ] **Unlayered Check:** Ensure that unlayered styles are intentionally
+      overriding layered ones where expected.
+- [ ] **!important Check:** If using `!important`, verify it behaves correctly
+      according to the "reversal" rule.

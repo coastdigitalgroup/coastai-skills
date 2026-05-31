@@ -1,76 +1,71 @@
-# Overriding a Library without Specificity Wars
+# Example: Overriding a CSS Library with Cascade Layers
 
-This example demonstrates how to use CSS Cascade Layers to override styles from a complex third-party library (like a "Widget Library") without having to resort to `!important` or overly complex selectors.
+This example demonstrates how to use CSS Cascade Layers to override styles from
+a third-party library (like Bootstrap) without using `!important` or complex
+selectors.
 
-## The Problem (Before)
+## Scenario
 
-A third-party widget library uses very specific selectors, making it difficult to theme.
+We are using a legacy CSS library that defines a button with high specificity.
+We want to override its color in our local design system.
 
-```html
-<!-- Third-party Widget -->
-<div class="widget-container">
-  <div class="widget-header">
-    <button class="widget-close-btn">Close</button>
-  </div>
-</div>
-```
+### Before: Specificity War
+
+Without layers, we might have to resort to this:
 
 ```css
-/* third-party-library.css */
-.widget-container .widget-header .widget-close-btn {
+/* legacy-library.css */
+.theme-dark .main-content .btn-primary {
   background-color: blue;
   color: white;
-  padding: 10px 20px;
+}
+
+/* our-styles.css */
+/* We have to match or beat the specificity */
+.theme-dark .main-content .btn-primary {
+  background-color: purple; /* This works but is fragile */
+}
+
+/* Or worse... */
+.btn-primary {
+  background-color: purple !important; /* Hard to maintain */
 }
 ```
 
-To override this, you usually have to match or beat that specificity:
+### After: Using Cascade Layers
 
-```css
-/* custom-theme.css */
-body .widget-container .widget-header .widget-close-btn {
-  background-color: red; /* Hard to maintain and easy to break */
-}
-
-/* OR */
-.widget-close-btn {
-  background-color: red !important; /* The "Nuclear Option" */
-}
-```
-
-## The Solution (After)
-
-Using `@layer`, we can "demote" the library and ensure our theme always wins.
+With layers, we can control the priority regardless of selector specificity.
 
 ```css
 /* main.css */
 
-/* 1. Define the layer order (priority goes left to right) */
-@layer library, theme;
+/* 1. Define the layer order */
+@layer vendor, base, components;
 
-/* 2. Wrap the library (either via @import or block) */
-@layer library {
-  /* Imagine this is the content of third-party-library.css */
-  .widget-container .widget-header .widget-close-btn {
+/* 2. Import the library into the lowest-priority 'vendor' layer */
+@layer vendor {
+  /* In a real project, this might be an @import "legacy.css" layer(vendor); */
+  .theme-dark .main-content .btn-primary {
     background-color: blue;
     color: white;
-    padding: 10px 20px;
   }
 }
 
-/* 3. Your theme styles - even with a simple selector, they win! */
-@layer theme {
-  .widget-close-btn {
-    background-color: red; /* WINS because the 'theme' layer is higher than 'library' */
-    border-radius: 8px;
+/* 3. Define our styles in a higher-priority layer */
+@layer components {
+  /* This wins even though the selector is much simpler */
+  .btn-primary {
+    background-color: purple;
   }
 }
 ```
 
-## Why it works
+## Key Takeaways
 
-In the CSS Cascade, the layer order is checked **before** selector specificity.
-Because the `theme` layer is defined after the `library` layer, any selector in `theme` will override any selector in `library`, regardless of how many IDs or classes the library uses.
-
-## Key Takeaway
-You no longer need to inspect the library's source code just to figure out how many `.parent` classes you need to prepend to your selector to make your override work.
+1.  **Priority over Specificity:** The `.btn-primary` in the `components` layer
+    wins over the more specific selector in the `vendor` layer because
+    `components` comes after `vendor` in the `@layer` declaration.
+2.  **Cleaner Code:** We don't have to mirror the library's DOM structure in our
+    CSS just to override a style.
+3.  **Maintainability:** If the library updates its internal selector structure,
+    our override still works as long as the class name remains the same.

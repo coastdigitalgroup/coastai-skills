@@ -1,58 +1,73 @@
 # Cascade Precedence Rules
 
-Understanding how layers interact with other CSS features is critical for avoiding debugging headaches.
+Understanding how CSS Cascade Layers interact with existing cascade rules is
+critical for successful implementation.
 
-## 1. The Cascade Order (Lowest to Highest)
+## The Hierarchy of Precedence
 
-When a browser decides which style to apply, it checks in this order:
+When multiple declarations target the same element and property, the browser
+resolves the conflict using the following order of importance (from highest
+priority to lowest):
 
-1. User Agent styles (Browser defaults)
-2. **Layered styles (in the order they are defined)**
-3. **Unlayered styles** (Styles not inside any `@layer` block)
-4. Animations (`@keyframes`)
-5. **Layered `!important` styles (in REVERSE order of definition)**
-6. **Unlayered `!important` styles**
-7. Transitions
+1.  **Transitioned Styles:** Active CSS transitions.
+2.  **!important (Important) Styles:**
+    *   **Layered !important:** Interestingly, **earlier** layers win over
+        **later** layers for `!important` declarations.
+    *   **Unlayered !important:** Overridden by any layered `!important` style.
+3.  **Normal Styles:**
+    *   **Unlayered Normal:** Styles defined outside of any `@layer` block.
+    *   **Layered Normal:** Styles defined inside `@layer`. The **last** defined
+        layer wins.
+4.  **Animations:** CSS `@keyframes` animations.
 
-### The "Unlayered Wins" Rule
-Styles that are **not** in a layer always override styles that **are** in a layer (for normal styles). This allows unlayered CSS to act as a "final override" layer.
+---
 
-## 2. The `!important` Inversion
+## The "Normal" Rule: Unlayered Wins
 
-One of the most confusing parts of Cascade Layers is how they handle `!important`.
+For standard declarations (not `!important`), unlayered styles always override
+layered styles, regardless of selector specificity.
 
-- For **normal** declarations, **later** layers win over **earlier** layers.
-- For **!important** declarations, **earlier** layers win over **later** layers.
-
-| Layer Order | Normal Style Priority | `!important` Style Priority |
-| :--- | :--- | :--- |
-| `reset` | 1 (Lowest) | 4 (Highest) |
-| `base` | 2 | 3 |
-| `theme` | 3 | 2 |
-| `utilities` | 4 (Highest) | 1 (Lowest) |
-
-**Reasoning:** This allows a "reset" layer to force a style that cannot be easily overridden by later layers, maintaining the integrity of the system.
-
-## 3. Nesting Layers
-
-Layers can be nested to create sub-priorities:
+*   **Logic:** The browser treats all layered styles as a block that comes
+    *before* all unlayered styles.
 
 ```css
-@layer framework {
-  @layer components, utilities;
+@layer components {
+  .btn { background: blue; }
 }
 
-/* Accessible via: */
-@layer framework.components { ... }
+/* Unlayered style wins even with the same specificity */
+.btn { background: red; }
 ```
 
-## 4. Browser Support
+---
 
-As of 2024, Cascade Layers are widely supported in all major browsers:
-- **Chrome:** 99+ (March 2022)
-- **Firefox:** 97+ (Feb 2022)
-- **Safari:** 15.4+ (March 2022)
-- **Edge:** 99+ (March 2022)
+## The "!important" Reversal
 
-### Polyfilling
-There is no "perfect" polyfill because layers are a fundamental change to the browser's CSS engine. However, PostCSS plugins like `postcss-cascade-layers` can transpile layers into high-specificity selectors for older browsers.
+The precedence of `!important` declarations in layers is the **opposite** of
+normal declarations. This is to allow low-level layers (like a reset) to enforce
+certain rules that cannot be easily overridden even by utilities.
+
+1.  `@layer reset { color: red !important; }` **(WINS)**
+2.  `@layer utilities { color: blue !important; }`
+3.  `color: green !important;` (Unlayered)
+
+---
+
+## Summary Table
+
+| Source Category | Normal Priority | !important Priority |
+| :--- | :--- | :--- |
+| **Unlayered** | Highest (Wins) | Lowest (Loses to layers) |
+| **Last Layer** | High | Low |
+| **First Layer** | Lowest | Highest |
+
+## Best Practices
+
+*   **Declare Order Early:** Use `@layer layer1, layer2;` at the top of your
+    stylesheet to avoid relying on the order of implementation.
+*   **Avoid !important in Layers:** Only use `!important` in layers for truly
+    enforced "system" rules (like accessibility overrides) due to the reversal
+    logic.
+*   **Migrate Gradually:** You can safely start using layers for new components
+    while legacy unlayered CSS continues to function (and override layered
+    components).

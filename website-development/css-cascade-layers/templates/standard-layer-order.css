@@ -1,52 +1,44 @@
-/*
-  Standard Layer Manifesto
+/**
+ * Standard CSS Cascade Layer Order
+ *
+ * This template defines a recommended layer order for a modern web project.
+ * Place this declaration at the very top of your main CSS entry point.
+ */
 
-  Place this at the very top of your main CSS entry point.
-  Layers are listed from LOWEST priority to HIGHEST priority.
-*/
+/* 1. Define the order of priority (Last layer wins) */
+@layer reset, vendor, base, components, utilities;
 
-@layer
-  reset,      /* Browser resets and normalize.css */
-  base,       /* Global styles (html, body, typography, links) */
-  library,    /* Third-party frameworks and components */
-  components, /* Your custom design system components */
-  utilities;  /* Atomic helper classes (e.g., .mt-4, .hidden) */
+/**
+ * Layer Descriptions:
+ * - reset: Global resets, normalize.css, or basic element resets.
+ * - vendor: Third-party libraries (Bootstrap, Tailwind, etc.).
+ * - base: Global typography, base spacing, and element-level styles.
+ * - components: Encapsulated UI components (Buttons, Cards, Modals).
+ * - utilities: Single-purpose helper classes (Margin, Padding, Visibility).
+ */
 
-/*
-  Usage examples:
-*/
+/* Example implementation: */
 
 @layer reset {
-  /* Box sizing rules */
-  *, *::before, *::after {
-    box-sizing: border-box;
-  }
+  /* Lowest priority: basic resets */
+  * { box-sizing: border-box; margin: 0; }
 }
 
 @layer base {
-  body {
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-  }
+  /* Typography and global defaults */
+  body { font-family: system-ui; line-height: 1.5; }
 }
 
-/* Importing a library into its layer */
-/* @import "some-ui-kit.css" layer(library); */
-
 @layer components {
-  /* Component styles go here */
+  /* Component-specific styles */
+  .card { padding: 1rem; border: 1px solid #ccc; }
 }
 
 @layer utilities {
-  .visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
+  /* Highest priority (layered): overrides everything in previous layers */
+  .text-center { text-align: center; }
+  .hidden { display: none; }
 }
+
+/* NOTE: Unlayered styles (styles outside of any @layer) will override
+   all layered styles for normal declarations! */
