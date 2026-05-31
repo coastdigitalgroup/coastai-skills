@@ -1,61 +1,59 @@
 # Badge and Tag Anatomy Template
 
-This template defines the structural and visual rules for creating consistent
-Badge and Tag components.
+Use this template to define the structure and styling for badges and tags in your design system.
 
-## 1. Visual Specification (CSS-like tokens)
+## 1. Component Anatomy
 
-| Property          | Badge (Pill)         | Tag (Rounded)        | Notes                                     |
-| :---------------- | :------------------- | :------------------- | :---------------------------------------- |
-| **Font Size**     | 0.75rem (12px)       | 0.8125rem (13px)     | Tags are slightly larger for legibility.  |
-| **Font Weight**   | 600 (Semibold)       | 500 (Medium)         |                                           |
-| **Border Radius** | 9999px (Pill)        | 4px (Rounded)        | Shape distinction is key.                 |
-| **Padding (V)**   | 2px                  | 4px                  |                                           |
-| **Padding (H)**   | 8px                  | 10px                 |                                           |
-| **Border**        | None (Solid)         | 1px Solid (Outline)  | Default styles to distinguish them.       |
+| Zone | Description | Requirement |
+| :--- | :--- | :--- |
+| **Container** | The background shape (Pill or Rounded). | Must have at least 8px horizontal padding. |
+| **Leading Icon** | Optional icon for status clarity. | 12px-14px size; must be same color as text. |
+| **Label** | The 1-2 word text content. | WCAG AA Contrast (4.5:1 minimum). |
+| **Trailing Action** | The "X" for removable tags. | Minimum 24px interactive hit zone. |
 
----
+## 2. Structural Blueprint (CSS-ish)
 
-## 2. Structural Anatomy
+```css
+.badge-tag-base {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem; /* 4px */
+  padding: 0.125rem 0.5rem; /* 2px 8px */
+  font-size: 0.75rem; /* 12px */
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
 
-### The Badge (Status)
-```text
-[ (Icon) TEXT ]
-  ^      ^
-  |      +-- 1-2 words, Sentence Case
-  +--------- Optional, 12px size, 4px gap
+.badge--pill {
+  border-radius: 9999px;
+}
+
+.tag--rounded {
+  border-radius: 4px;
+}
 ```
 
-### The Tag (Category/Interactive)
-```text
-[ (Icon) TEXT (Close) ]
-  ^      ^      ^
-  |      |      +-- Dismissible only (20x20px hit area)
-  |      +--------- 1-2 words
-  +---------------- Optional, decorative
-```
+## 3. Placement Template
 
----
+### Card Overlay
+- **Position:** Absolute (Top: 12px, Left: 12px).
+- **Z-Index:** 10 (ensure it sits above image).
 
-## 3. Responsive Behavior
+### Title Inline
+- **Position:** Relative.
+- **Vertical Alignment:** Middle or Baseline.
+- **Spacing:** `margin-left: 8px` from the title text.
 
-- **Desktop:** Display in a horizontal row (`flex-direction: row`).
-- **Mobile:**
-  - Wrap to multiple lines if they exceed container width (`flex-wrap: wrap`).
-  - Increase vertical gap between wrapped rows (min 8px).
-  - Dismissible Tags: Ensure the "Close" icon hit area increases to 44x44px if possible, or keep the whole tag as a 44px hit area.
+### Tag Group (Filter/Metadata)
+- **Container:** Flexbox.
+- **Gap:** 8px (Horizontal and Vertical).
+- **Behavior:** `flex-wrap: wrap`.
 
----
+## 4. Annotation Checklist
 
-## 4. Accessibility Annotations
-
-### Badges (Non-interactive)
-- **Role:** None (decorative/text) or `role="status"` if it updates dynamically.
-- **Hidden Meaning:** If the color conveys meaning, ensure the text does too.
-  - *Bad:* `[ ]` (Red box)
-  - *Good:* `[ Error ]` (Red box + Text)
-
-### Tags (Interactive)
-- **Role:** `button` (if clickable) or `listitem` (if in a list of categories).
-- **Aria-Label:** For dismissible tags, the close button must have a clear label.
-  - *Markup:* `<button aria-label="Remove 'Software' tag">Software <span aria-hidden="true">×</span></button>`
+When handing off to developers, annotate the following:
+- [ ] **Semantic Role:** Is this Success, Warning, Error, or Info?
+- [ ] **Interactive Type:** Is it Static, Link, or Removable?
+- [ ] **Dynamic Data:** How should it handle a label longer than 15 characters? (Truncate vs. Wrap).
+- [ ] **Alt Text:** Does the icon need a label for screen readers? (e.g., "Status: Active").
