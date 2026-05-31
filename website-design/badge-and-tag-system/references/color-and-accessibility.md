@@ -1,34 +1,43 @@
-# Reference: Color and Accessibility
+# Color and Accessibility Logic
 
-When designing badges and tags, accessibility is often compromised for the sake of "minimalist" design. Follow these guidelines to ensure compliance with WCAG 2.2 Level AA.
+## Why Color Alone Is Not Enough
 
-## 1. Contrast Ratios
+Color communicates intent quickly, but users with color vision deficiencies may miss distinctions. Badges and tags should combine:
+- Text labels
+- Optional iconography
+- Shape/border differences where useful
 
-Small text (below 18pt/24px) requires a higher contrast ratio because it is harder to read at low resolutions.
+## WCAG Contrast Targets
 
--   **Minimum Requirement:** 4.5:1 (WCAG AA).
--   **Target Requirement:** 7:1 (WCAG AAA) for critical status information.
--   **Border Contrast:** If the badge background is very light (e.g., `< 1.5:1` against the page background), use a 1px border with a `3:1` contrast ratio to define the shape.
+- Normal text: **4.5:1** minimum
+- Large text (18pt+ or 14pt bold+): **3:1** minimum
+- Non-text UI indicators/focus outlines: **3:1** against adjacent colors
 
-## 2. Non-Color Indicators
+## Semantic Color Mapping Guidance
 
-Users with Protanopia, Deuteranopia, or Tritanopia may not be able to distinguish between Red/Green or Blue/Yellow states.
+| Meaning | Recommended Hue | Notes |
+|---------|------------------|-------|
+| Success / Positive | Green | Pair with check icon when critical |
+| Warning / Attention | Amber/Yellow | Ensure sufficient text contrast |
+| Error / Destructive | Red | Avoid red-only distinction |
+| Info / Neutral | Blue or Gray | Prefer blue for info, gray for neutral states |
 
--   **Labels:** Use clear text (e.g., "Error: Payment Failed" instead of just "Payment Failed").
--   **Icons:** Always pair a semantic color with a meaningful icon (Check, Warning Triangle, Info Circle).
--   **Patterns:** In extremely dense data visualizations, consider using patterns (dots, stripes) in addition to color.
+## Badge vs Tag Emphasis Strategy
 
-## 3. Screen Reader Interaction
+- **Badge (status):** Higher emphasis; stronger fill and contrast.
+- **Tag (category/filter):** Lower emphasis; lighter tones or outlines.
+- Preserve hierarchy so status signals remain visually dominant.
 
-Interactive tags (like those used in a "Filter" bar) must be understandable by users who cannot see the visual grouping.
+## Focus and Interaction Accessibility
 
--   **Role:** Use `role="button"` for clickable tags.
--   **Aria-Label:** For removable tags, the "X" button must have an `aria-label` like `aria-label="Remove 'Marketing' filter"`.
--   **Focus:** Ensure a visible focus ring (min 2px) is present.
+- Interactive tags must have:
+  - Keyboard focus ring with 3:1 contrast.
+  - Clear hover and pressed states.
+  - Screen-reader labels for remove actions (e.g., `Remove tag: Marketing`).
 
-## 4. Touch Targets
+## Validation Steps
 
-Tags are often small, making them difficult to interact with on mobile.
-
--   **Static Tags:** No minimum size required, but must not overlap interactive elements.
--   **Interactive Tags:** Must have a minimum touch target of 44x44px. If the tag itself is smaller (e.g., 24px tall), the transparent hit area around it must be expanded.
+1. Verify contrast ratios using automated tooling (design plugin or accessibility checker).
+2. Simulate grayscale/color-blind views to confirm distinguishability.
+3. Test keyboard-only operation for removable/selectable tags.
+4. Confirm semantic text remains visible at all responsive sizes.
