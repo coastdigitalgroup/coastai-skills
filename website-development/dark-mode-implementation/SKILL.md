@@ -121,7 +121,7 @@ form controls, and system UIs.
 - **Inaccessible Contrast:** Creating a "dark" theme that is just gray-on-gray
   with poor legibility.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Flicker Test:** Open the page in Dark Mode (manual or system) and
       refresh. Verify there is no "flash" of white.

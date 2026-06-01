@@ -128,6 +128,18 @@ Verify the strategy against the video conversion heuristics.
 - **Speed to Value:** Remove all "brand intro" animations. Start the content
   at 0:00.
 
+## Constraints
+
+- **Source Quality Ceiling:** Video optimization cannot compensate for fundamentally poor production quality — low-resolution or poorly lit source footage limits achievable results.
+- **Autoplay Restrictions:** iOS and Android restrict autoplay for videos with audio; muted autoplay is the only reliable cross-platform option for background or hero video.
+- **Accessibility Requirement:** Videos with spoken dialogue require captions or a transcript to meet WCAG 2.1 AA standards.
+
+## Non-Goals
+
+- Video production, scripting, or editing direction.
+- Paid video advertising strategy such as YouTube Ads or social video campaigns.
+- CDN selection, video hosting infrastructure, or encoding pipeline configuration.
+
 ## Common Failure Patterns
 
 - **The "Corporate Intro":** Spending the first 15 seconds on an animated logo
@@ -141,13 +153,13 @@ Verify the strategy against the video conversion heuristics.
 - **Over-Length:** A 5-minute video for a product that only needs 60 seconds of
   explanation.
 
-## Validation Methods
+## Validation Criteria
 
-- **Play Rate Lift:** (Video Plays / Page Views). Target: 10-25% increase by
+- [ ] **Play Rate Lift:** (Video Plays / Page Views). Target: 10-25% increase by
   optimizing thumbnails.
-- **Average Watch Time (AWT):** Measure if re-hooking the intro keeps users
+- [ ] **Average Watch Time (AWT):** Measure if re-hooking the intro keeps users
   watching for longer.
-- **Video-Assisted Conversion Rate:** The CVR of users who watched the video vs.
+- [ ] **Video-Assisted Conversion Rate:** The CVR of users who watched the video vs.
   those who did not.
-- **Drop-off Rate Reduction:** Decreasing the percentage of users who leave in
+- [ ] **Drop-off Rate Reduction:** Decreasing the percentage of users who leave in
   the first 5-10 seconds.

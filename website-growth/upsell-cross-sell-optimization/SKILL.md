@@ -121,6 +121,18 @@ Verify the strategy against the upsell heuristics.
   after adding an upsell, the offer is too intrusive and must be moved or
   simplified.
 
+## Constraints
+
+- **Relevance Required:** Upsell and cross-sell suggestions must be genuinely useful to the buyer — irrelevant recommendations reduce trust and risk lowering the primary conversion rate.
+- **Transparent Pricing:** The additional cost of any upsell must be clearly stated before the user commits.
+- **No Dark Patterns:** Pre-selected add-ons, hidden subscriptions, or bundles that obscure the real total price are prohibited.
+
+## Non-Goals
+
+- Pricing strategy or product catalog decisions for add-ons and bundles.
+- Backend logic for bundle pricing, discount stacking, or inventory grouping.
+- Email-based post-purchase upsell sequences.
+
 ## Common Failure Patterns
 
 - **The "Wall of Offers":** Bombarding the user with multiple popups before
@@ -134,11 +146,11 @@ Verify the strategy against the upsell heuristics.
 - **Over-Discounting:** Offering such deep discounts on upsells that it devalues
   the primary product or erodes all profit margin.
 
-## Validation Methods
+## Validation Criteria
 
-- **Average Order Value (AOV) Lift:** (Total Revenue / Total Orders). Target:
+- [ ] **Average Order Value (AOV) Lift:** (Total Revenue / Total Orders). Target:
   10-25% increase.
-- **Cross-sell Take Rate:** (Orders with Add-on / Total Orders) * 100.
-- **Revenue Per Visitor (RPV):** (Total Revenue / Total Unique Visitors).
-- **Secondary Conversion Impact:** Monitor the primary conversion rate to
+- [ ] **Cross-sell Take Rate:** (Orders with Add-on / Total Orders) * 100.
+- [ ] **Revenue Per Visitor (RPV):** (Total Revenue / Total Unique Visitors).
+- [ ] **Secondary Conversion Impact:** Monitor the primary conversion rate to
   ensure the upsell isn't causing abandonment.

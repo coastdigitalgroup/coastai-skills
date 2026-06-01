@@ -116,6 +116,18 @@ Verify the proposed changes against the PLP growth heuristics.
 - **Price Transparency:** Always show the final price (and any discounts)
   clearly on the PLP card. Never hide the price behind a click.
 
+## Constraints
+
+- **Data Accuracy:** Product names, prices, availability, and images must remain accurate — conversion optimization cannot override data integrity.
+- **Catalog Metadata Dependency:** Filter and sort options are limited to what metadata exists in the product catalog; missing tags cannot be compensated for by UX changes alone.
+- **Search Integration:** Site search and PLP filters operate as a unified discovery system; changes to one affect the other.
+
+## Non-Goals
+
+- Writing or improving individual product descriptions.
+- Product photography direction or image production.
+- Inventory management, stock levels, or fulfillment operations.
+
 ## Common Failure Patterns
 
 - **The Hidden Filter:** Putting all discovery tools behind a single "Filter"
@@ -127,13 +139,13 @@ Verify the proposed changes against the PLP growth heuristics.
 - **Pagination Friction:** Using standard pagination (1, 2, 3...) for large
   catalogs on mobile instead of a "Load More" button.
 
-## Validation Methods
+## Validation Criteria
 
-- **PDP Click-Through Rate (CTR):** (Product Clicks / PLP Views) \* 100. Target:
+- [ ] **PDP Click-Through Rate (CTR):** (Product Clicks / PLP Views) \* 100. Target:
   10-15% lift.
-- **Add-to-Cart (ATC) from PLP:** If using "Quick Add," measure the increase in
+- [ ] **Add-to-Cart (ATC) from PLP:** If using "Quick Add," measure the increase in
   direct-to-cart conversions.
-- **Filter Engagement Rate:** Percentage of users who interact with at least one
+- [ ] **Filter Engagement Rate:** Percentage of users who interact with at least one
   filter.
-- **Search-to-Product Transition:** Measure if users find products faster via
+- [ ] **Search-to-Product Transition:** Measure if users find products faster via
   search-driven PLPs.

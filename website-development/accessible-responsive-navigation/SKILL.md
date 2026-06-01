@@ -94,7 +94,7 @@ The Accessible Responsive Navigation skill provides a technical framework for bu
 - **Inaccessible Mobile Menu:** Hiding the menu visually but leaving its links reachable via `Tab`.
 - **Losing Focus:** Forgetting to return focus to the toggle button after closing a mobile menu.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Keyboard Test:** Can I navigate the entire menu using only the keyboard (`Tab`, `Enter`, `Esc`)?
 - [ ] **Screen Reader Test:** Does the screen reader announce the menu state (expanded/collapsed) and the number of items?

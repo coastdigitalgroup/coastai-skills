@@ -105,6 +105,18 @@ like demo requests, trial signups, and gated content downloads.
 - **Mobile Keyboard Rule:** Every numeric or email field must use the
   appropriate HTML5 input type.
 
+## Constraints
+
+- **Required Fields:** Legally required consent fields (GDPR/CCPA opt-in) and minimum CRM fields cannot be removed regardless of friction reduction goals.
+- **Backend Integrity:** Field changes must not break CRM mapping, webhook payloads, or server-side validation rules.
+- **Privacy Compliance:** Data collection scope must remain within what is disclosed in the privacy policy.
+
+## Non-Goals
+
+- CRM configuration, lead routing rules, or integration setup.
+- Email nurture sequence design after lead capture.
+- Backend form validation logic or submission handling.
+
 ## Common Failure Patterns
 
 - **The "Data Greedy" Form:** Asking for a phone number or physical address for
@@ -116,11 +128,11 @@ like demo requests, trial signups, and gated content downloads.
 - **Placeholder Labels:** Using placeholders instead of labels, making it
   impossible for users to check their work before hitting submit.
 
-## Validation Methods
+## Validation Criteria
 
-- **Form Completion Rate (FCR):** (Submissions / Form Views) \* 100. Target
+- [ ] **Form Completion Rate (FCR):** (Submissions / Form Views) \* 100. Target
   improvement: 15-30%.
-- **Field-Level Drop-off:** Identify which specific field causes the most exits.
-- **Time to Complete:** Measure how long it takes a user to finish the form.
-- **Error Trigger Rate:** Percentage of users who see a validation error. High
+- [ ] **Field-Level Drop-off:** Identify which specific field causes the most exits.
+- [ ] **Time to Complete:** Measure how long it takes a user to finish the form.
+- [ ] **Error Trigger Rate:** Percentage of users who see a validation error. High
   rates indicate confusing field requirements.

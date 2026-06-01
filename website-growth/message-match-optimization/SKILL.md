@@ -114,6 +114,18 @@ Verify that the journey feels like a single, cohesive experience.
 - **The "Scent" Priority:** In a conflict between "Brand Consistency" and
   "Message Match," prioritize Message Match for campaign-specific landing pages.
 
+## Constraints
+
+- **Traffic Source Coordination:** Ad copy or email subject line changes must be coordinated with the channel owner — this skill addresses the landing page side of the journey only.
+- **UTM Integrity:** UTM parameter structure used for source-level attribution must not be disrupted.
+- **Cannot Fix Traffic Quality:** Message match improves conversion for existing traffic; it cannot compensate for fundamentally misaligned audience targeting.
+
+## Non-Goals
+
+- Writing new ad creative or managing paid ad campaigns.
+- Email marketing strategy or subject line optimization.
+- Improving organic traffic quality or SEO keyword targeting.
+
 ## Common Failure Patterns
 
 - **The "Generic Catch-All":** Sending targeted ad traffic to a generic
@@ -127,13 +139,13 @@ Verify that the journey feels like a single, cohesive experience.
 - **CTA Pivot:** Ad says "Download the Ebook"; landing page forces a "Contact
   Sales" demo request.
 
-## Validation Methods
+## Validation Criteria
 
-- **Scent Test:** Show a user the ad for 3 seconds, then show them the landing
+- [ ] **Scent Test:** Show a user the ad for 3 seconds, then show them the landing
   page for 3 seconds. Ask: "Did you arrive where you expected?"
-- **Bounce Rate by Source:** Monitor if bounce rates for specific campaigns
+- [ ] **Bounce Rate by Source:** Monitor if bounce rates for specific campaigns
   decrease after optimization.
-- **Quality Score (Google Ads):** Look for an increase in the "Landing Page
+- [ ] **Quality Score (Google Ads):** Look for an increase in the "Landing Page
   Experience" component of Google Ads Quality Score.
-- **Conversion Lift:** Measure the increase in CVR for traffic coming from the
+- [ ] **Conversion Lift:** Measure the increase in CVR for traffic coming from the
   optimized journey.

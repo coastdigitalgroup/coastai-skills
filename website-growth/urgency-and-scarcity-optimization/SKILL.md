@@ -114,6 +114,18 @@ Verify that the triggers are authentic, visible, and non-intrusive.
 - **The "Low-Pressure" Exit:** Allow users to dismiss popups or notifications
   easily to avoid frustration.
 
+## Constraints
+
+- **Truthfulness Mandatory:** All urgency and scarcity signals must be factually accurate — manufactured deadlines or false stock levels are dark patterns that may violate FTC and ASA regulations.
+- **No Evergreen Countdowns:** Countdown timers that reset per page load or per visitor are deceptive and must not be used.
+- **Proportional Placement:** Urgency signals must be proportional to the actual stakes — excessive pressure on low-commitment actions reads as manipulative.
+
+## Non-Goals
+
+- Creating the underlying limited-time offers or sale events, which requires business and marketing decisions.
+- Inventory management or stock level systems.
+- Email and retargeting campaigns that use urgency triggers.
+
 ## Common Failure Patterns
 
 - **The Resetting Timer:** A countdown that starts over when the page is
@@ -127,12 +139,12 @@ Verify that the triggers are authentic, visible, and non-intrusive.
 - **Poor Timing:** Showing a "Limited Time" offer to a user who has already
   missed the deadline, causing frustration.
 
-## Validation Methods
+## Validation Criteria
 
-- **Conversion Rate (CVR) Lift:** Measure the increase in completion rates on
+- [ ] **Conversion Rate (CVR) Lift:** Measure the increase in completion rates on
   pages with optimized triggers.
-- **Time-to-Purchase:** Track if the average duration from first view to
+- [ ] **Time-to-Purchase:** Track if the average duration from first view to
   purchase decreases.
-- **Checkout Completion Rate:** Measure the reduction in cart abandonment.
-- **Revenue per Visitor (RPV):** Ensure that the triggers are driving higher
+- [ ] **Checkout Completion Rate:** Measure the reduction in cart abandonment.
+- [ ] **Revenue per Visitor (RPV):** Ensure that the triggers are driving higher
   volume without negatively impacting order value.

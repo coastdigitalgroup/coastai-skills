@@ -113,6 +113,18 @@ Verify the new flow against the growth heuristics below.
 - **The "One Idea" Rule:** Each section or block of content should communicate
   exactly ONE key idea or benefit.
 
+## Constraints
+
+- **Content Accuracy:** All claims, statistics, and proof points used throughout the page hierarchy must be factually accurate.
+- **Brand Voice:** Reordering and rewriting sections must preserve the established brand voice and messaging framework.
+- **Technical Dependency:** Section reordering may require developer or CMS involvement depending on the page builder or template in use.
+
+## Non-Goals
+
+- Writing new copy or designing new visual elements for sections.
+- Technical implementation of the page layout or CMS configuration.
+- SEO keyword strategy or on-page SEO optimization.
+
 ## Common Failure Patterns
 
 - **The "Feature Dump":** Listing every technical detail before establishing the
@@ -126,14 +138,14 @@ Verify the new flow against the growth heuristics below.
 - **Uniform Visual Weight:** Making every section look identical, which prevents
   the user from identifying the most important information.
 
-## Validation Methods
+## Validation Criteria
 
-- **The "Headlines Only" Test:** Read only the H2s on the page. Does it tell a
+- [ ] **The "Headlines Only" Test:** Read only the H2s on the page. Does it tell a
   complete and persuasive story?
-- **Scroll Mapping:** Analyze where users stop scrolling. A sharp drop-off
+- [ ] **Scroll Mapping:** Analyze where users stop scrolling. A sharp drop-off
   usually indicates a "boring" or "illogical" section.
-- **Squint Test:** Squint at the page. Is the logical progression of sections
+- [ ] **Squint Test:** Squint at the page. Is the logical progression of sections
   and the primary CTA still clear?
-- **User Sequence Survey:** Ask testers to rank the sections in order of
+- [ ] **User Sequence Survey:** Ask testers to rank the sections in order of
   "importance to their decision." If their ranking differs from your layout,
   adjust the hierarchy.

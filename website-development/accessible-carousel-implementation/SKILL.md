@@ -139,7 +139,7 @@ navigable and understandable by users of assistive technologies.
 - **Stale Live Regions:** Forgetting to update the "Slide X of Y" announcement
   when the slide changes.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Keyboard Navigation:** Can I navigate to every slide and use every
       control using only the `Tab` and `Enter` keys?

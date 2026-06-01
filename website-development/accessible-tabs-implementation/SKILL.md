@@ -124,7 +124,7 @@ interaction patterns (arrow key navigation).
 - **No Arrow Support:** Forcing users to use the `Tab` key to move between tabs
   instead of the standard arrow-key pattern.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Keyboard Navigation:** Can you move between tabs using arrow keys? Does
       focus wrap around?

@@ -112,7 +112,7 @@ Provide a sensible default style (usually the mobile/narrow view) that works if 
 - **Missing Container Name:** In complex apps, a component mistakenly queries a distant global container instead of its immediate wrapper because names weren't used.
 - **Fixed Units in Fluid Containers:** Using fixed `px` values inside a container query when `cqw` would provide a smoother transition.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Context Swap Test:** Place the component in a wide main area and a narrow sidebar on the same screen. Verify they both render correctly for their specific width.
 - [ ] **Resize Test:** Use DevTools to resize the *parent container* (not the whole window) and observe the layout shift.

@@ -97,7 +97,7 @@ The Responsive Images skill ensures that websites deliver the most appropriate i
 - **Forgotten `alt`:** Failing to provide an `alt` attribute (even an empty one), which causes screen readers to announce the file name.
 - **CLS Issues:** Not defining `width` and `height` on the `<img>`, causing the page to jump as images load.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Network Inspector Test:** Open DevTools, set "Throttling" to a mobile profile, and verify that a smaller image variant is downloaded.
 - [ ] **Resolution Test:** Check that a high-DPI screen (like Retina) downloads a @2x or @3x version.

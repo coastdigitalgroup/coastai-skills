@@ -113,6 +113,18 @@ Ensure the handling is concise and doesn't introduce *new* doubts.
   "We know switching CRMs is a pain. That's why we handle the data migration for
   you").
 
+## Constraints
+
+- **Factual Honesty:** Objection responses must be truthful — fabricated social proof, misleading guarantees, or false comparisons will backfire and may violate advertising regulations.
+- **Audience Specificity:** Objections vary significantly by segment (enterprise vs. SMB, first-time vs. returning buyer); a single response set may not serve all audiences.
+- **Placement Precision:** Handling copy must appear near the point where each doubt arises, not buried in an FAQ section far from the decision moment.
+
+## Non-Goals
+
+- Redesigning the product or pricing to eliminate legitimate objections at their root.
+- Customer support process improvements for handling post-purchase issues.
+- Sales team scripting or CRM-based objection handling workflows.
+
 ## Common Failure Patterns
 
 - **Burying the Answer:** Putting critical objection-handling in a separate,
@@ -125,13 +137,13 @@ Ensure the handling is concise and doesn't introduce *new* doubts.
 - **Fake Reassurance:** Claiming something is "easy" when users clearly find it
   difficult.
 
-## Validation Methods
+## Validation Criteria
 
-- **Conversion Rate (CVR) Lift:** Measure the increase in CTA clicks or form
+- [ ] **Conversion Rate (CVR) Lift:** Measure the increase in CTA clicks or form
   submissions after adding the handling copy.
-- **Support Ticket Volume:** A decrease in "pre-sales" questions indicates the
+- [ ] **Support Ticket Volume:** A decrease in "pre-sales" questions indicates the
   site is doing a better job of handling objections.
-- **Time-on-Page:** An increase in time-on-page *without* a decrease in CVR
+- [ ] **Time-on-Page:** An increase in time-on-page *without* a decrease in CVR
   suggests users are reading and processing the reassurances.
-- **Qualitative User Testing:** Ask users to "Think Aloud" and note when a doubt
+- [ ] **Qualitative User Testing:** Ask users to "Think Aloud" and note when a doubt
   is triggered and whether it is resolved by the on-page content.

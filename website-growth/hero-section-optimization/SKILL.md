@@ -78,6 +78,18 @@ Verify that the new design follows the growth heuristics defined below.
 - **Above the Fold:** The Headline, Subheadline, and Primary CTA must be visible on standard mobile and desktop viewports without scrolling.
 - **Social Proof:** If space permits, include a small "trust signal" (e.g., "Joined by 10k+ users" or a 5-star rating) near the CTA.
 
+## Constraints
+
+- **Truthful Claims:** The value proposition must accurately reflect what the product or service delivers — overpromising increases bounce after the initial impression fades.
+- **Brand Consistency:** Visual style, tone, and messaging must remain consistent with the broader brand identity.
+- **Above-the-Fold Priority:** The primary CTA must be visible without scrolling on the most common viewport sizes.
+
+## Non-Goals
+
+- Rewriting the overarching brand messaging strategy or product positioning.
+- Commissioning or creating new visual assets such as photography, illustration, or video.
+- Improving the product itself to deliver on the promises made in the hero.
+
 ## Common Failure Patterns
 
 - **The "Vague Headline":** Headlines like "Welcome to the Future" or "We Do It Better" that don't explain the product.
@@ -85,9 +97,9 @@ Verify that the new design follows the growth heuristics defined below.
 - **Image Disconnect:** Using generic stock photos that don't relate to the value proposition.
 - **Information Overload:** Trying to explain every feature in the hero section instead of focusing on the primary benefit.
 
-## Validation Methods
+## Validation Criteria
 
-- **The 5-Second Test:** Show the new hero to someone for 5 seconds and ask them what the site is about and what they should do.
-- **A/B Testing:** Compare the optimized version against the original to measure changes in CTR and Bounce Rate.
-- **Scroll Mapping:** Use tools like Hotjar to ensure users are seeing the CTA before they bounce.
-- **Clarity Score:** Rate the hero on a scale of 1-10 based on how quickly the value prop is understood.
+- [ ] **The 5-Second Test:** Show the new hero to someone for 5 seconds and ask them what the site is about and what they should do.
+- [ ] **A/B Testing:** Compare the optimized version against the original to measure changes in CTR and Bounce Rate.
+- [ ] **Scroll Mapping:** Use tools like Hotjar to ensure users are seeing the CTA before they bounce.
+- [ ] **Clarity Score:** Rate the hero on a scale of 1-10 based on how quickly the value prop is understood.

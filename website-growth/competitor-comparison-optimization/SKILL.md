@@ -116,6 +116,18 @@ Use testimonials specifically from people who switched.
 - **Scannability First:** A user should understand why you are better in less
   than 10 seconds of scrolling.
 
+## Constraints
+
+- **Factual Accuracy:** All competitive claims must be verifiable and current — outdated or false comparisons create legal liability and damage trust.
+- **Legal Review:** Directly naming competitors in comparative advertising may require legal sign-off depending on jurisdiction and phrasing.
+- **Maintenance Burden:** Comparison pages require ongoing updates as competitor pricing, features, and positioning change.
+
+## Non-Goals
+
+- Conducting primary competitor research or pricing discovery.
+- Setting product positioning strategy or pricing tiers.
+- Managing competitor monitoring or alerting systems.
+
 ## Common Failure Patterns
 
 - **The "Feature War":** Listing 50 technical features that the average user
@@ -128,13 +140,13 @@ Use testimonials specifically from people who switched.
 - **Outdated Data:** Showing prices or features for a competitor that changed
   a year ago, which ruins your credibility.
 
-## Validation Methods
+## Validation Criteria
 
-- **Conversion Rate (CR):** Percentage of comparison page visitors who start a
+- [ ] **Conversion Rate (CR):** Percentage of comparison page visitors who start a
   trial or request a demo.
-- **Trial-to-Paid Velocity:** Does traffic from comparison pages convert to
+- [ ] **Trial-to-Paid Velocity:** Does traffic from comparison pages convert to
   paying customers faster than general traffic? (Indicates higher intent).
-- **Bounce Rate on "Vs" Keywords:** A decrease in bounce rate on specific
+- [ ] **Bounce Rate on "Vs" Keywords:** A decrease in bounce rate on specific
   search landing pages.
-- **Qualitative Customer Feedback:** Asking new signups, "Did our comparison
+- [ ] **Qualitative Customer Feedback:** Asking new signups, "Did our comparison
   page help you make your decision?"

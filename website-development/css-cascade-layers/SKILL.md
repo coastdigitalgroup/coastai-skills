@@ -140,7 +140,7 @@ replace them with simple classes, relying on the layer order for precedence.
 - **Mixed Imports:** Mixing layered and unlayered `@import` statements in a
   way that breaks the expected cascade.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Cascade Audit:** Use the "Styles" tab in Browser DevTools to verify
       which layer a property is coming from.

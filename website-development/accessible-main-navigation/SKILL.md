@@ -130,7 +130,7 @@ menu interactions.
 - **Non-Standard Keyboard Support:** Forgetting to handle the `Escape` key for
   closing submenus or mobile overlays.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Keyboard Navigation Test:** Can you reach all links using only the `Tab`
       key?

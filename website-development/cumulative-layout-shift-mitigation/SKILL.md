@@ -139,7 +139,7 @@ asynchronously, which improves user experience and Core Web Vitals scores.
 - **Font Swapping:** A heavy custom font swapping in and changing the line
   height of every paragraph on the page.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Performance Audit:** Verify the CLS score is below 0.1 in Lighthouse.
 - [ ] **Layout Shift Region Highlighting:** In Chrome DevTools, enable "Layout

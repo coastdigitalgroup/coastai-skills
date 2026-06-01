@@ -118,6 +118,18 @@ The results must be authoritative enough to be used in a internal business case.
 - **Mobile First:** Use large tap targets for sliders and ensure charts are
   responsive (not just shrunk-down images).
 
+## Constraints
+
+- **Defensible Outputs:** Calculator results must be based on honest assumptions and a validated formula — inflated projections create unrealistic expectations and erode post-sale trust.
+- **Business Validation:** The formula inputs, weights, and assumptions must be reviewed and approved by product, finance, or sales before publishing.
+- **Appropriate Caveats:** Results should include clear disclaimers (e.g., "estimates vary by use case") to set accurate expectations.
+
+## Non-Goals
+
+- Building or maintaining the calculator backend, data model, or API.
+- CRM integration for routing calculator-generated leads.
+- Financial modeling, pricing strategy, or guarantee commitments based on calculator outputs.
+
 ## Common Failure Patterns
 
 - **The "Interrogation":** Asking for 20+ precise data points that the user
@@ -131,13 +143,13 @@ The results must be authoritative enough to be used in a internal business case.
 - **Hidden CTAs:** Focusing so much on the math that the "What's Next?" button
   is buried at the bottom of the page.
 
-## Validation Methods
+## Validation Criteria
 
-- **Completion Rate:** (Calculations Completed / Calculators Started) * 100.
+- [ ] **Completion Rate:** (Calculations Completed / Calculators Started) * 100.
   Target: >60%.
-- **Lead Conversion Rate (LCR):** Percentage of calculator users who provide
+- [ ] **Lead Conversion Rate (LCR):** Percentage of calculator users who provide
   their contact info.
-- **Sales Velocity:** Measure if leads coming from the calculator close faster
+- [ ] **Sales Velocity:** Measure if leads coming from the calculator close faster
   than generic demo requests (due to established value).
-- **Sharing Rate:** How many users use the "Email this report" or "Share"
+- [ ] **Sharing Rate:** How many users use the "Email this report" or "Share"
   functionality.

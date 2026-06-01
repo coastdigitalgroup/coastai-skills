@@ -115,6 +115,18 @@ Ensure the proposed changes align with the growth heuristics below.
 - **Scannability:** Users rarely read full testimonials. The "hook" (the best
   sentence) must be visually emphasized.
 
+## Constraints
+
+- **Authenticity Required:** All testimonials, reviews, case studies, and statistics must be genuine and verifiable — fabricated social proof violates FTC and ASA guidelines.
+- **Review Gating Prohibited:** Selectively soliciting reviews only from satisfied customers while suppressing negative ones violates platform terms of service and advertising standards.
+- **Recency:** Outdated proof (stale statistics, years-old testimonials, inactive logos) can undermine rather than build trust.
+
+## Non-Goals
+
+- Generating new reviews, testimonials, or case studies, which is a content and outreach task.
+- PR, media outreach, or brand reputation management.
+- Platform review administration (Google Business Profile, G2, Trustpilot).
+
 ## Common Failure Patterns
 
 - **The "Ghost Town":** Having a "Testimonials" section with only 1-2 entries,
@@ -126,13 +138,13 @@ Ensure the proposed changes align with the growth heuristics below.
 - **Outdated Stats:** "Trusted by 500 users" when the company has been around
   for 5 years (implies lack of growth).
 
-## Validation Methods
+## Validation Criteria
 
-- **Conversion Rate Lift:** Measure the increase in CTA clicks or form
+- [ ] **Conversion Rate Lift:** Measure the increase in CTA clicks or form
   completions after adding/optimizing proof.
-- **Heatmap Analysis:** Check if users are actually hovering over or reading the
+- [ ] **Heatmap Analysis:** Check if users are actually hovering over or reading the
   testimonial sections.
-- **Trust Score Surveys:** Post-purchase surveys asking "How much did [Specific
+- [ ] **Trust Score Surveys:** Post-purchase surveys asking "How much did [Specific
   Section] influence your decision?"
-- **Qualitative Feedback:** User testing where participants are asked to talk
+- [ ] **Qualitative Feedback:** User testing where participants are asked to talk
   through their "trust" level as they browse.

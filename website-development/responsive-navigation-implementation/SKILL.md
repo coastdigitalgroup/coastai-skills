@@ -142,7 +142,7 @@ horizontal layouts, ensuring accessibility (ARIA, focus management), performance
   by hiding elements with JS instead of CSS).
 - **Z-Index Issues:** Mobile menu appearing behind other page content.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Keyboard Test:** Can I open/close the menu and navigate all links using
       only `Tab`, `Enter`, and `Esc`?

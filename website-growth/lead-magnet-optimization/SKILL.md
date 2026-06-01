@@ -108,6 +108,18 @@ Verify the proposed lead magnet against the growth heuristics below.
 - **Intent Alignment:** The magnet must be the "logical next step" from the
   content the user is currently reading.
 
+## Constraints
+
+- **Value Delivery:** The lead magnet must deliver genuine, immediate value — low-quality magnets damage brand trust and attract unqualified leads.
+- **Honest Opt-in:** The consent mechanism must clearly describe what users are signing up for; pre-checked boxes violate GDPR in the EU.
+- **Delivery Reliability:** The distribution mechanism (email, instant download) must be tested and functional before driving traffic to the offer.
+
+## Non-Goals
+
+- Creating or editing the lead magnet content itself.
+- Email marketing platform setup, list management, or automation.
+- Paid promotion or content syndication of the lead magnet.
+
 ## Common Failure Patterns
 
 - **The "Data Grab":** Asking for 10 fields for a 1-page PDF.
@@ -120,13 +132,13 @@ Verify the proposed lead magnet against the growth heuristics below.
 - **Mobile Unfriendly:** Delivering a horizontal PDF that is impossible to
   read on a phone.
 
-## Validation Methods
+## Validation Criteria
 
-- **Opt-in Conversion Rate (CVR):** (Leads / Visitors) * 100. Target: 5-15% for
+- [ ] **Opt-in Conversion Rate (CVR):** (Leads / Visitors) * 100. Target: 5-15% for
   targeted blog posts.
-- **Consumption Rate:** Measure how many users actually click the link in the
+- [ ] **Consumption Rate:** Measure how many users actually click the link in the
   delivery email or download the file.
-- **Lead Quality:** Monitor how many of these leads progress to the next stage
+- [ ] **Lead Quality:** Monitor how many of these leads progress to the next stage
   of the funnel (e.g., booking a demo or making a purchase).
-- **Feedback Loops:** Short surveys on the thank-you page: "On a scale of 1-10,
+- [ ] **Feedback Loops:** Short surveys on the thank-you page: "On a scale of 1-10,
   how helpful was this?"

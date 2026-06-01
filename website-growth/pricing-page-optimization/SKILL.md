@@ -109,6 +109,18 @@ Ensure the proposed changes align with the growth heuristics below.
 - **Transparency:** No hidden fees. If there are add-ons, mention them clearly
   or include them in a higher tier.
 
+## Constraints
+
+- **Pricing Accuracy:** All plan features, limits, and prices must reflect the actual product — inaccurate pricing pages create support burden and increase churn.
+- **Business Approval:** Changes to plan structure, pricing tiers, or feature positioning require product and finance sign-off.
+- **Billing FAQ:** Frequently asked billing questions (upgrades, cancellations, refunds) must be addressed accurately and not omitted for brevity.
+
+## Non-Goals
+
+- Setting pricing strategy, determining plan feature sets, or defining trial terms.
+- Configuring billing systems, payment gateways, or subscription logic.
+- Contract and enterprise pricing negotiation flows.
+
 ## Common Failure Patterns
 
 - **Feature Dumping:** Listing 20+ features in the main pricing cards, making
@@ -120,13 +132,13 @@ Ensure the proposed changes align with the growth heuristics below.
 - **Lack of Currency/Regional Context:** Not showing the correct currency or
   local pricing if the business is global.
 
-## Validation Methods
+## Validation Criteria
 
-- **Preference Testing:** Show users two versions and ask which plan they would
+- [ ] **Preference Testing:** Show users two versions and ask which plan they would
   pick and why.
-- **Conversion to Checkout:** Measure the percentage of pricing page visitors
+- [ ] **Conversion to Checkout:** Measure the percentage of pricing page visitors
   who click a "Buy" or "Sign Up" button.
-- **AOV Analysis:** Compare the average order value before and after
+- [ ] **AOV Analysis:** Compare the average order value before and after
   optimization.
-- **Customer Support Tickets:** Monitor if "Which plan should I get?" questions
+- [ ] **Customer Support Tickets:** Monitor if "Which plan should I get?" questions
   decrease after the update.

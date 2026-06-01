@@ -118,6 +118,18 @@ Verify the proposed changes against the checkout heuristics below.
   "Next" button. Remove site navigation (header/footer) to minimize
   distractions.
 
+## Constraints
+
+- **Required Fields:** Payment, billing address, and legally required consent fields cannot be removed regardless of the friction cost they introduce.
+- **Payment Gateway:** Payment provider integration, configuration, and security are outside this skill's scope.
+- **PCI Compliance:** PCI-DSS requirements for handling payment field data must not be compromised by any UI changes.
+
+## Non-Goals
+
+- Payment gateway selection, integration, or configuration.
+- Backend order processing, fulfillment logic, or inventory management.
+- Post-purchase transactional email flows (receipts, shipping notifications).
+
 ## Common Failure Patterns
 
 - **The "Forced Marriage":** Requiring account creation before the user can even
@@ -131,13 +143,13 @@ Verify the proposed changes against the checkout heuristics below.
 - **The "Clear All" Trap:** Including a "Reset Form" button that users might
   accidentally click.
 
-## Validation Methods
+## Validation Criteria
 
-- **Checkout Completion Rate (CCR):** (Completed Orders / Checkout
+- [ ] **Checkout Completion Rate (CCR):** (Completed Orders / Checkout
   Starts) \* 100. Target: 5-15% lift.
-- **Cart-to-Detail Rate:** Measure if changes to shipping transparency in the
+- [ ] **Cart-to-Detail Rate:** Measure if changes to shipping transparency in the
   cart reduce checkout abandonment.
-- **Form Analytics:** Track time-spent and error-rate per field to identify
+- [ ] **Form Analytics:** Track time-spent and error-rate per field to identify
   "stuck" points.
-- **User Testing (The "No Scroll" Test):** Can a user complete the primary
+- [ ] **User Testing (The "No Scroll" Test):** Can a user complete the primary
   shipping form on mobile without excessive vertical scrolling?

@@ -113,6 +113,18 @@ confirmation.
   business (like a referral), offer immediate value in return (like a discount
   or bonus content).
 
+## Constraints
+
+- **Confirmation First:** The success page must clearly confirm the user's completed action before any secondary ask is introduced.
+- **Non-Exploitative Tone:** Post-conversion messaging must feel like a natural extension of the relationship — not a bait-and-switch that undermines trust.
+- **Subordinate CTAs:** Secondary actions must be visually subordinate to the confirmation and must not create confusion about whether the primary action succeeded.
+
+## Non-Goals
+
+- Email-based onboarding sequences triggered after conversion.
+- Full user activation or product onboarding flow design (see `user-onboarding-optimization`).
+- Loyalty program design or long-term retention strategy.
+
 ## Common Failure Patterns
 
 - **The "Dead End":** A success page that only says "Thank you" and has no
@@ -125,13 +137,13 @@ confirmation.
 - **Broken Context:** Asking the user to re-enter information they just
   provided in the primary conversion form.
 
-## Validation Methods
+## Validation Criteria
 
-- **Secondary Conversion Rate:** The percentage of users who complete the
+- [ ] **Secondary Conversion Rate:** The percentage of users who complete the
   additional action on the success page.
-- **Bounce Rate on Success Page:** A high bounce rate indicates a missed
+- [ ] **Bounce Rate on Success Page:** A high bounce rate indicates a missed
   opportunity for momentum.
-- **Time to Activation:** Measure if post-conversion prompts (like profile
+- [ ] **Time to Activation:** Measure if post-conversion prompts (like profile
   setup) decrease the time it takes for a user to reach their "Aha! Moment."
-- **Referral Volume:** Track the increase in organic invites originating
+- [ ] **Referral Volume:** Track the increase in organic invites originating
   specifically from the "Thank You" page.

@@ -141,7 +141,7 @@ accessibility (ensuring screen readers are notified of new content), and UX
 - **Memory Leaks:** Not disconnecting observers or removing event listeners
   when the component is destroyed.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Throttle Test:** Use "Slow 3G" in DevTools; does the loading indicator
       appear correctly?

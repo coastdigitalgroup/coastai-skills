@@ -133,7 +133,7 @@ unused groups).
 - **Blob Exports:** Exporting "outlined" text or complex paths that could be
   represented as simple shapes, leading to unnecessarily large files.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Optimization Check:** Compare raw vs. optimized file size (aim for >50%
       reduction).

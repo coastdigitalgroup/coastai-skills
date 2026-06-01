@@ -121,7 +121,7 @@ Ensure the facade and the final embed have identical dimensions (`width` and
 - **Missing Accessibility:** Using a non-focusable `<div>` for the facade,
   preventing keyboard users from ever loading the content.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Lighthouse Audit:** Run a report and check for "Reduce the impact of
       third-party code" and "Total Blocking Time" improvements.

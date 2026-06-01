@@ -116,6 +116,18 @@ Place "Security Blankets" near the ATC button:
 - **Mobile First:** Ensure touch targets (buttons, variant swatches) are at
   least 44x44px.
 
+## Constraints
+
+- **Content Accuracy:** Product specifications, compatibility claims, and pricing must reflect real facts — inaccurate PDPs increase returns and erode brand trust.
+- **Review Authenticity:** Review content is user-generated and cannot be fabricated; incentivized reviews must comply with FTC and ASA guidelines.
+- **Variant Accuracy:** Variant availability and pricing must reflect actual inventory in real time.
+
+## Non-Goals
+
+- Product photography, videography, or asset production direction.
+- Review solicitation campaigns or platform reputation management.
+- Inventory management, fulfillment, or returns processing.
+
 ## Common Failure Patterns
 
 - **Generic Descriptions:** Using the manufacturer's stock description instead
@@ -128,13 +140,13 @@ Place "Security Blankets" near the ATC button:
 - **Cluttered Visuals:** Too many badges, popups, or "People also bought"
   widgets that distract from the main ATC goal.
 
-## Validation Methods
+## Validation Criteria
 
-- **Add-to-Cart (ATC) Rate:** (ATC clicks / PDP Views) \* 100. Target a 10-20%
+- [ ] **Add-to-Cart (ATC) Rate:** (ATC clicks / PDP Views) \* 100. Target a 10-20%
   relative lift.
-- **Review Sentiment:** Monitor if questions asked in reviews decrease (due to
+- [ ] **Review Sentiment:** Monitor if questions asked in reviews decrease (due to
   better descriptions).
-- **Heatmap Interaction:** Verify that users are engaging with variant selectors
+- [ ] **Heatmap Interaction:** Verify that users are engaging with variant selectors
   and lifestyle images.
-- **Return Rate:** A decrease in "item not as described" returns indicates
+- [ ] **Return Rate:** A decrease in "item not as described" returns indicates
   better PDP clarity.

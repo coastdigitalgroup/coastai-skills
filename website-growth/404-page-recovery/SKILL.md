@@ -114,6 +114,18 @@ Ensure the page solves the user's problem without creating more confusion.
   Humor is acceptable for B2C, but B2B should prioritize efficiency and
   assistance.
 
+## Constraints
+
+- **Analytics Access:** Requires access to site analytics and Google Search Console to identify high-traffic 404 sources before prioritizing fixes.
+- **Template Control:** Must have the ability to customize the 404 page template; some third-party platforms impose restrictions on layout and content.
+- **Scope Boundary:** This skill addresses the 404 *experience*; fixing broken links or configuring redirects at the source is a separate task.
+
+## Non-Goals
+
+- Implementing 301 redirects for moved or deleted content.
+- Auditing and repairing the broken internal link structures that cause 404s.
+- Organic SEO recovery strategy for URLs that have lost link equity.
+
 ## Common Failure Patterns
 
 - **The "Dead End":** A page that only says "404 - Not Found" with no links and
@@ -127,13 +139,13 @@ Ensure the page solves the user's problem without creating more confusion.
 - **SEO Suicide:** Returning a `200 OK` status code for the 404 page (Soft
   404), which prevents search engines from identifying broken links.
 
-## Validation Methods
+## Validation Criteria
 
-- **Recovery Rate:** (Clicks to another page from 404 / Total 404 Views) * 100.
+- [ ] **Recovery Rate:** (Clicks to another page from 404 / Total 404 Views) * 100.
   Target: >30% recovery.
-- **404 Bounce Rate:** The percentage of users who exit the site immediately
+- [ ] **404 Bounce Rate:** The percentage of users who exit the site immediately
   upon seeing the 404 page. Goal: Decrease.
-- **Search Usage on 404:** Percentage of users who use the search bar on the
+- [ ] **Search Usage on 404:** Percentage of users who use the search bar on the
   error page.
-- **Assisted Conversions:** Track if users who encounter a 404 page and then
+- [ ] **Assisted Conversions:** Track if users who encounter a 404 page and then
   recover go on to complete a primary goal (Sign up/Purchase).

@@ -132,7 +132,7 @@ follow the ARIA 1.2 Combobox pattern, making them usable for everyone.
 - **No "No Results" Feedback:** Failing to inform screen reader users when a
   search returns zero items.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Keyboard Test:** Can you open, navigate, select, and close the widget
       using only the keyboard?

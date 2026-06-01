@@ -124,6 +124,18 @@ Verify that the search strategy aligns with conversion heuristics.
 - **The 5-Result Minimum:** On a results page, aim to show at least 5 results
   above the fold on desktop by balancing image size and metadata.
 
+## Constraints
+
+- **Platform Dependency:** Synonym mapping, typo tolerance, and ranking tuning require configuration access to the search platform (e.g., Algolia, Elasticsearch, or native CMS search).
+- **Catalog Quality Ceiling:** Search can only surface what exists — poor product titles, missing descriptions, or inconsistent tagging limit result quality regardless of search tuning.
+- **Analytics Prerequisite:** Search query reporting must be enabled before optimization can be data-driven.
+
+## Non-Goals
+
+- Building or migrating the search infrastructure.
+- Improving product content quality or catalog taxonomy, which is a separate content task.
+- External SEO and Google Search optimization.
+
 ## Common Failure Patterns
 
 - **The "Invisible" Search:** Hiding the search input behind an icon on desktop,
@@ -136,13 +148,13 @@ Verify that the search strategy aligns with conversion heuristics.
 - **Mobile Keyboard Conflict:** Not using the correct input type, causing the
   mobile keyboard to block the search results as they appear.
 
-## Validation Methods
+## Validation Criteria
 
-- **Search Conversion Rate:** Measure the percentage of users who search and
+- [ ] **Search Conversion Rate:** Measure the percentage of users who search and
   subsequently convert. Compare this to the site-wide average.
-- **Search Exit Rate:** The percentage of users who leave the site from the
+- [ ] **Search Exit Rate:** The percentage of users who leave the site from the
   search results page. Goal: Decrease.
-- **Time to First Click:** How long it takes a user to click a result after
+- [ ] **Time to First Click:** How long it takes a user to click a result after
   searching. Goal: Decrease.
-- **Zero-Results Rate:** The percentage of total searches that return no
+- [ ] **Zero-Results Rate:** The percentage of total searches that return no
   results. Goal: Decrease via synonym mapping and typo handling.

@@ -130,7 +130,7 @@ scale.
 - **Fixed Position Confusion:** `position: fixed` elements always create a
   stacking context (in most modern browsers).
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Layer Audit:** Use DevTools to confirm the stacking context hierarchy.
 - [ ] **Dynamic Content Test:** Verify that dynamically added content (like

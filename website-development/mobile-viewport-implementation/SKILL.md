@@ -127,7 +127,7 @@ safe areas.
 - **100vh Overflow:** Creating a "100vh" container that requires scrolling to
   see the bottom CTA because the browser's bottom bar is taking up space.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Physical Device/Simulator Test:** Test on a device with a notch (iPhone
       X or later) in both portrait and landscape.

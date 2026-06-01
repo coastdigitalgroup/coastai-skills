@@ -120,7 +120,7 @@ readability. Use `:lang()` selectors or `[dir="rtl"]` to apply these.
   rules that break when the direction changes.
 - **Inconsistent Alignment:** Mixing `text-align: start` with `float: left`.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Toggle Test:** Change the `dir` attribute from `ltr` to `rtl` and verify
   the layout mirrors correctly.

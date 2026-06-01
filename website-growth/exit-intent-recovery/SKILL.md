@@ -121,6 +121,18 @@ Ensure the intervention doesn't degrade the user experience.
 - **The "No-Pressure" Exit:** Always provide a clear "No thanks" or "I'm not
   interested" link that closes the intervention immediately.
 
+## Constraints
+
+- **Honest Offers:** Discounts and incentives must be genuine — fake exit offers erode brand trust and may violate advertising standards.
+- **Mobile Limitation:** Exit-intent detection is unreliable on mobile (no mouseout event); mobile strategies require alternative triggers such as scroll velocity or inactivity.
+- **Consent Compliance:** Email capture through exit overlays must comply with GDPR/CCPA opt-in requirements.
+
+## Non-Goals
+
+- Email re-engagement campaigns for users who have already left the site.
+- Paid retargeting ad strategy for abandoning visitors.
+- Fixing the underlying UX or offer issues that drive users to exit in the first place.
+
 ## Common Failure Patterns
 
 - **Generic "Wait!" Popups:** Showing the same generic message on every page,
@@ -134,13 +146,13 @@ Ensure the intervention doesn't degrade the user experience.
 - **Incompatible Offers:** Offering a discount on a page where the user is
   seeking support or documentation.
 
-## Validation Methods
+## Validation Criteria
 
-- **Exit-Intent Conversion Rate (EICR):** (Conversions from Exit-Intent / Total
+- [ ] **Exit-Intent Conversion Rate (EICR):** (Conversions from Exit-Intent / Total
   Exit-Intent Displays) \* 100.
-- **Abandoned Cart Recovery Rate:** Percentage of users who return to complete a
+- [ ] **Abandoned Cart Recovery Rate:** Percentage of users who return to complete a
   purchase after seeing an exit-intent offer.
-- **Lead Volume Growth:** Measure the increase in total leads/subscribers
+- [ ] **Lead Volume Growth:** Measure the increase in total leads/subscribers
   attributed specifically to the exit-intent source.
-- **Bounce Rate Impact:** Monitor if the intervention actually keeps users on
+- [ ] **Bounce Rate Impact:** Monitor if the intervention actually keeps users on
   the site for longer or leads to secondary page views.

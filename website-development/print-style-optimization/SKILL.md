@@ -99,7 +99,7 @@ contrast, and handling URL visibility for printed links.
 - **Floating Elements:** Leaving "Sticky" headers or "Back to top" buttons visible, which often overlap content on every printed page.
 - **Broken Tables:** Allowing tables to break awkwardly, leaving headers on one page and data on another.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Print Preview Test:** Use the browser's "Print..." command to inspect the layout in the preview window.
 - [ ] **Link Check:** Verify that important URLs are visible next to their text labels.

@@ -118,6 +118,18 @@ Verify the proposed flow against the onboarding heuristics.
 - **Default to Action:** Whenever possible, provide sensible defaults so the
   user can click "Next" rather than having to make a decision.
 
+## Constraints
+
+- **Aha Moment Definition:** The "Aha! Moment" must be explicitly defined before optimization begins — without a clear activation event, success cannot be measured.
+- **Essential Steps:** Onboarding cannot bypass steps that are required for security, compliance, or core product function.
+- **Privacy:** User data collected during onboarding (preferences, profile details) must be handled in accordance with the product's privacy policy.
+
+## Non-Goals
+
+- Feature development to improve the underlying product value being onboarded to.
+- Email-based onboarding sequences sent after initial sign-up.
+- Human-led customer success or sales-assisted onboarding.
+
 ## Common Failure Patterns
 
 - **The "Grand Tour":** Forcing users through a 10-step modal tour of the
@@ -131,12 +143,12 @@ Verify the proposed flow against the onboarding heuristics.
 - **Irrelevant Onboarding:** Showing the same onboarding to a "Pro" user as
   to a "Beginner" user.
 
-## Validation Methods
+## Validation Criteria
 
-- **Activation Rate:** (Users who reach the "Aha! Moment" / Total Signups) * 100.
-- **Time-to-Value (TTV):** The average time it takes for a user to reach the
+- [ ] **Activation Rate:** (Users who reach the "Aha! Moment" / Total Signups) * 100.
+- [ ] **Time-to-Value (TTV):** The average time it takes for a user to reach the
   "Aha! Moment." Goal: Decrease.
-- **Onboarding Completion Rate:** Percentage of users who finish the initial
+- [ ] **Onboarding Completion Rate:** Percentage of users who finish the initial
   setup wizard.
-- **Day-1 Retention:** The percentage of users who return to the product the
+- [ ] **Day-1 Retention:** The percentage of users who return to the product the
   day after signing up.

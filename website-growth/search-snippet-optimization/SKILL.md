@@ -121,6 +121,18 @@ Verify the new snippet against the optimization heuristics.
 - **Unique Per Page:** Every page must have a unique title and description to
   avoid cannibalization and "duplicate snippet" errors.
 
+## Constraints
+
+- **Search Engine Override:** Google may display its own title or description regardless of meta tags; this skill improves the input, not the guaranteed output.
+- **Accuracy Requirement:** Structured data markup must accurately represent the actual page content — false or misleading markup violates Google Webmaster Guidelines and may result in manual penalties.
+- **Ranking Independence:** Meta descriptions do not directly influence organic rankings; the goal of this skill is CTR improvement, not position.
+
+## Non-Goals
+
+- On-page content strategy, keyword research, or organic ranking improvements.
+- Link building, domain authority improvements, or technical SEO infrastructure.
+- Paid search ad copy optimization or Google Ads Quality Score.
+
 ## Common Failure Patterns
 
 - **Keyword Stuffing:** Creating titles that look like a list of tags rather
@@ -134,13 +146,13 @@ Verify the new snippet against the optimization heuristics.
 - **Stale Snippets:** Failing to update years (e.g., "Best of 2022" in 2024) or
   outdated pricing/stock info.
 
-## Validation Methods
+## Validation Criteria
 
-- **CTR Lift in GSC:** Measure the change in Click-Through Rate for the target
+- [ ] **CTR Lift in GSC:** Measure the change in Click-Through Rate for the target
   keywords over a 14–30 day period.
-- **Rich Result Status:** Verify that Rich Snippets are appearing using the
+- [ ] **Rich Result Status:** Verify that Rich Snippets are appearing using the
   "Rich Results Test" tool.
-- **Average Position Stability:** Ensure that the CTR-focused changes haven't
+- [ ] **Average Position Stability:** Ensure that the CTR-focused changes haven't
   negatively impacted the ranking position.
-- **Search Console "Enhancements" Report:** Monitor for valid items and zero
+- [ ] **Search Console "Enhancements" Report:** Monitor for valid items and zero
   errors in the Schema reports.

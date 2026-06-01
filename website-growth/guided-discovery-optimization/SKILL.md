@@ -120,6 +120,18 @@ Verify the proposed discovery engine against the heuristics below.
 - **The Progress Rule:** Always show a progress bar or "Step X of Y" to manage
   user expectations.
 
+## Constraints
+
+- **Catalog Dependency:** Quiz results must map to real, available products or services — the recommendation is only as strong as the underlying catalog and metadata.
+- **Completion vs. Accuracy:** Shortening the quiz to improve completion rates must not degrade the relevance of recommendations.
+- **Mobile Usability:** Each question step must be fully functional on small screens without horizontal scrolling or cramped tap targets.
+
+## Non-Goals
+
+- Building the recommendation algorithm or backend matching logic.
+- Writing the product descriptions displayed on results pages.
+- Personalization at the logged-in account level, which requires separate infrastructure.
+
 ## Common Failure Patterns
 
 - **The "Dead End":** Reaching the end of a quiz and seeing "No results found."
@@ -133,12 +145,12 @@ Verify the proposed discovery engine against the heuristics below.
 - **The "Data Trap":** Using the quiz purely for lead gen without actually
   helping the user find a product.
 
-## Validation Methods
+## Validation Criteria
 
-- **Completion Rate:** (Quiz Finished / Quiz Started) * 100. Target: >70%.
-- **Conversion from Results:** Percentage of users who land on the results page
+- [ ] **Completion Rate:** (Quiz Finished / Quiz Started) * 100. Target: >70%.
+- [ ] **Conversion from Results:** Percentage of users who land on the results page
   and then Add to Cart or Sign Up.
-- **AOV Lift:** Compare the average order value of "Quiz Users" vs. "Organic
+- [ ] **AOV Lift:** Compare the average order value of "Quiz Users" vs. "Organic
   Browsers."
-- **Return Rate Reduction:** Measure if products bought via the finder are
+- [ ] **Return Rate Reduction:** Measure if products bought via the finder are
   returned less frequently (indicating better fit).

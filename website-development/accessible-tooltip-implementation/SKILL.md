@@ -124,7 +124,7 @@ standards and provide a robust user experience.
 - **Timeout Dismissal:** Tooltips that disappear automatically after a few
   seconds, which violates accessibility for users who need more time to read.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Keyboard Test:** Tab to the trigger. Does the tooltip appear?
 - [ ] **Screen Reader Test:** Focus the trigger. Does the screen reader announce

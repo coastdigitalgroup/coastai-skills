@@ -116,6 +116,18 @@ Verify the proposed loop against the viral growth heuristics.
 - **Proximity to Value:** Place the referral prompt *after* the user has
   received value, never *before*.
 
+## Constraints
+
+- **Business Approval:** Incentive type, value, and budget must be explicitly approved by the business before implementation.
+- **Fraud Prevention:** High-value incentives attract abuse; unique code or link tracking and basic fraud checks are required as a prerequisite.
+- **Terms Clarity:** Referral terms (eligibility, reward expiry, per-account limits) must be clearly communicated to prevent disputes.
+
+## Non-Goals
+
+- Building the referral tracking backend, unique code generation, or attribution system.
+- Email delivery infrastructure for referral invitations.
+- Fraud detection system design or implementation.
+
 ## Common Failure Patterns
 
 - **Premature Referral:** Asking for a referral during the first 30 seconds of
@@ -129,13 +141,13 @@ Verify the proposed loop against the viral growth heuristics.
 - **Spammy Behavior:** Sending automated emails from the user's account
   without clear consent or preview.
 
-## Validation Methods
+## Validation Criteria
 
-- **Viral Coefficient (K):** (Avg. invites per user) * (Conversion rate of
+- [ ] **Viral Coefficient (K):** (Avg. invites per user) * (Conversion rate of
   invites). Goal: Move closer to (or above) 1.0.
-- **Referral Conversion Rate:** (Signups from referrals / Total referral link
+- [ ] **Referral Conversion Rate:** (Signups from referrals / Total referral link
   clicks).
-- **Incentive Participation Rate:** Percentage of active users who have
+- [ ] **Incentive Participation Rate:** Percentage of active users who have
   interacted with the referral program.
-- **CAC Impact:** Measure the decrease in blended Customer Acquisition Cost
+- [ ] **CAC Impact:** Measure the decrease in blended Customer Acquisition Cost
   over time.

@@ -135,7 +135,7 @@ animations without sacrificing accessibility.
 - **Lack of Heading Hierarchy:** Putting the accordion at the top level without
   using proper headings (`h3`, `h4`), breaking the document outline.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Keyboard Test:** Can I open and close every panel using only the
       keyboard (`Tab`, `Enter`, `Space`)?

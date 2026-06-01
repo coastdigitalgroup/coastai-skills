@@ -123,7 +123,7 @@ reliably.
 - **Resetting Focus to Top:** Losing the user's place after an AJAX submission
   error.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Accessibility Audit:** Run an automated tool (e.g., Axe) and verify
       `aria-describedby` links.

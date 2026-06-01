@@ -1,22 +1,17 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run build)",
-      "Bash(npm run typecheck)",
-      "Bash(npm run lint)",
-      "Bash(npm run dev)",
-      "Bash(npm install)",
-      "Bash(git status)",
-      "Bash(git diff*)",
-      "Bash(git log*)",
-      "Bash(rg*)",
-      "Bash(find .* )",
-      "Bash(grep*)"
+      "Bash(*)"
     ],
     "deny": [
       "Bash(git commit*)",
       "Bash(git push*)",
-      "Bash(git tag*)"
+      "Bash(git tag*)",
+      "Bash(git merge*)",
+      "Bash(git reset*)",
+      "Bash(git checkout*)",
+      "Bash(git clean*)",
+      "Bash(rm -rf*)"
     ]
   }
 }

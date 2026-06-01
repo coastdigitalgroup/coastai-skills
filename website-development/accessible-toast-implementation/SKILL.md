@@ -135,7 +135,7 @@ perceivable by assistive technologies and comply with timing requirements.
 - **Lack of Contrast:** Using light green text on a white background for
   success messages, failing WCAG contrast requirements.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Screen Reader Test:** Verify the message is announced automatically when
       it appears.

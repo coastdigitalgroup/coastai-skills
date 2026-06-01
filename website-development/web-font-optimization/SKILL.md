@@ -131,7 +131,7 @@ Cumulative Layout Shift (CLS) caused by font swaps.
   the `crossorigin` attribute was omitted.
 - **Redundant Weights:** Loading "Semi-Bold" when it's never used in the UI.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Lighthouse Check:** Run a performance audit and check for "Eliminate
       render-blocking resources" or "Preload key requests" related to fonts.

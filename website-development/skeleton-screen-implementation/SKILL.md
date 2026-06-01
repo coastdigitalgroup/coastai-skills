@@ -136,7 +136,7 @@ performance, providing immediate visual feedback, and preventing layout shifts.
 - **Ghost Content:** Skeletons being read by screen readers as "blank" or
   "empty" because `aria-hidden` was omitted.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **CLS Test:** Use Chrome DevTools "Performance" tab or "Show layout shift
       regions" to verify zero shift during the swap.

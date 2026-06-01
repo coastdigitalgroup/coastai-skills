@@ -131,7 +131,7 @@ tracking) without scroll-event bottlenecks.
 - **Accessibility Gaps:** Using `div`s instead of links, or failing to update
   `aria-current`, making the ToC a "black box" for screen reader users.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Jump Link Test:** Click every ToC link and verify it moves the viewport
       to the correct heading without clipping.

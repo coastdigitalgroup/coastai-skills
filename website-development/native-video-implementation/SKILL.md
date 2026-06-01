@@ -125,7 +125,7 @@ third-party players.
 - **Format Inefficiency:** Only providing MP4, missing out on 30%+ bandwidth
   savings from WebM.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Network Check:** Verify that the browser downloads the WebM version if
       supported.

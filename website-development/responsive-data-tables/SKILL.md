@@ -124,7 +124,7 @@ ensuring screen readers can still interpret the table structure.
   roles, making the data a "string of text" for screen readers.
 - **Missing Interaction Cues:** Users not realizing a table is scrollable.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Viewport Stress Test:** Check the table at 320px, 768px, and 1024px.
       Does it overflow?

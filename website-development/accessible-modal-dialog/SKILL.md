@@ -95,7 +95,7 @@ The Accessible Modal Dialog skill ensures that UI overlays (modals) are usable b
 - **No Escape:** Forgetting to close the modal when the `Escape` key is pressed.
 - **Inertia Issues:** Background content remaining scrollable or clickable while the modal is open.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Screen Reader Test:** Verify the title and description are announced when the modal opens.
 - [ ] **Keyboard Trap Test:** Press `Tab` repeatedly to ensure focus never leaves the modal.

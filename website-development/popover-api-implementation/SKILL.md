@@ -162,7 +162,7 @@ popover.addEventListener('beforetoggle', (event) => {
 - **Missing Backdrop Style:** Forgetting to style `::backdrop`, which can make
   the popover blend into the background.
 
-## Validation Steps
+## Validation Criteria
 
 - [ ] **Top Layer Check:** Inspect the element in DevTools; verify it appears in
       the `#top-layer` section.
