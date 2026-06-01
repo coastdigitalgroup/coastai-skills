@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLS Mitigation Example: Dynamic Content</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .example-box {
+            border: 1px solid #ccc;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        h2 { margin-top: 0; }
+
+        /* --- BEFORE (Shifting) --- */
+        .ad-container-before {
+            background: #f0f0f0;
+            /* No height defined - will be 0 until content arrives */
+        }
+
+        /* --- AFTER (Stable) --- */
+        .ad-container-after {
+            background: #f0f0f0;
+            /* Reserving space for a common 300x250 ad */
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px dashed #999;
+            margin-bottom: 1rem;
+        }
+
+        .ad-container-after:empty::before {
+            content: "Ad Space Reserved (300x250)";
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        /* Generic image styles */
+        .dynamic-img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Better image implementation */
+        .stable-img {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9; /* Reserves 16:9 space immediately */
+            background: #eee;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>CLS Mitigation: Dynamic Content</h1>
+    <p>This page demonstrates the difference between unreserved space (causing shift) and reserved space (stable).</p>
+
+    <div class="comparison-container">
+        <!-- SCENARIO 1: WITHOUT MITIGATION -->
+        <div class="example-box">
+            <h2>Before (Shifting)</h2>
+            <p>The content below will jump once the "ad" and "image" load because the browser doesn't know their dimensions yet.</p>
+
+            <div class="ad-container-before" id="ad-before">
+                <!-- Ad content will be injected here after 2 seconds -->
+            </div>
+
+            <p>This text is pushed down suddenly when the ad above appears, which is frustrating for users who have already started reading.</p>
+
+            <img src="https://placehold.co/600x400/png" alt="Dynamic image" class="dynamic-img">
+            <p>Even standard images without width/height attributes cause shifts.</p>
+        </div>
+
+        <!-- SCENARIO 2: WITH MITIGATION -->
+        <div class="example-box">
+            <h2>After (Stable)</h2>
+            <p>The content below is stable. Space is reserved using <code>min-height</code> and <code>aspect-ratio</code>.</p>
+
+            <div class="ad-container-after" id="ad-after">
+                <!-- Ad content will be injected here after 2 seconds -->
+            </div>
+
+            <p>This text stays exactly where it is. When the ad loads, it fills the pre-existing gap without moving any surrounding elements.</p>
+
+            <img src="https://placehold.co/600x400/png" alt="Stable image" class="stable-img" width="600" height="400">
+            <p>Using <code>width</code>, <code>height</code>, and <code>aspect-ratio</code> keeps the layout locked.</p>
+        </div>
+    </div>
+
+    <script>
+        // Simulate late-loading dynamic content (Ads/Widgets)
+        setTimeout(() => {
+            const adContent = '<div style="background: #ffeb3b; height: 250px; width: 100%; display: flex; align-items: center; justify-content: center; font-weight: bold;">SPONSORED AD CONTENT</div>';
+
+            document.getElementById('ad-before').innerHTML = adContent;
+            // For the stable version, we replace the content or the class handles the empty state
+            document.getElementById('ad-after').innerHTML = adContent;
+        }, 2000);
+    </script>
+
+</body>
+</html>
