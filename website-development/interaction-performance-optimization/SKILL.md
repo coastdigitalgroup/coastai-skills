@@ -1,137 +1,147 @@
 ---
 name: interaction-performance-optimization
 description:
-  Improve Interaction to Next Paint (INP) by breaking up long tasks, yielding
-  to the main thread, and optimizing the interaction lifecycle phases.
+  Identify and resolve bottlenecks in the interaction lifecycle to improve
+  Interaction to Next Paint (INP) by breaking up long tasks, yielding to the
+  main thread, and optimizing rendering.
 ---
 
-# Interaction Performance Optimization
+# Interaction Performance Optimization (INP)
 
 ## Purpose
 
 The Interaction Performance Optimization skill provides a technical protocol for
-minimizing the latency between a user's action (click, tap, keypress) and the
-resulting visual update on the screen. It specifically targets the **Interaction
-to Next Paint (INP)** metric, solving the problem of "frozen" or sluggish UIs
-caused by long-running JavaScript tasks that block the main thread.
+minimizing the delay between a user's interaction (click, tap, keypress) and the
+next visual update on the screen. It focuses on optimizing the three phases of
+an interaction: **Input Delay**, **Processing Time**, and **Presentation Delay**.
+This directly improves user-perceived responsiveness and Interaction to Next
+Paint (INP) scores.
 
 ## Use Cases
 
-- Reducing input lag on complex forms or interactive data visualizations.
-- Optimizing "heavy" UI transitions (e.g., opening a large menu or filtering a
-  long list).
-- Fixing sluggishness in single-page applications (SPAs) during navigation or
-  state updates.
-- Auditing and improving Lighthouse/Core Web Vitals scores for INP.
-- Handling high-frequency events (scroll, resize, mousemove) without dropping
-  frames.
+- Fixing "janky" buttons or links that don't respond immediately when clicked.
+- Optimizing complex UI updates (e.g., filtering a large list, opening a heavy
+  modal) that freeze the main thread.
+- Improving Core Web Vitals (specifically INP) to "Good" status (< 200ms).
+- Debugging long-running JavaScript tasks that block high-priority user input.
 
 ## When NOT to Use
 
-- **Static Content:** Pages with no interactivity do not have INP issues.
-- **Server Latency:** If the delay is caused by waiting for a network response,
-  use loading states or optimistic UI patterns instead of task chunking.
-- **Initial Load Performance:** Use `resource-prioritization-strategy` for LCP
-  and FCP improvements. INP is a lifecycle metric, not a load metric.
+- **Static Content:** Pages with no interactive elements or very simple
+  navigation don't benefit from INP optimization.
+- **Background Processes:** Tasks that don't need to provide immediate feedback
+  to the user (e.g., analytics pings) should be deferred using
+  `requestIdleCallback` rather than optimized for INP.
+- **Server-Side Latency:** If the delay is caused by a slow API response, focus
+  on backend performance or "optimistic UI" patterns rather than INP yielding.
 
 ## Inputs
 
-1. **Performance Trace:** A Chrome DevTools Performance recording showing long
-   tasks (red bars) during an interaction.
-2. **Field Data:** INP scores from real users (e.g., via Search Console or
-   PageSpeed Insights).
-3. **Target Interaction:** The specific user action that feels slow or has high
-   latency.
+1. **Performance Audit Data:** INP scores and "Long Task" entries from Chrome
+   DevTools Performance panel or Lighthouse.
+2. **Event Trace:** A recording of the specific interaction that is slow,
+   identifying which event handlers are firing.
+3. **Task Inventory:** Identification of heavy JavaScript functions (loops,
+   complex calculations, large DOM manipulations) triggered by interactions.
 
 ## Outputs
 
-1. **Optimized Event Handlers:** Code that yields control back to the browser
-   to allow for paint operations.
-2. **Task Scheduler:** Implementation of patterns like `scheduler.yield()` or
-   `setTimeout` to chunk heavy logic.
-3. **Interaction Audit:** Breakdown of latency into Input Delay, Processing
-   Time, and Presentation Delay.
+1. **Yielding Interaction Logic:** Refactored event handlers that break up long
+   tasks using `scheduler.yield()`, `setTimeout()`, or `requestAnimationFrame()`.
+2. **Optimized Render Strategy:** Implementation of "Optimistic UI" or
+   incremental updates to reduce Presentation Delay.
+3. **Priority-Aware Scheduling:** Use of the Prioritized Task Scheduling API
+   (e.g., `scheduler.postTask()`) where appropriate.
 
 ## Workflow
 
-### 1. Identify the Interaction Bottleneck
-Record a Performance trace while performing the slow interaction. Look for:
-- **Long Tasks:** Tasks exceeding 50ms.
-- **Interaction Segment:** The "Interactions" track in DevTools will highlight
-  the specific latency breakdown.
+### 1. Identify the Bottleneck
 
-### 2. Deconstruct Interaction Latency
-Analyze which phase is contributing most to the delay:
-- **Input Delay:** Waiting for the main thread to become free.
-- **Processing Time:** Time spent executing the event handler's JavaScript.
-- **Presentation Delay:** Time spent calculating layout, painting, and
-  compositing the frame.
+- Record the interaction in the Chrome DevTools **Performance** panel.
+- Look for the **Interactions** track to see the INP duration.
+- Expand the **Main** track to identify "Long Tasks" (marked with a red corner).
+- Break down the duration into:
+  - **Input Delay:** Time between input and event handler start.
+  - **Processing Time:** Time spent executing event handlers.
+  - **Presentation Delay:** Time spent calculating layout and painting.
 
-### 3. Yield to the Main Thread
-If **Processing Time** is high, break up the work.
-- Use `scheduler.yield()` (where supported) or `await new Promise(r => setTimeout(r, 0))`
-  to allow the browser to paint a frame before continuing heavy logic.
-- Move non-critical work (like analytics or background data syncing) out of
-  the immediate interaction handler.
+### 2. Reduce Input Delay
 
-### 4. Minimize Presentation Delay
-- Avoid **Layout Thrashing:** Don't read layout properties (e.g., `offsetHeight`)
-  after writing them in the same task.
-- Simplify DOM updates: Batch changes or use document fragments.
-- Avoid complex CSS filters or heavy paint operations during transitions.
+- **Keep the Main Thread Clear:** Minimize non-essential JavaScript execution
+  during page load or idle periods to ensure the thread is free when the user
+  interacts.
+- **Yield Early:** If a task is running when the user interacts, the browser
+  must wait for it to finish. Break up large non-interactive tasks into smaller
+  chunks.
 
-### 5. Reduce Input Delay
-- Remove unnecessary "Idle" work that blocks the main thread when the user
-  tries to interact.
-- Use `requestIdleCallback` for low-priority background tasks.
-- Avoid long-running third-party scripts that execute during user interaction
-  windows.
+### 3. Minimize Processing Time (Yielding)
+
+- **The 50ms Rule:** No single task should exceed 50ms.
+- **Break Up Loops:** Instead of processing 1000 items in one loop, process
+  them in chunks of 100, yielding to the browser between chunks.
+- **Modern Yielding:** Use `await scheduler.yield()` (if supported) to allow the
+  browser to process pending inputs and rendering before continuing the task.
+- **Fallback Yielding:** Use `await new Promise(resolve => setTimeout(resolve, 0))`
+  for wider browser support.
+
+### 4. Optimize Presentation Delay
+
+- **Avoid Layout Thrashing:** Do not alternate between reading and writing DOM
+  properties (e.g., reading `offsetHeight` then setting `style.height`).
+- **Batch DOM Updates:** Perform all reads first, then all writes.
+- **Prioritize Visual Feedback:** Update the UI immediately to show "Loading"
+  or "Processing" before starting the heavy computation.
+
+### 5. Leverage Priority APIs
+
+- Use `scheduler.postTask()` for non-critical work, setting the priority to
+  `background` or `user-visible` to avoid competing with `user-blocking` input
+  handlers.
 
 ## Decision Rules
 
-- **Is the task > 50ms?**
-  - YES: It must be broken up or moved to a Web Worker.
-- **Does the UI need to show an immediate state change?**
-  - YES: Update the state (e.g., show a loading spinner), then yield before
-    running the expensive logic.
-- **Is the work purely computational?**
-  - YES: Offload it to a **Web Worker** to keep the main thread free for
-    interactions.
+- **Yielding vs. Web Workers:** Use **Web Workers** for pure computational
+  tasks (e.g., data processing) that don't need DOM access. Use **Yielding** for
+  tasks that must interact with the DOM or the main thread state.
+- **`setTimeout` vs. `requestAnimationFrame`:** Use `requestAnimationFrame` for
+  work that should happen just before the next paint. Use `setTimeout(0)` or
+  `scheduler.yield()` for work that can wait for the next event loop turn.
+- **Immediate vs. Deferred:** If a UI change is critical (e.g., opening a menu),
+  do it immediately. If it's secondary (e.g., loading more data), defer it.
 
 ## Constraints
 
-- **Yielding overhead:** Yielding too frequently can increase total execution
-  time. Aim for chunks that take 10-30ms.
-- **State Consistency:** Ensure that yielding doesn't lead to "torn" UI states
-  where some data is updated and some is not.
-- **Browser Support:** `scheduler.yield()` is a modern API; always provide a
-  `setTimeout` fallback for older browsers.
+- **Browser Support:** `scheduler.yield()` and `scheduler.postTask()` are modern
+  APIs. Always provide fallbacks for older browsers.
+- **Complexity:** Yielding introduces asynchronous behavior. Ensure state
+  consistency is maintained between chunks (e.g., handling "Cancel" actions
+  mid-process).
 
 ## Non-Goals
 
-- Optimizing TTFB or initial download speed.
-- Implementing general UI animations (unless they impact INP).
-- Backend or database performance tuning.
+- Improving Largest Contentful Paint (LCP) or First Contentful Paint (FCP).
+- General JavaScript code minification or bundle size reduction.
+- Server-side performance tuning or database optimization.
 
 ## Common Failure Patterns
 
-- **Over-chunking:** Yielding after every minor operation, causing the total
-  task to take significantly longer due to overhead.
-- **Forgetting the Fallback:** Using `scheduler.yield()` without checking for
-  support, breaking the site in older browsers.
-- **Ignoring Layout Thrashing:** Optimizing JS logic but still causing the
-  browser to re-calculate layout multiple times, keeping Presentation Delay high.
-- **Blocking the Main Thread with Analytics:** Running heavy tracking scripts
-  synchronously inside a click handler.
+- **Synchronous Heavy Loops:** Running a `forEach` over 10,000 items inside a
+  click handler, causing the UI to freeze for seconds.
+- **Layout Thrashing:** Repeatedly reading `getBoundingClientRect()` in a loop
+  while modifying the DOM.
+- **Awaiting the Wrong Thing:** Awaiting an API response *before* showing a
+  loading state, leading to a "dead" button feel.
+- **Excessive Yielding:** Yielding too frequently (e.g., every 1ms), which can
+  add significant overhead and actually slow down the total task time.
 
 ## Validation Steps
 
-- [ ] **DevTools Interaction Track:** Verify that the "Interaction" bar is
-      green and below the 200ms threshold (Good).
-- [ ] **No Long Tasks:** Confirm that no single task in the interaction
-      lifecycle exceeds 50ms.
-- [ ] **Visual Feedback:** Confirm that the UI responds (e.g., a button state
-      change or spinner) immediately (< 100ms) even if the final result
-      takes longer.
-- [ ] **Lighthouse INP Audit:** Verify improved INP scores in local testing or
-      simulated environments.
+- [ ] **Performance Panel Check:** Verify that the interaction in DevTools no
+      longer shows a "Long Task" and the INP time is < 200ms.
+- [ ] **Visual Test:** Confirm the UI responds immediately (e.g., a button
+      shows a pressed state or a spinner) regardless of the heavy work behind
+      the scenes.
+- [ ] **Throttling Test:** Use "6x CPU Slowdown" in DevTools to simulate
+      lower-end devices and ensure the interaction remains responsive.
+- [ ] **Console Audit:** Use the `web-vitals` library to log INP values and
+      ensure they meet the "Good" threshold in real-user scenarios.

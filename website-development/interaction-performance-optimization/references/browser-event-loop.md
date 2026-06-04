@@ -1,61 +1,65 @@
-# Browser Event Loop and Interaction Lifecycle
+# Browser Event Loop and Rendering Pipeline
 
-Understanding how the browser processes tasks is critical for optimizing
-Interaction to Next Paint (INP).
+Understanding how the browser processes tasks and renders updates is crucial
+for optimizing Interaction to Next Paint (INP).
 
-## The Event Loop and Tasks
+## The Event Loop
 
-The browser's main thread runs an **Event Loop**. It processes a queue of
-**Tasks** (JavaScript execution, event handling, parsing).
+The browser's main thread runs a loop that executes tasks from multiple queues.
+For INP, the most important concepts are:
 
-1.  **Task Execution:** The browser picks a task from the queue and runs it
-    to completion. *The browser cannot do anything else (like painting) while
-    a task is running.*
-2.  **Microtasks:** After a task, the browser executes all pending microtasks
-    (e.g., Promise callbacks).
-3.  **Rendering:** If it's time for a frame (usually every 16.7ms), the
-    browser performs the **Rendering Pipeline**:
-    - **Style:** Calculate CSS styles for elements.
-    - **Layout:** Determine the geometry of elements.
-    - **Paint:** Determine the pixels for each element.
-    - **Composite:** Layer the elements together for the screen.
+1.  **Task (Macrotask):** Includes event handlers, timeouts, and network
+    callbacks. Only one task runs at a time. A "Long Task" is any task that
+    takes more than 50ms.
+2.  **Microtask:** Includes promise resolutions (`.then`, `await`). Microtasks
+    run immediately after the current task finishes and before the next task
+    starts.
+3.  **The Rendering Pipeline:** The browser attempts to update the screen
+    (Paint) at regular intervals (usually every 16.7ms for 60fps).
 
-## Why Interactions Get Slow
+## The Interaction Lifecycle
 
-If a single Task takes 200ms, the browser is "locked." If a user clicks during
-that 200ms window:
-1.  **Input Delay:** The click event sits in the queue until the 200ms task
-    finishes.
-2.  **Processing Time:** The click handler finally runs (let's say it takes
-    50ms).
-3.  **Presentation Delay:** After the click handler finishes, the browser
-    must still run the Rendering Pipeline (let's say 30ms).
+An interaction (e.g., a click) follows this path:
 
-**Total INP = 200ms (Delay) + 50ms (Processing) + 30ms (Presentation) = 280ms.**
+### Phase 1: Input Delay
+The user clicks a button. If the main thread is already busy running a long
+script (e.g., parsing a large JSON file or processing an old interaction), the
+new click event is queued and waits.
 
-## The Power of Yielding
+### Phase 2: Processing Time
+The main thread becomes free and starts executing your event handlers (click,
+mousedown, etc.). If these handlers run for 200ms without yielding, the browser
+cannot do anything else during this time.
 
-When you "yield" (via `setTimeout` or `scheduler.yield`), you are essentially
-breaking one giant task into multiple smaller tasks.
+### Phase 3: Presentation Delay
+Your event handlers finish, and you've updated the DOM. Now the browser must:
+1.  **Recalculate Styles:** Determine which CSS rules apply.
+2.  **Layout:** Calculate the geometry of elements.
+3.  **Paint:** Create the visual layers.
+4.  **Composite:** Draw the layers to the screen.
 
-- **Giant Task (300ms):** No paint can happen for 300ms.
-- **Three Small Tasks (100ms each) + Yielding:** The browser can sneak in
-  a **Rendering Pipeline** pass between each task. This ensures the user
-  sees visual updates and the main thread stays responsive to new inputs.
+INP measures the **total time** from the start of Phase 1 to the end of Phase 3.
 
-## Interaction Lifecycle Phases
+## Why `setTimeout(0)` or `scheduler.yield()` works
 
-### 1. Input Delay
-- **Cause:** Main thread is busy with other work (long tasks).
-- **Optimization:** Reduce "Total Blocking Time" (TBT) during the page
-  lifecycle. Use `requestIdleCallback` for non-essential work.
+When you `await` a `setTimeout` or `scheduler.yield`, you are explicitly
+breaking your code into two separate **Tasks**.
 
-### 2. Processing Time
-- **Cause:** Heavy JavaScript in event listeners.
-- **Optimization:** Break up loops, offload to Web Workers, or use
-  `scheduler.yield()`.
+- **Task A:** Updates the UI (e.g., shows a spinner) and then yields.
+- **Between Tasks:** The browser is now free. It looks at its queues and sees:
+    - "Oh, the UI changed! Let me run the **Rendering Pipeline** to show that
+      spinner."
+    - "Hey, the user clicked another button! Let me process that **Input**."
+- **Task B:** Your code resumes and performs the heavy calculation.
 
-### 3. Presentation Delay
-- **Cause:** Large DOM updates, complex CSS, or "Layout Thrashing."
-- **Optimization:** Avoid forced synchronous layouts. Read layout properties
-  first, then write them. Keep the DOM shallow.
+By yielding, you allow the browser to interleave critical work (rendering and
+user input) with your long-running logic.
+
+## Key Heuristics
+- **50ms Task Limit:** Stay under 50ms to keep the browser responsive.
+- **100ms Response Target:** Users perceive interactions under 100ms as
+  instant.
+- **Avoid Layout Thrashing:** Forced Synchronous Layout happens when you
+  request geometric information (like `offsetWidth`) after changing the DOM in
+  the same task. This forces the browser to run the "Layout" phase prematurely
+  and often multiple times.

@@ -1,87 +1,101 @@
-# Example: Refactoring a Blocking Task for Better Interaction
+# Example: Refactoring a Blocking Interaction
 
-This example demonstrates how a "heavy" interaction—filtering a large list of
-products—can be refactored to improve Interaction to Next Paint (INP) by
-yielding to the main thread.
+This example demonstrates how to refactor a common frontend performance
+bottleneck: a search filter that blocks the UI while processing a large dataset.
 
 ## The Problem (Before)
 
-In this version, the filtering logic runs synchronously. If there are thousands
-of items, the main thread is blocked for several hundred milliseconds. The
-user's click is not acknowledged (the UI stays frozen) until the entire list is
-processed.
+When the user types in the search box, the `handleSearch` function runs a heavy
+filtering logic synchronously. On a large list (e.g., 5,000 items), this task
+can take 300ms+, causing a visible "freeze" where the text they typed doesn't
+appear in the input until the calculation is finished.
+
+### Before: Blocking Implementation
 
 ```javascript
-// BEFORE: Blocking Interaction
-const filterInput = document.querySelector('#product-filter');
-const productList = document.querySelector('#product-list');
+// A heavy, synchronous task triggered by an input event
+const handleSearch = (event) => {
+  const query = event.target.value;
 
-filterInput.addEventListener('input', (e) => {
-  const query = e.target.value.toLowerCase();
+  // 1. Immediate UI update (Blocked by the loop below)
+  updateSearchInput(query);
 
-  // This loop is a "Long Task" that blocks the main thread
-  const items = Array.from(productList.children);
-  items.forEach(item => {
-    const text = item.textContent.toLowerCase();
-    const isMatch = text.includes(query);
-    item.style.display = isMatch ? 'block' : 'none';
+  // 2. Heavy processing (Takes 300ms)
+  const results = allItems.filter(item => {
+    return complexSearchLogic(item, query);
   });
 
-  // The browser cannot paint the changes until this entire
-  // function finishes, leading to high INP.
-});
+  // 3. Render results
+  renderResults(results);
+};
+
+// Attached directly to input
+searchInput.addEventListener('input', handleSearch);
 ```
 
 ## The Solution (After)
 
-In this version, we provide immediate visual feedback (a loading state) and
-then use a scheduler utility to process the list in small chunks, yielding
-to the browser after each chunk so it can paint the frames.
+The refactored version uses a **yielding** strategy. It ensures the input
+field updates immediately and breaks the heavy filtering into smaller chunks,
+allowing the browser to "breathe" (render the input and process new keystrokes)
+between chunks.
+
+### After: Optimized Implementation
 
 ```javascript
-// AFTER: Yielding Interaction
-const filterInput = document.querySelector('#product-filter');
-const productList = document.querySelector('#product-list');
-
-// A simple yielding utility
+// Utility to yield to the main thread
 const yieldToMain = () => {
-  if (window.scheduler && scheduler.yield) {
+  if (globalThis.scheduler?.yield) {
     return scheduler.yield();
   }
   return new Promise(resolve => setTimeout(resolve, 0));
 };
 
-filterInput.addEventListener('input', async (e) => {
-  const query = e.target.value.toLowerCase();
+const handleSearchOptimized = async (event) => {
+  const query = event.target.value;
 
-  // 1. Immediate Feedback: Optional loading state or visual acknowledge
-  productList.classList.add('filtering');
+  // 1. UPDATE UI IMMEDIATELY
+  // This happens in the current task, before we start heavy work.
+  updateSearchInput(query);
+  showLoadingSpinner();
 
-  const items = Array.from(productList.children);
-  const CHUNK_SIZE = 100;
+  // 2. YIELD
+  // Allow the browser to paint the input change and spinner.
+  await yieldToMain();
 
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i];
-    const text = item.textContent.toLowerCase();
-    const isMatch = text.includes(query);
-    item.style.display = isMatch ? 'block' : 'none';
+  // 3. CHUNKED PROCESSING
+  const CHUNK_SIZE = 500;
+  let results = [];
 
-    // 2. Yield every CHUNK_SIZE items to allow the browser to paint
-    if (i > 0 && i % CHUNK_SIZE === 0) {
-      await yieldToMain();
-    }
+  for (let i = 0; i < allItems.length; i += CHUNK_SIZE) {
+    const chunk = allItems.slice(i, i + CHUNK_SIZE);
+
+    // Process a small chunk
+    const filteredChunk = chunk.filter(item => complexSearchLogic(item, query));
+    results = results.concat(filteredChunk);
+
+    // YIELD after every chunk to keep the UI responsive
+    // This allows the browser to process more typing or click events
+    await yieldToMain();
+
+    // Optional: Abort if the query has changed since we started
+    if (currentSearchQuery !== query) return;
   }
 
-  // 3. Cleanup
-  productList.classList.remove('filtering');
-});
+  // 4. FINAL RENDER
+  renderResults(results);
+  hideLoadingSpinner();
+};
+
+searchInput.addEventListener('input', handleSearchOptimized);
 ```
 
-## Key Improvements
+## Why this improves INP
 
-1.  **Lower Interaction Latency:** The initial event handler finishes almost
-    instantly, allowing the browser to acknowledges the user's input.
-2.  **Visual Progress:** If the list is very large, the user sees the list
-    updating in "waves" rather than waiting for one giant freeze.
-3.  **Responsiveness:** The user can interrupt the process (e.g., by typing
-    another character) because the main thread isn't locked up.
+1.  **Reduced Input Delay:** By yielding immediately after the input update, we
+    allow the browser to acknowledge the user's keystroke and render it.
+2.  **Shortened Processing Time:** The browser never sees a single 300ms task.
+    Instead, it sees six 50ms tasks.
+3.  **Presentation Fluidity:** The user sees the loading indicator instantly,
+    providing immediate visual feedback that the system has received their
+    intent.
