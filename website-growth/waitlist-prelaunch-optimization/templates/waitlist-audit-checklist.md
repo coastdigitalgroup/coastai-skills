@@ -1,45 +1,31 @@
 # Waitlist & Pre-launch Audit Checklist
 
-Use this checklist to audit a pre-launch page or design a new waitlist flow.
+Use this checklist to audit a "Coming Soon" or pre-launch page to transform it into a viral growth engine.
 
-## 1. Value Proposition & Scarcity
-- [ ] **Outcome-Focused Headline:** Does the headline sell the *benefit* of the
-  product rather than just the fact that it's "coming soon"?
-- [ ] **Specific Reward:** Is there a clear benefit for joining the waitlist
-  (e.g., early access, discount, founder badge)?
-- [ ] **Scarcity Signal:** Is there a limit mentioned (e.g., "First 500 only" or
-  "Beta closes in 48 hours")?
+## 1. The Above-the-Fold "Hook"
+- [ ] **Clarity:** Does the headline explain the *benefit* of the product in under 5 seconds?
+- [ ] **The "Why Now":** Is it clear why I should sign up *today* rather than waiting for the launch?
+- [ ] **Visual Proof:** Is there a teaser (image/video/mockup) that makes the product feel "real"?
+- [ ] **Single Focus:** Is the email signup the *only* primary action above the fold?
 
-## 2. The Signup Friction Audit
-- [ ] **Single Field Focus:** Is the form limited to just the email address (if
-  possible)?
-- [ ] **High-Contrast CTA:** Does the signup button stand out from the
-  background?
-- [ ] **Privacy Assurance:** Is there a "No spam" or privacy link near the
-  email field?
+## 2. Signup Friction
+- [ ] **Field Count:** Are you asking for more than just an email? (If yes, can those fields be moved post-signup?)
+- [ ] **Social Auth:** Is there a "Sign up with Google/Slack" option to reduce typing?
+- [ ] **Mobile Layout:** Is the CTA button large (44px+) and the keyboard type optimized (`type="email"`)?
 
 ## 3. The Post-Signup Viral Loop
-- [ ] **Immediate Transition:** Does the page instantly change to the "Share"
-  view after signup (without a page reload)?
-- [ ] **Queue Visibility:** Does the user know their exact position in line?
-- [ ] **The "Skip the Line" Offer:** Is there a clear "Do X to move up"
-  instruction?
-- [ ] **One-Click Sharing:** Are there buttons for WhatsApp, Twitter/X, and
-  Email with *pre-filled* copy?
-- [ ] **Personalized Referral Link:** Is the referral link easy to copy and
-  distinctly associated with the user?
+- [ ] **Immediate Reward:** Is the user immediately shown their position in line?
+- [ ] **Clear "Jump" Logic:** Does the page explain exactly how many spots a user skips per referral?
+- [ ] **Frictionless Sharing:** Are there "One-Tap" share buttons for WhatsApp, Twitter, and LinkedIn?
+- [ ] **Copy-Paste Link:** Is the unique referral link easy to select and copy?
+- [ ] **Status Tiers:** (Optional) Are there milestones? (e.g., "Refer 3 friends to unlock a Founder's Badge").
 
-## 4. The Engagement Strategy
-- [ ] **Confirmation Email:** Does the user receive an instant email confirming
-  their spot and reiterating the referral link?
-- [ ] **Nurture Plan:** Is there a schedule for "Behind the scenes" updates
-  (e.g., every 7-14 days)?
-- [ ] **Social Proof:** Does the page show how many others are already on the
-  list?
+## 4. Anticipation & Nurture
+- [ ] **Confirmation Email:** Does the user get an immediate email confirming their spot and their referral link?
+- [ ] **Drip Cadence:** Is there a plan to email the list at least once every 10-14 days until launch?
+- [ ] **"Behind the Scenes":** Does the content make the user feel like an "insider" in the development process?
 
-## 5. Technical & Compliance
-- [ ] **Mobile-Friendly:** Is the queue and sharing interface usable on a
-  small screen?
-- [ ] **Tracking:** Is every referral link uniquely tracked to a specific user?
-- [ ] **GDPR/CCPA:** Does the signup include the necessary consent checkboxes
-  for the specific region?
+## 5. Technical & Ethical
+- [ ] **GDPR/CCPA:** Is there a clear privacy link and consent checkbox if required?
+- [ ] **Bot Protection:** Is there a hidden honey-pot or silent CAPTCHA to prevent waitlist padding?
+- [ ] **Persistence:** If the user returns to the page, do they see their "Success" state (position) rather than the empty form again?

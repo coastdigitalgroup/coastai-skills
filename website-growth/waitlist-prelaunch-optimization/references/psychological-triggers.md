@@ -1,40 +1,27 @@
-# Psychological Triggers for Pre-launch Growth
+# Psychological Triggers for Pre-launches
 
-Waitlist optimization relies on several core psychological principles to
-transform passive interest into active advocacy.
+Effective waitlists leverage deep-seated psychological biases to drive action and sharing.
 
-## 1. The Robinhood Effect (Viral Queueing)
-Popularized by the app Robinhood, this is the practice of using a public queue
-where users can "jump ahead" by performing viral actions (like referring
-friends).
-- **Mechanism:** It creates a sense of "earned" status. Users who share aren't
-  just doing the company a favor; they are competing for their own benefit.
-- **Result:** Higher K-factor and lower Customer Acquisition Cost (CAC).
+## 1. The Zeigarnik Effect
+**The Principle:** People remember uncompleted or interrupted tasks better than completed ones.
+**Application:** A waitlist is an "incomplete" transaction. By giving a user a position in line, you create a psychological "open loop" that they want to close by finally getting the product.
 
-## 2. The Zeigarnik Effect (The Open Loop)
-The psychological principle that people remember uncompleted or interrupted
-tasks better than completed ones.
-- **Mechanism:** Being "on a waitlist" is an open loop. The user has started the
-  journey but hasn't reached the destination (the product).
-- **Result:** Constant "Progress Updates" keep this loop active in the user's
-  mind, ensuring high brand recall and launch-day engagement.
+## 2. Anticipatory Utility
+**The Principle:** The pleasure derived from *expecting* a future reward is often as high (or higher) than the reward itself.
+**Application:** Regular "teasers" or "milestone updates" during the waitlist period provide small hits of dopamine that keep the user engaged with the brand before they can even use the product.
 
-## 3. Anticipatory Utility
-The pleasure derived from looking forward to a future event.
-- **Mechanism:** By showing "Behind the scenes" content or "Teasers," you
-  extend the period of anticipation.
-- **Result:** Users build a higher perceived value of the product before they
-  ever use it.
+## 3. Social Proof (The Crowd Effect)
+**The Principle:** People look to others to determine "correct" behavior in uncertain situations.
+**Application:** Showing a live counter (e.g., "Join 45,201 others in line") validates the product's value. If that many people are waiting, it *must* be good.
 
 ## 4. The Scarcity Principle (FOMO)
-People place a higher value on things that are perceived as rare or hard to
-obtain.
-- **Mechanism:** "Beta access" or "Invite-only" creates an exclusive group.
-- **Result:** Increased conversion rate on the signup page as users rush to
-  secure their spot before it's "too late."
+**The Principle:** We place a higher value on things that are perceived as rare or limited.
+**Application:** "Limited Beta Access" or "Only 500 spots available this week" forces a faster decision and increases the perceived status of being "in."
 
-## 5. Social Proof (Informational Social Influence)
-The tendency to see an action as more appropriate when others are doing it.
-- **Mechanism:** Displaying "Joined by 10,000+ others" or a live feed of
-  signups.
-- **Result:** Reduces the "perceived risk" of joining a new, unproven platform.
+## 5. Endowed Progress Effect
+**The Principle:** People are more likely to complete a goal if they feel they have already made progress toward it.
+**Application:** When a user signs up, you might "give" them a head start (e.g., "We've moved you past the first 1,000 bots! You are now #9,400"). This makes them more likely to refer friends to keep the momentum going.
+
+## 6. The Robinhood Effect (Viral Queue Jumping)
+**The Principle:** A combination of competition and "merit-based" access.
+**Application:** Users feel a sense of agency when they can "earn" their way to the front of the line through referrals, rather than just waiting passively.

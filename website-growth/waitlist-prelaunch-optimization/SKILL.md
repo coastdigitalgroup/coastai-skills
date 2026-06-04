@@ -1,150 +1,133 @@
 ---
 name: waitlist-prelaunch-optimization
 description:
-  Systematic framework for building anticipation, validating demand, and driving
-  viral growth before a product or feature launch. Use this to optimize
-  waitlist pages, referral loops, and queue mechanics.
+  Audit and optimize waitlist experiences to build anticipation, validate
+  demand, and drive viral growth before a product or feature launch. Trigger
+  this skill for "Coming Soon" pages or pre-launch campaigns with low
+  engagement or referral volume.
 ---
 
 # Waitlist & Pre-launch Optimization
 
 ## Purpose
-
-The Waitlist & Pre-launch Optimization skill provides a systematic framework for
-maximizing the impact of a pre-launch phase. Instead of a static "Coming Soon"
-page, this skill transforms the waitlist into a high-leverage growth engine
-that validates market demand, builds a "hot" lead list, and leverages viral
-mechanics to lower acquisition costs before a single dollar is spent on paid
-media.
+The Waitlist & Pre-launch Optimization skill provides a framework for
+transforming a passive "Coming Soon" page into an active growth engine. By
+leveraging psychological triggers like exclusivity, social proof, and the
+"Robinhood Effect" (viral queue jumping), this skill aims to maximize pre-launch
+signups, increase viral referrals (K-factor), and ensure a high-intent user base
+is ready for day-one activation.
 
 ## Use Cases
-
-- **New Product Launches:** Building a seed audience for a startup or MVP.
-- **Major Feature Releases:** Creating hype and early-adopter feedback loops for
-  a new capability.
-- **Beta Programs:** Managing exclusive access to a product for testing and
-  refinement.
-- **Physical Product Drops:** Managing scarcity and demand for limited-edition
+- **New Product Launches:** Building a base of early adopters for a startup or
+  new venture.
+- **Feature Waitlists:** Managing demand for high-value features in an existing
+  product.
+- **Beta Programs:** Recruiting and segmenting testers for a new version.
+- **Event Registration:** Creating early interest for conferences or major
+  webinars.
+- **Physical Product Drops:** Managing inventory scarcity for limited-edition
   releases.
 
 ## When NOT to Use
-
-- **Established Utilities:** For routine updates or maintenance where "hype"
-  would feel forced or disingenuous.
-- **Low-Intent Products:** If the product doesn't solve a clear "pain point,"
-  a waitlist may simply increase friction without a corresponding reward.
-- **Immediate-Need Services:** Emergency services (e.g., locksmiths, roadside
-  assistance) where users cannot afford to wait.
+- **Immediate-Access Products:** If the product is ready and the goal is instant
+  revenue, a waitlist adds unnecessary friction. Use `checkout-flow-optimization`.
+- **Low-Utility Waitlists:** If the "wait" is purely administrative and offers
+  no early-access benefit or incentive, it can damage brand trust.
+- **B2B Enterprise Sales:** For high-touch, long-cycle sales where a generic
+  waitlist might feel too "consumer-oriented" or impersonal.
 
 ## Inputs
-
-1. **Value Proposition:** What is the core "unfair advantage" or benefit of the
-   upcoming product?
-2. **Target Persona:** Who are the early adopters most likely to tolerate a
-   pre-launch phase?
-3. **Launch Timeline:** When is the expected delivery or beta access date?
-4. **Current Traffic Source:** How are users finding the pre-launch page (SEO,
-   Social, Direct)?
+1. **Launch Timeline:** When will the product/feature actually be available?
+2. **Early Access Value:** What is the specific benefit of being on the
+   waitlist? (e.g., "First 100 get it free," "Skip the line").
+3. **Target Persona:** Who are the ideal early adopters?
+4. **Current Pre-launch Metrics:** Sign-up conversion rate, referral rate, and
+   social share volume.
 
 ## Outputs
-
-1. **Pre-launch Page Audit:** Identification of friction points in the signup
-   and sharing flow.
-2. **Waitlist Queue Logic:** A defined system for how users "move up" the list
-   (e.g., referrals, social sharing).
-3. **Engagement Sequence:** A plan for maintaining momentum between signup and
-   actual launch.
-4. **Viral Loop Specification:** Detailed mechanics for the "Robinhood Effect"
-   (refer-to-skip-the-line).
+1. **Waitlist Strategy Audit:** Identification of friction points in the signup
+   and referral flow.
+2. **Optimized Waitlist Landing Page:** Guidance on the "Hook," the value prop,
+   and the simplicity of the signup.
+3. **Viral Referral Loop Design:** A plan for the "Post-Signup" experience that
+   incentivizes sharing to "jump the queue."
+4. **Anticipation Management Plan:** Recommended email sequence to keep the
+   waitlist "warm" until launch.
 
 ## Workflow
 
-### 1. Value Proposition & Scarcity Setting
+### 1. Define the "Why Wait?" (The Incentive)
+A waitlist only works if the reward for waiting is clear.
+- **Exclusivity:** "Only 1,000 spots available."
+- **Early Access:** "Get it 2 weeks before anyone else."
+- **Financial Reward:** "Locked-in lifetime discount for waitlist members."
+- **Status:** "Founder's Edition" badges or early-access community perks.
 
-Define why the user should join the waitlist *now* instead of waiting for the
-launch.
+### 2. The High-Conversion Signup (Minimum Friction)
+The goal is to capture the email as fast as possible.
+- **One-Field Form:** On the landing page, ask ONLY for an email.
+- **The "Mystery" Hook:** Use a compelling, high-curiosity headline (e.g., "The
+  end of slow meetings is coming").
+- **Visual Teaser:** Show a glimpse of the product (blurred UI, silhouette, or
+  short teaser video) to build curiosity.
 
-- **The Reward:** Offer early-access, "Founder" status, lifetime discounts, or
-  exclusive features.
-- **Scarcity Framing:** Use limited seats (e.g., "First 500 only") or time-bound
-  access to drive urgency.
+### 3. Implement the Viral Loop (The Robinhood Effect)
+The most successful waitlists turn signups into recruiters.
+- **The Queue:** Give every user a position (e.g., "You are #5,402 in line").
+- **Queue Jumping:** Allow users to move up by referring friends. (e.g., "Refer
+  one friend to skip 500 spots").
+- **Live Leaderboard:** Show top referrers to leverage social competition.
 
-### 2. High-Conversion Hero Section
+### 4. Post-Signup Momentum (The "Warm-up")
+Don't let the waitlist go cold.
+- **Immediate Confirmation:** Validate their spot and reiterate the referral
+  benefit.
+- **Progress Updates:** Send "behind-the-scenes" content or "development
+  milestones" to maintain interest.
+- **Interactive Tasks:** Ask for feedback or survey the waitlist to make them
+  feel part of the building process.
 
-The pre-launch page must be leaner and faster than a standard landing page.
-
-- **Primary Headline:** Focus on the outcome, not just "Coming Soon."
-- **Minimal Form:** Usually just an email address to reduce cognitive load.
-- **Immediate Gratification:** Confirm signup instantly and immediately
-  transition to the "Viral Loop" state.
-
-### 3. The "Viral Queue" Implementation
-
-Leverage the **Robinhood Effect** to turn every sign-up into an acquisition
-channel.
-
-- **Position Tracking:** Show the user their current place in line (e.g., "You are
-  #12,450").
-- **Gamified Advancement:** "Move up 1,000 spots for every friend you invite."
-- **Social Proof:** Show live updates of others joining or "People ahead of you"
-  to trigger the Fear Of Missing Out (FOMO).
-
-### 4. The "Zeigarnik Effect" Engagement
-
-Keep the list "warm" so they don't forget the product before launch.
-
-- **Progress Updates:** Send "Behind the scenes" or "We're 80% ready" updates.
-- **Micro-Value Delivery:** Provide small tips, guides, or insights related to
-  the product's problem space while they wait.
-
-### 5. Review Against Decision Rules
-
-Verify the waitlist mechanics against the growth heuristics.
+### 5. The Transition (Waitlist-to-User)
+Plan the "Roll-out" to maximize activation.
+- **The "You're In" Notification:** High-excitement email with a direct link to
+  onboarding.
+- **Phased Access:** Invite users in batches to manage server load and maintain
+  the sense of exclusivity.
 
 ## Decision Rules
-
-- **The "Immediate Action" Rule:** The user should be asked to share *instantly*
-  after submitting their email, while their intent is at its peak.
-- **Value Over Hype:** Ensure the reward for joining (and sharing) is
-  proportionate to the effort required.
-- **The Transparency Rule:** If using a queue, be honest about movement. Fake
-  numbers erode long-term brand trust.
-- **Low-Friction Referral:** Use pre-filled sharing text for WhatsApp, Twitter,
-  and Email to make sharing a one-click action.
+- **Transparency vs. Mystery:** Use "Mystery" (vague but intriguing) for new-to-market
+  innovations. Use "Transparency" (clear specs) for feature updates to existing
+  products.
+- **The Friction Balance:** If K-factor is low, the referral incentive is likely
+  too weak. If CVR is low, the "Hook" is likely too vague or the form is too
+  complex.
+- **Mobile First:** Waitlist pages are often shared on social media; they MUST
+  be perfectly optimized for mobile viewport "above-the-fold" signups.
 
 ## Constraints
-
-- **Data Privacy:** Waitlist data collection must comply with GDPR/CCPA, including
-  clear disclosure of how their email will be used.
-- **System Integrity:** Viral mechanics must have basic protection against
-  self-referral/botting if high-value rewards are involved.
-- **Delivery Commitment:** Avoid "vaporware" — having a rough launch window
-  is required to maintain credibility.
-
-## Non-Goals
-
-- Building the actual waitlist management software or referral tracking backend.
-- Creating the post-launch marketing strategy or paid media plan.
-- Designing the final product UI beyond the pre-launch page.
+- **Launch Commitment:** Do not build a waitlist if there is no realistic launch
+  plan; infinite waitlists destroy brand credibility.
+- **Referral Ethics:** Incentives for referrals must be clearly stated and
+  honored — failing to deliver on a "skip the line" promise will backfire.
+- **Data Privacy:** Waitlist signups must comply with GDPR/CCPA, especially
+  when using third-party waitlist management tools.
 
 ## Common Failure Patterns
+- **The "Void":** Signing up and hearing nothing for months until the product
+  finally launches.
+- **Boring "Coming Soon":** A plain page with "Coming Soon" and a logo, giving
+  the user no reason to care.
+- **Complex Referral Requirements:** Asking for 5 referrals to get any benefit
+  (high barrier to entry).
+- **Broken Queue Logic:** Users moving *down* the list or positions not updating,
+  which feels like a "scam."
 
-- **The "Dead End" Signup:** Providing a "Thank you, we'll email you" message
-  with no next step or sharing prompt.
-- **Opaque Queues:** Telling a user they are "on the list" without showing
-  progress or a way to move faster.
-- **Over-Promising:** Offering rewards that the business cannot sustain at
-  scale (e.g., "Lifetime Free" to everyone).
-- **Silent Waiting:** Not emailing the waitlist for months, leading to high
-  churn and "spam" reports when the launch email finally arrives.
-
-## Validation Criteria
-
-- [ ] **Waitlist Conversion Rate (WCR):** (Waitlist Signups / Page Views) * 100.
-  Target: 20-40% for high-intent pre-launches.
-- [ ] **Viral Coefficient (K):** Average number of successful referrals per
-  waitlist member. Target: >0.2.
-- [ ] **Share Rate:** Percentage of users who interact with the sharing buttons
-  immediately after signup.
-- [ ] **Launch Day Open Rate:** The percentage of the waitlist that opens the
-  actual "We are live" email.
+## Validation Methods
+- [ ] **Waitlist Conversion Rate (CVR):** (Signups / Landing Page Views) * 100.
+  Target: >20% for high-intent niches.
+- [ ] **Viral Coefficient (K-factor):** (Avg. invites per user) * (Conversion rate
+  of invites). Goal: >0.5.
+- [ ] **Pre-launch Activation Rate:** Percentage of waitlist members who actually
+  sign up/purchase on launch day.
+- [ ] **Social Share Volume:** Number of organic shares of the waitlist link
+  on Twitter/LinkedIn/WhatsApp.
