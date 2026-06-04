@@ -2,135 +2,152 @@
 name: review-and-rating-system
 description:
   Design and implement a systematic framework for user feedback interfaces,
-  including aggregate ratings, distribution summaries, and individual reviews.
+  including aggregate ratings, distribution summaries, and individual reviews
+  to build trust and social proof.
 ---
 
-# Review and Rating System
+# Review and Rating UI System
 
 ## Purpose
 
-The Review and Rating System skill provides a methodology for designing the
-visual and structural components of user feedback. It ensures that social proof
-is presented in a clear, trustworthy, and accessible way, allowing users to
-quickly assess product or service quality through aggregate data and detailed
-personal accounts.
+The Review and Rating UI System provides a methodology for designing the visual
+and structural framework of user-generated feedback. It ensures that quantitative
+data (star ratings) and qualitative data (written reviews) are organized into a
+scannable, trustworthy, and accessible interface. This system helps users make
+informed decisions by surfacing the most relevant feedback while maintaining
+visual consistency with the broader site design.
 
 ## Use Cases
 
-- Designing product review sections for e-commerce sites.
-- Implementing rating systems for services, apps, or content (e.g., star ratings).
-- Creating aggregate rating summaries (e.g., "4.5 out of 5 stars").
-- Structuring review lists with filtering, sorting, and "helpful" voting.
-- Designing the "Write a Review" interface and feedback loops.
+- **E-commerce Product Pages:** Displaying product satisfaction and detailed
+  customer experiences.
+- **Service/SaaS Marketplaces:** Rating providers, tools, or applications.
+- **Content Platforms:** Allowing users to rate articles, courses, or media.
+- **Feedback Collection Forms:** Designing the input side of the rating system.
+- **Review Summaries:** Creating "at-a-glance" rating distributions (e.g., 5-star
+  bar charts).
 
 ## When NOT to Use
 
-- **Internal Qualitative Feedback:** For internal surveys or net promoter scores
-  (NPS) that aren't displayed publicly.
-- **Single-Testimonial Callouts:** Where a single quote is used as a design
-  element; use `social-proof-optimization` or `section-composition-system`.
-- **Low-Data Sites:** Where there are fewer than 3-5 reviews; a simple list or
-  quote block is more effective than a full system.
+- **Internal Quality Audits:** Where feedback is private and used only for
+  internal processing without a public UI.
+- **Binary Feedback:** If the goal is a simple "Helpful/Not Helpful" or "Upvote/Downvote,"
+  use a simpler interaction pattern from `interactive-state-system`.
+- **Low-Volume Content:** If a site typically has 0–2 reviews per item, a
+  complex distribution summary might look "empty" or discouraging.
+- **Strictly Quantitative Data:** For performance metrics or system health
+  (e.g., "99.9% Uptime"), use a simple `badge-and-tag-system` or data visualization.
 
 ## Inputs
 
-1. **Feedback Type:** Is it a simple binary (thumbs up/down), a 5-star scale, or
-   a complex multi-attribute rating (e.g., "Fit," "Quality," "Value")?
-2. **Data Metadata:** Reviewer name, date, verification status (e.g., "Verified
-   Purchase"), and images.
-3. **Volume Expectations:** How many reviews are expected? (Influences sorting,
-   filtering, and pagination needs).
-4. **Brand Tokens:** Iconography (stars vs. hearts), color palette, and spacing.
+1. **Feedback Schema:** The data to be captured/displayed (Rating 1-5, Title,
+   Body, Date, User ID, Verified status, Photos).
+2. **Aggregate Metadata:** Total review count and average score.
+3. **Distribution Data:** The count of reviews for each star level (5, 4, 3, 2, 1).
+4. **Interaction Requirements:** Sorting (Newest, Highest Rated), Filtering
+   (Verified only, with Photos), and "Helpful" voting.
 
 ## Outputs
 
-1. **Review Anatomy Spec:** Visual definitions for aggregate scores,
-   distribution bars, and individual review cards.
-2. **Interaction Map:** Logic for sorting (Newest, Highest Rated) and filtering
-   (By rating, With images).
-3. **Accessibility Spec:** ARIA labels for stars, focus management for forms,
-   and contrast rules.
-4. **Layout Blueprint:** Positioning of the summary vs. the list vs. the action.
+1. **Rating Component Spec:** Visual design for the "Star Row" (including empty,
+   half, and full states).
+2. **Review Summary Anatomy:** A layout for the aggregate score and distribution
+   bar chart.
+3. **Individual Review Blueprint:** The structural layout for a single review
+   entry (User, Rating, Content, Actions).
+4. **Input Interaction Spec:** The design for the rating selection and review
+   submission form.
 
 ## Workflow
 
 ### 1. Design the Aggregate Summary (The Snapshot)
 
-Provide an immediate "at-a-glance" understanding:
-- **Primary Score:** Large numerical score (e.g., 4.8) and star icons.
-- **Rating Distribution:** Horizontal bars showing the percentage of 1-5 star
-  reviews.
-- **Review Count:** Total number of ratings/reviews to establish volume trust.
+Before showing individual reviews, provide a mental shortcut:
+- **Average Score:** Large, prominent number (e.g., "4.8").
+- **Star Visualization:** A row of 5 stars reflecting the average.
+- **Total Count:** "Based on 1,240 reviews."
+- **Distribution Bars:** A vertical or horizontal list showing the percentage
+  of 5, 4, 3, 2, and 1-star reviews. These should ideally be interactive
+  (clicking a bar filters the list).
 
-### 2. Define the Review Card Anatomy
+### 2. Establish the Individual Review Anatomy
 
-Apply `visual-hierarchy-system` to the individual review:
-- **The Rating:** Clear visual (stars) and numeric value.
-- **The Content:** Bold headline (optional) and the body text.
-- **The Metadata:** Reviewer name, date, and trust signals (e.g., "Verified").
-- **Visual Evidence:** Space for user-uploaded photos if relevant.
+Apply `visual-hierarchy-system` to the review card:
+- **Header:** User name (optionally anonymized) and "Verified Purchase" badge.
+- **Rating & Date:** The star rating and when it was posted.
+- **Title & Body:** A bold title for the core sentiment, followed by the
+  descriptive text.
+- **Media (Optional):** Thumbnails for user-uploaded photos.
+- **Footer/Actions:** "Was this helpful? (Yes/No)" and "Report" buttons.
 
-### 3. Establish Discovery Controls
+### 3. Select Interaction & Discovery Patterns
 
-Help users find relevant feedback:
-- **Sorting:** Default to "Most Helpful" or "Newest."
-- **Filtering:** Allow users to filter by specific ratings (e.g., "Show all
-  1-star reviews").
-- **Search:** For high-volume reviews, include a keyword search within the
-  reviews section.
+Enable users to find the feedback most relevant to them:
+- **Sorting:** Default to "Most Relevant" (a mix of recency and helpfulness).
+  Allow switching to "Newest" or "Highest/Lowest Rated."
+- **Filtering:** Provide quick toggles for "With Images," "Verified Only,"
+  or specific star counts.
 
-### 4. Design the Feedback Loop (The "Write" Action)
+### 4. Design the Feedback Input (The Form)
 
-Encourage participation:
-- **Placement:** A clear "Write a Review" button, usually near the summary.
-- **The Form:** Simple star selection first, followed by text and image
-  uploads. Use `form-design-system` for the input fields.
+Ensure the collection process is frictionless:
+- **Initial Trigger:** Use large, interactive stars that change state on hover.
+- **Progressive Disclosure:** Reveal the text input area only after a star
+  rating is selected.
+- **Contextual Guidance:** Use placeholders like "What did you like or dislike?"
+  to encourage useful feedback.
 
-### 5. Plan for Content States
+### 5. Plan for Content Variance
 
-Handle different amounts of data:
-- **Empty State:** A prompt to "Be the first to review."
-- **Low Volume:** Show the list without complex filters.
-- **High Volume:** Use `pagination-system` and robust filtering.
+- **Empty State:** Design a "No reviews yet—be the first to review" state.
+- **Long Reviews:** Implement "Read More" truncation for extremely long
+  qualitative feedback.
+- **Responsive Stacking:** On mobile, move the distribution summary into a
+  collapsible section or stack it above the review list.
 
 ## Decision Rules
 
-- **The "No Empty Bars" Rule:** If a rating level (e.g., 2 stars) has zero
-  reviews, the distribution bar should still be visible but at 0% to maintain
-  structural consistency.
-- **Trust Signaling:** Always visually prioritize "Verified Purchase" or
-  "Real Name" badges to increase credibility.
-- **Negative Proof:** Do not hide low-rated reviews. Transparency builds more
-  trust than a "perfect" 5.0 score with hidden criticism.
-- **The 44px Rule:** Ensure star icons in the "Write a Review" form are large
-  enough to be easily tapped on mobile (min 44x44px).
+- **The "Squint" Test for Stars:** Stars must be distinguishable even when small.
+  Use high-contrast colors (e.g., Amber/Gold) against the background.
+- **Verified Priority:** "Verified Purchase" badges should be visually distinct
+  (often green or with a check icon) to build immediate trust.
+- **Average Precision:** Round the numeric average to one decimal place (e.g.,
+  4.7) but ensure the star row visually represents half-stars correctly.
+- **Helpfulness Logic:** Use "Helpful" voting to surface the best reviews,
+  but ensure the UI doesn't become cluttered with too many secondary actions.
+- **Image Aspect Ratio:** Use square (1:1) thumbnails for user-uploaded review
+  images to keep the review list organized.
 
 ## Constraints
 
-- **Accessibility:** Stars must have `aria-label` (e.g., "4 out of 5 stars").
-  Interactive stars must be focusable and keyboard-operable.
-- **Responsiveness:** Aggregate summaries often shift from a horizontal layout
-  on desktop to a vertical stack on mobile.
-- **Contrast:** Star colors (usually yellow/gold) must meet at least 3:1
-  contrast against their background if they are functional/interactive.
+- **Accessibility:** Star ratings must use `aria-label` (e.g., "4 out of 5
+  stars"). Interactive star inputs must be keyboard-accessible and use
+  `role="radiogroup"` or similar.
+- **Contrast:** Empty stars (background) must have a 3:1 contrast against the
+  page background; filled stars must have 4.5:1 against the background or a
+  strong border.
+- **Responsiveness:** Review lists must be fluid. Avoid multi-column review
+  cards on mobile; stack all metadata vertically.
 
 ## Common Failure Patterns
 
-- **The "Mystery Average":** Showing a star rating without the numeric score or
-  total count, leaving the user guessing at the volume.
-- **Inaccessible Stars:** Using icons that aren't readable by screen readers or
-  have no focus states.
-- **Lack of Filtering:** Forcing users to scroll through hundreds of reviews to
-  find specific feedback (e.g., about "shipping speed").
-- **Form Friction:** Making the "Write a Review" form too complex, causing
-  users to drop off before submitting.
+- **The "Binary Star" Mistake:** Using stars that are only "On" or "Off" without
+  half-star states, which misrepresents averages like 4.3.
+- **Hidden Distribution:** Showing the average score but not the breakdown,
+  making it impossible for users to see the volume of negative vs. positive.
+- **Lack of Verification:** Failing to distinguish between a verified buyer and
+  a generic user, reducing the trust of the entire system.
+- **The "Review Wall":** Not providing sorting or filtering, forcing users to
+  scroll through hundreds of irrelevant entries.
+- **Inaccessible Inputs:** Using an icon-only star rating input that cannot be
+  reached or selected by keyboard-only users.
 
 ## Validation Criteria
 
-- [ ] Aggregate summary includes both icons and numerical scores.
-- [ ] Rating distribution (1-5 stars) is clearly visualized.
-- [ ] Reviews are sortable and filterable.
-- [ ] "Verified" trust signals are visually distinct.
-- [ ] Interactive stars in the form meet the 44x44px touch target.
-- [ ] Semantic ARIA labels are used for all rating components.
-- [ ] Layout is responsive and preserves hierarchy on mobile.
+- [ ] Average rating and distribution summary are present and scannable.
+- [ ] Individual reviews have a clear hierarchy (User -> Rating -> Content).
+- [ ] "Verified Purchase" status is visually signaled.
+- [ ] Sorting and filtering controls are present for high-volume scenarios.
+- [ ] Accessibility: Star ratings have descriptive ARIA labels.
+- [ ] Interactive rating inputs are keyboard-navigable and have focus states.
+- [ ] Layout is responsive, stacking elements logically on smaller screens.

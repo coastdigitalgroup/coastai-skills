@@ -1,64 +1,70 @@
-# Product Review Section Breakdown
+# Example: Product Review & Rating Breakdown
 
-This example demonstrates the **Review and Rating System** applied to a
-high-intent e-commerce product page.
+This example demonstrates the Review and Rating UI System applied to a high-volume e-commerce product page. It shows how the system balances aggregate data with individual qualitative feedback.
 
-## The Snapshot (Aggregate Summary)
+## 1. Aggregate Rating Summary (The "Snapshot")
 
-Located at the top of the reviews section, this area provides the "Trust
-Baseline."
+Located at the top of the reviews section, this provides immediate context before the user dives into the details.
 
-- **Total Score:** "4.7" (H2 size, bold)
-- **Star Visualization:** 5 stars (4 filled, 1 half-filled), color: `--gold-500`
-- **Review Count:** "Based on 1,248 reviews" (Muted text)
-- **Distribution Histogram:**
-  - 5 Stars: 75% (Greenish-gold bar)
-  - 4 Stars: 15%
-  - 3 Stars: 5%
-  - 2 Stars: 3%
-  - 1 Star: 2% (Gray bar)
-
-## The Filter & Sort Row
-
-- **Sort Dropdown:** Options: "Most Helpful" (Default), "Newest," "Rating: High
-  to Low."
-- **Filter Chips:**
-  - "With Images"
-  - "Verified Only"
-  - "Mentioned: 'Battery Life'" (Dynamic keywords)
-
-## The Review Card (Individual Entry)
-
-A single entry in the list, designed for scannability.
-
-### Anatomy
-1. **Header Zone:**
-   - Stars (Size: 16px)
-   - Badge: "Verified Purchase" (Small, green check icon + text)
-   - Date: "Oct 12, 2023" (Right-aligned, muted)
-2. **Title Zone:**
-   - "Exceeded my expectations!" (H4, semi-bold)
-3. **Body Zone:**
-   - "The battery life is incredible. I've been using it for three days
-     straight..." (Line-height: 1.5, max-width: 60ch)
-4. **Visual Zone (Optional):**
-   - Thumbnail of a user-uploaded photo (48x48px, rounded corners)
-5. **Footer Zone (Feedback):**
-   - "Was this helpful?" (Text)
-   - Thumbs Up/Down icons (Interactive)
-   - "Report" link (Tertiary)
-
-## Responsive Strategy
-
-| Component | Desktop | Mobile |
+| Component | Visual Treatment | Purpose |
 | :--- | :--- | :--- |
-| **Summary** | Split: Left (Score) / Right (Bars) | Stacked: Score Top / Bars Below |
-| **Filters** | Horizontal row | Scrollable horizontal pill-tray |
-| **Review Card** | 24px padding, clear borders | 16px padding, border-bottom only |
+| **Global Average** | Large 48px Bold Text ("4.7") | Immediate value communication. |
+| **Star Row** | 5 Amber Stars (4 full, 1 three-quarter) | Visual reinforcement of the number. |
+| **Total Count** | Muted 14px Text ("1,240 Reviews") | Establishes statistical significance. |
+| **Distribution** | Horizontal bars for 5, 4, 3, 2, 1 stars | Shows the "sentiment spread." |
+| **CTA** | "Write a Review" Button (Secondary) | Encourages participation. |
 
-## Why it works
-The combination of **numerical data** (4.7) and **visual distribution** (the
-bars) allows the user to quickly see that the majority of people are satisfied.
-The **Verified Purchase** badge adds layers of trust, while the **Filtering**
-allows users to seek out the specific information they care about most (e.g.,
-"Battery Life").
+### Visual Layout
+```text
+[ 4.7 ]  ★★★★¾  Based on 1,240 reviews
+---------------------------------------
+5 Star [ |||||||||||||||||||| 85% ]
+4 Star [ ||||                10% ]
+3 Star [ |                    2% ]
+2 Star [ |                    1% ]
+1 Star [ |                    2% ]
+```
+
+## 2. Individual Review Card
+
+Each review is a modular unit using a vertical stack on mobile and a hybrid layout on desktop.
+
+### Anatomy Breakdown
+- **Sidebar (Desktop) / Top Row (Mobile):**
+  - **User:** "Sarah M." (Bold)
+  - **Status:** [✓ Verified Purchase] (Green text/icon)
+  - **Location:** "Seattle, WA" (Muted)
+- **Main Content:**
+  - **Rating:** ★★★★★ (Immediate context)
+  - **Date:** "Oct 24, 2023" (Muted)
+  - **Headline:** "Game changer for my morning routine!" (Bold H4)
+  - **Body:** "I was hesitant at first, but after a week of use, I can't imagine going back..."
+- **Media:** 3x Square thumbnails of the product in use.
+- **Actions:**
+  - "Helpful? Yes (42) No (2)"
+  - "Report" (Link)
+
+## 3. Discovery & Sorting Controls
+
+Placed between the Summary and the Review List to manage cognitive load.
+
+- **Sort Dropdown:** "Sort by: Most Relevant" (Default), "Newest," "Highest Rating."
+- **Filter Chips:**
+  - [✓ Verified Only]
+  - [With Images]
+  - [5 Stars]
+  - [Critical]
+
+## 4. Responsive Adaptation
+
+### Desktop (1200px+)
+- Aggregate Summary sits on the left (33% width).
+- Review List and Sorting sit on the right (66% width).
+- Media thumbnails are 80x80px inline.
+
+### Mobile (<768px)
+- Aggregate Summary is full-width at the top.
+- Distribution bars become narrower.
+- Review metadata (User/Status) stacks above the star rating.
+- Media thumbnails wrap to a new line below the text.
+- Sorting/Filtering becomes a single "Filter & Sort" button that opens a bottom drawer.
