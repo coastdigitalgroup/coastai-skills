@@ -1,0 +1,58 @@
+/*
+  reveal-styles.css
+  Base styles for scroll-reveal entrance animations.
+*/
+
+/*
+  1. Progressive Enhancement
+  Only hide elements if JS is active and motion is allowed.
+*/
+@media (prefers-reduced-motion: no-preference) {
+  .js-enabled .reveal {
+    opacity: 0;
+    will-change: opacity, transform;
+    transition:
+      opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Default entrance: Slide Up */
+  .js-enabled .reveal:not(.reveal-left):not(.reveal-right) {
+    transform: translateY(20px);
+  }
+
+  /* Directional variants */
+  .js-enabled .reveal-left { transform: translateX(-30px); }
+  .js-enabled .reveal-right { transform: translateX(30px); }
+  .js-enabled .reveal-scale { transform: scale(0.95); }
+
+  /* Target state: Visible */
+  .js-enabled .reveal.is-revealed {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+/*
+  2. Staggering Helper
+  Apply these to children of a container to create a sequential reveal.
+*/
+.reveal-stagger > *:nth-child(1) { transition-delay: 0.1s; }
+.reveal-stagger > *:nth-child(2) { transition-delay: 0.2s; }
+.reveal-stagger > *:nth-child(3) { transition-delay: 0.3s; }
+.reveal-stagger > *:nth-child(4) { transition-delay: 0.4s; }
+.reveal-stagger > *:nth-child(5) { transition-delay: 0.5s; }
+
+/*
+  3. Handling Hidden State Accessibility
+  Ensure content that is 'opacity: 0' doesn't block clicks or focus
+  if it's positioned over other content.
+*/
+.js-enabled .reveal:not(.is-revealed) {
+  pointer-events: none;
+  /* Optional: visibility: hidden; if content contains focusable elements */
+}
+
+.js-enabled .reveal.is-revealed {
+  pointer-events: auto;
+}
