@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scroll Reveal Example - Standard</title>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --text-color: #1f2937;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+        }
+
+        section {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .hero {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        /* --- Scroll Reveal Logic --- */
+
+        /* 1. Only apply initial hidden state if JS is enabled */
+        .js-enabled .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            will-change: opacity, transform;
+        }
+
+        /* 2. Target state when revealed */
+        .reveal.is-revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 3. Respect user motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            .js-enabled .reveal {
+                transition: none;
+                transform: none;
+            }
+            .reveal {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        }
+
+        /* Helper classes for different directions */
+        .js-enabled .reveal-left { transform: translateX(-30px); }
+        .js-enabled .reveal-right { transform: translateX(30px); }
+    </style>
+    <script>
+        // Immediately add js-enabled class to prevent "flash of invisible content"
+        document.documentElement.classList.add('js-enabled');
+    </script>
+</head>
+<body>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Always Visible Hero</h1>
+            <p>This content is above the fold and should not be delayed by animations.</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 class="reveal">Built for Performance</h2>
+            <p class="reveal">Using Intersection Observer ensures smooth scrolling even on low-end devices.</p>
+
+            <div class="card-grid">
+                <div class="card reveal" style="transition-delay: 0.1s;">
+                    <h3>Feature One</h3>
+                    <p>Reveals with a slight delay relative to the header.</p>
+                </div>
+                <div class="card reveal" style="transition-delay: 0.2s;">
+                    <h3>Feature Two</h3>
+                    <p>Uses inline transition-delay for easy staggering.</p>
+                </div>
+                <div class="card reveal" style="transition-delay: 0.3s;">
+                    <h3>Feature Three</h3>
+                    <p>Clean, semantic, and accessible.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section style="background-color: #e5e7eb;">
+        <div class="container">
+            <h2 class="reveal reveal-left">Art Direction</h2>
+            <p class="reveal reveal-right">You can easily vary the entrance direction using simple modifier classes.</p>
+        </div>
+    </section>
+
+    <script>
+        /**
+         * Standard Scroll Reveal Implementation
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            const revealElements = document.querySelectorAll('.reveal');
+
+            const observerOptions = {
+                root: null, // use viewport
+                rootMargin: '0px 0px -50px 0px', // trigger 50px before element hits bottom
+                threshold: 0.1 // trigger when 10% visible
+            };
+
+            const revealCallback = (entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Add revealed class
+                        entry.target.classList.add('is-revealed');
+
+                        // Stop observing once revealed for performance
+                        observer.unobserve(entry.target);
+                    }
+                });
+            };
+
+            const observer = new IntersectionObserver(revealCallback, observerOptions);
+
+            revealElements.forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>
