@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Step Registration Wizard</title>
+    <style>
+        body { font-family: system-ui, sans-serif; line-height: 1.5; max-width: 600px; margin: 2rem auto; padding: 1rem; }
+        .step { display: none; }
+        .step.active { display: block; }
+        .error { color: #d32f2f; font-size: 0.875rem; display: none; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; font-weight: bold; margin-bottom: 0.25rem; }
+        input { width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; }
+        input:invalid { border-color: #d32f2f; }
+        .controls { display: flex; justify-content: space-between; margin-top: 2rem; }
+        .progress-bar { display: flex; list-style: none; padding: 0; margin-bottom: 2rem; border-bottom: 2px solid #eee; }
+        .progress-step { padding: 0.5rem 1rem; color: #666; position: relative; }
+        .progress-step.active { color: #000; font-weight: bold; border-bottom: 3px solid #000; margin-bottom: -2.5px; }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+    </style>
+</head>
+<body>
+
+    <h1>Join Our Platform</h1>
+
+    <nav aria-label="Progress">
+        <ol class="progress-bar">
+            <li class="progress-step active" id="p-step-1" aria-current="step">Account</li>
+            <li class="progress-step" id="p-step-2">Profile</li>
+            <li class="progress-step" id="p-step-3">Review</li>
+        </ol>
+    </nav>
+
+    <div id="announcer" class="sr-only" aria-live="polite"></div>
+
+    <form id="registration-form" novalidate>
+        <!-- Step 1: Account -->
+        <section id="step-1" class="step active" role="group" aria-labelledby="heading-1">
+            <h2 id="heading-1">Step 1: Account Information</h2>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required placeholder="you@example.com">
+                <span id="email-error" class="error">Please enter a valid email.</span>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required minlength="8">
+                <span id="password-error" class="error">Minimum 8 characters required.</span>
+            </div>
+        </section>
+
+        <!-- Step 2: Profile -->
+        <section id="step-2" class="step" role="group" aria-labelledby="heading-2">
+            <h2 id="heading-2">Step 2: Profile Details</h2>
+            <div class="form-group">
+                <label for="first-name">First Name</label>
+                <input type="text" id="first-name" name="first-name" required>
+            </div>
+            <div class="form-group">
+                <label for="last-name">Last Name</label>
+                <input type="text" id="last-name" name="last-name" required>
+            </div>
+        </section>
+
+        <!-- Step 3: Review -->
+        <section id="step-3" class="step" role="group" aria-labelledby="heading-3">
+            <h2 id="heading-3">Step 3: Review & Submit</h2>
+            <p>Please confirm your details before submitting.</p>
+            <div id="review-summary">
+                <!-- Summary will be injected here -->
+            </div>
+        </section>
+
+        <div class="controls">
+            <button type="button" id="back-btn" style="visibility: hidden;">Back</button>
+            <button type="button" id="next-btn">Next</button>
+        </div>
+    </form>
+
+    <script>
+        const form = document.getElementById('registration-form');
+        const steps = Array.from(document.querySelectorAll('.step'));
+        const pSteps = Array.from(document.querySelectorAll('.progress-step'));
+        const nextBtn = document.getElementById('next-btn');
+        const backBtn = document.getElementById('back-btn');
+        const announcer = document.getElementById('announcer');
+
+        let currentStep = 0;
+
+        function updateUI() {
+            steps.forEach((step, index) => {
+                step.classList.toggle('active', index === currentStep);
+                pSteps[index].classList.toggle('active', index === currentStep);
+                if (index === currentStep) {
+                    pSteps[index].setAttribute('aria-current', 'step');
+                } else {
+                    pSteps[index].removeAttribute('aria-current');
+                }
+            });
+
+            backBtn.style.visibility = currentStep === 0 ? 'hidden' : 'visible';
+            nextBtn.textContent = currentStep === steps.length - 1 ? 'Submit Registration' : 'Next';
+
+            // Focus management
+            const currentStepEl = steps[currentStep];
+            const heading = currentStepEl.querySelector('h2');
+            heading.setAttribute('tabindex', '-1');
+            heading.focus();
+
+            // Screen reader announcement
+            announcer.textContent = `Step ${currentStep + 1} of ${steps.length}: ${heading.textContent}`;
+        }
+
+        function validateStep(stepIndex) {
+            const currentStepEl = steps[stepIndex];
+            const inputs = Array.from(currentStepEl.querySelectorAll('input'));
+            let isValid = true;
+
+            inputs.forEach(input => {
+                if (!input.checkValidity()) {
+                    isValid = false;
+                    input.setAttribute('aria-invalid', 'true');
+                    // In a real app, you'd show specific error messages here
+                } else {
+                    input.removeAttribute('aria-invalid');
+                }
+            });
+
+            return isValid;
+        }
+
+        function buildSummary() {
+            const summary = document.getElementById('review-summary');
+            const data = new FormData(form);
+            const ul = document.createElement('ul');
+
+            for (let [key, value] of data.entries()) {
+                if (key !== 'password') { // Don't show password in summary
+                    const li = document.createElement('li');
+                    const strong = document.createElement('strong');
+                    strong.textContent = `${key}: `;
+                    li.appendChild(strong);
+                    li.appendChild(document.createTextNode(value));
+                    ul.appendChild(li);
+                }
+            }
+
+            summary.innerHTML = '';
+            summary.appendChild(ul);
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentStep < steps.length - 1) {
+                if (validateStep(currentStep)) {
+                    currentStep++;
+                    if (currentStep === steps.length - 1) buildSummary();
+                    updateUI();
+                }
+            } else {
+                if (validateStep(currentStep)) {
+                    alert('Form Submitted Successfully!');
+                    console.log('Final Data:', Object.fromEntries(new FormData(form)));
+                }
+            }
+        });
+
+        backBtn.addEventListener('click', () => {
+            if (currentStep > 0) {
+                currentStep--;
+                updateUI();
+            }
+        });
+    </script>
+</body>
+</html>
