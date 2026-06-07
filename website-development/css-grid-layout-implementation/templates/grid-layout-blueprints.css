@@ -1,0 +1,101 @@
+/*
+   CSS Grid Layout Blueprints
+   Reusable patterns for common website layouts
+*/
+
+/* 1. THE AUTO-RESPONSIVE GRID (No Media Queries) */
+.blueprint-auto-grid {
+    --min-column-width: 300px;
+    --grid-gap: 1.5rem;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(var(--min-column-width), 1fr));
+    gap: var(--grid-gap);
+}
+
+/* 2. THE HOLY GRAIL (Header, Sidebar, Main, Footer) */
+.blueprint-holy-grail {
+    --header-height: 80px;
+    --footer-height: 60px;
+    --sidebar-width: 250px;
+
+    display: grid;
+    min-height: 100vh;
+    grid-template-rows: var(--header-height) 1fr var(--footer-height);
+    grid-template-columns: var(--sidebar-width) 1fr;
+    grid-template-areas:
+        "header header"
+        "sidebar main"
+        "footer footer";
+}
+
+/* Responsive adjustment for Holy Grail */
+@media (max-width: 768px) {
+    .blueprint-holy-grail {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto 1fr auto;
+        grid-template-areas:
+            "header"
+            "sidebar"
+            "main"
+            "footer";
+    }
+}
+
+/* 3. THE BENTO BOX (Irregular masonry-like grid) */
+.blueprint-bento {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 200px);
+    gap: 1rem;
+}
+
+.bento-item-large {
+    grid-column: span 2;
+    grid-row: span 2;
+}
+
+.bento-item-wide {
+    grid-column: span 2;
+}
+
+.bento-item-tall {
+    grid-row: span 2;
+}
+
+/* 4. THE SUBGRID CARD ALIGNER */
+.blueprint-subgrid-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    /* Each logical 'row' in the UI spans 3 rows in the grid */
+    grid-template-rows: auto 1fr auto;
+    align-items: stretch;
+}
+
+.blueprint-subgrid-card {
+    display: grid;
+    grid-row: span 3; /* Must match the number of internal sections */
+    grid-template-rows: subgrid;
+}
+
+/* 5. UTILITY: GRID OVERLAY (For debugging) */
+.debug-grid-overlay {
+    position: relative;
+}
+
+/*
+   Note: To make the background-size match your grid tracks exactly,
+   you would typically set these via CSS variables from the container.
+   e.g., --track-width: 100px; background-size: var(--track-width) 1fr;
+*/
+.debug-grid-overlay::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(to right, rgba(255,0,0,0.1) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,0,0,0.1) 1px, transparent 1px);
+    background-size: 25% 100px;
+    z-index: 9999;
+}

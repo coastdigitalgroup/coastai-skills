@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intrinsic Grid - Media-Query-Less Responsiveness</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            padding: 2rem;
+            background: #fafafa;
+        }
+
+        .grid-container {
+            display: grid;
+            /*
+               THE MAGIC LINE:
+               - auto-fit: Creates as many tracks as will fit
+               - minmax(300px, 1fr): Each item is at least 300px,
+                 but expands to fill remaining space
+            */
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+        }
+
+        .card h3 { margin-top: 0; color: #2c3e50; }
+        .card p { color: #666; font-size: 0.95rem; }
+
+        .demo-controls {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: #eee;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Intrinsic Responsive Grid</h1>
+    <div class="demo-controls">
+        Resize your browser window to see these cards wrap and resize <strong>without a single media query</strong>.
+    </div>
+
+    <div class="grid-container">
+        <div class="card">
+            <h3>Card One</h3>
+            <p>I will always be at least 300px wide. If there isn't room for me and my friends, I'll wrap to a new line.</p>
+        </div>
+        <div class="card">
+            <h3>Card Two</h3>
+            <p>The <code>auto-fit</code> keyword ensures we fill the entire row even if there are only a few of us.</p>
+        </div>
+        <div class="card">
+            <h3>Card Three</h3>
+            <p>Using <code>1fr</code> as the max in minmax allows us to grow to fill any leftover gaps.</p>
+        </div>
+        <div class="card">
+            <h3>Card Four</h3>
+            <p>This pattern is perfect for product listings, blog feeds, or feature highlights.</p>
+        </div>
+        <div class="card">
+            <h3>Card Five</h3>
+            <p>Minimal CSS, maximum flexibility. This is the power of modern CSS Grid.</p>
+        </div>
+    </div>
+
+</body>
+</html>
