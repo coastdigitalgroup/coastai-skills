@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subgrid Alignment - Cross-Card Consistency</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            padding: 2rem;
+            background: #f8f9fa;
+        }
+
+        .parent-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            display: grid;
+            /*
+               Establish a internal row structure for the card:
+               1. Header (auto)
+               2. Image (fixed/aspect)
+               3. Body (1fr)
+               4. Footer (auto)
+            */
+            grid-template-rows: auto 200px 1fr auto;
+
+            /*
+               CRITICAL: Set the rows to use the subgrid of the parent
+               (Note: This requires the parent to define the rows or for the card to span multiple parent rows)
+
+               Correction for this specific example:
+               We actually want cards in the same row to align their internal parts.
+               We achieve this by making the parent grid manage the rows of ALL cards.
+            */
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+
+        /*
+           Modern Subgrid approach:
+           We want the header, body, and footer of all cards in a row to line up
+           regardless of content length.
+        */
+        .subgrid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            /* Cards span 3 rows in the parent grid */
+            grid-template-rows: auto 1fr auto;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card-subgrid {
+            display: grid;
+            /* This card occupies 3 rows in the parent grid */
+            grid-row: span 3;
+            /* It adopts the row definitions of the parent! */
+            grid-template-rows: subgrid;
+
+            background: white;
+            border: 1px solid #ddd;
+            padding: 1rem;
+            gap: 0; /* Gap is managed by parent */
+        }
+
+        .header { background: #eef; padding: 10px; border-bottom: 1px solid #ccc; }
+        .body { padding: 10px; }
+        .footer { background: #fee; padding: 10px; border-top: 1px solid #ccc; font-weight: bold;}
+
+        @media (max-width: 800px) {
+            .subgrid-container {
+                grid-template-columns: 1fr;
+                /* Subgrid behavior usually collapses or changes on mobile */
+            }
+            .card-subgrid {
+                grid-row: auto;
+                grid-template-rows: auto auto auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Card Alignment with Subgrid</h1>
+    <p>Notice how the headers, bodies, and footers of these cards line up horizontally, even though their text lengths are different.</p>
+
+    <div class="subgrid-container">
+        <!-- Card 1 -->
+        <div class="card-subgrid">
+            <div class="header">Short Header</div>
+            <div class="body">
+                <p>This body has very little text.</p>
+            </div>
+            <div class="footer">$9.99</div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="card-subgrid">
+            <div class="header">A Much Longer Header That Wraps To Multiple Lines</div>
+            <div class="body">
+                <p>This body has more text to show how the alignment holds. The header of the card to my left is forced to match my height, and the body of the card to my right is forced to match the height of the largest body in this row.</p>
+            </div>
+            <div class="footer">$19.99</div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="card-subgrid">
+            <div class="header">Medium Header</div>
+            <div class="body">
+                <p>Consistent alignment across cards used to require fixed heights or complex JS. Now, with <code>grid-template-rows: subgrid</code>, it's native and performant.</p>
+            </div>
+            <div class="footer">$29.99</div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editorial Layout - CSS Grid Areas</title>
+    <style>
+        :root {
+            --gap: 20px;
+            --primary-bg: #f0f0f0;
+            --accent: #3498db;
+        }
+
+        body {
+            font-family: system-ui, sans-serif;
+            margin: 0;
+            padding: var(--gap);
+            line-height: 1.5;
+        }
+
+        .editorial-grid {
+            display: grid;
+            gap: var(--gap);
+            /* Define the named areas for a complex layout */
+            grid-template-areas:
+                "hero hero sidebar"
+                "hero hero sidebar"
+                "content-a content-b sidebar"
+                "footer footer footer";
+            grid-template-columns: 1fr 1fr 300px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Responsive remapping of areas */
+        @media (max-width: 900px) {
+            .editorial-grid {
+                grid-template-areas:
+                    "hero"
+                    "sidebar"
+                    "content-a"
+                    "content-b"
+                    "footer";
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .item {
+            background: var(--primary-bg);
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .hero { grid-area: hero; background: var(--accent); color: white; min-height: 400px; }
+        .sidebar { grid-area: sidebar; }
+        .content-a { grid-area: content-a; }
+        .content-b { grid-area: content-b; }
+        .footer { grid-area: footer; text-align: center; font-size: 0.9rem; }
+
+        h2 { margin-top: 0; }
+    </style>
+</head>
+<body>
+
+    <h1>Modern Editorial Grid</h1>
+    <p>This layout uses <code>grid-template-areas</code> to define a complex layout that responds by remapping names.</p>
+
+    <div class="editorial-grid">
+        <section class="item hero">
+            <h2>Featured Story</h2>
+            <p>The hero section spans multiple rows and columns in the desktop view, creating a strong visual anchor.</p>
+        </section>
+
+        <aside class="item sidebar">
+            <h2>Related News</h2>
+            <ul>
+                <li>Modern CSS Techniques</li>
+                <li>The Power of Subgrid</li>
+                <li>Intrinsic Responsiveness</li>
+            </ul>
+        </aside>
+
+        <article class="item content-a">
+            <h2>Secondary News A</h2>
+            <p>Short snippet of content appearing below the hero.</p>
+        </article>
+
+        <article class="item content-b">
+            <h2>Secondary News B</h2>
+            <p>Another snippet of content beside its peer.</p>
+        </article>
+
+        <footer class="item footer">
+            <p>&copy; 2025 Coast Digital Group - Build with Grid</p>
+        </footer>
+    </div>
+
+</body>
+</html>
