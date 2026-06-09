@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Performance Comparison: Layout vs. Compositor</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 2rem;
+      line-height: 1.5;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    .box {
+      width: 100px;
+      height: 100px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+
+    /* BAD: Animating 'margin-left' triggers Layout and Paint */
+    .bad-box {
+      background-color: #ef4444;
+      animation: move-bad 2s infinite alternate ease-in-out;
+    }
+
+    @keyframes move-bad {
+      from { margin-left: 0; }
+      to { margin-left: 200px; }
+    }
+
+    /* GOOD: Animating 'transform' only triggers Composition */
+    .good-box {
+      background-color: #10b981;
+      animation: move-good 2s infinite alternate ease-in-out;
+      /* Optional: signal GPU promotion */
+      will-change: transform;
+    }
+
+    @keyframes move-good {
+      from { transform: translateX(0); }
+      to { transform: translateX(200px); }
+    }
+
+    .info {
+      padding: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #f9f9f9;
+    }
+
+    code {
+      background: #eee;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bad-box, .good-box {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Performance Comparison</h1>
+  <p>Open <strong>Chrome DevTools > Rendering</strong> and enable <strong>Paint Flashing</strong> and <strong>Frame Rendering Stats</strong> to see the difference.</p>
+
+  <div class="container">
+    <div>
+      <h2>Layout Trigger (Bad)</h2>
+      <div class="box bad-box">Layout</div>
+      <div class="info">
+        <p>Uses <code>margin-left</code>.</p>
+        <p><strong>Result:</strong> Triggers <em>Recalculate Style</em>, <em>Layout</em>, <em>Update Layer Tree</em>, <em>Paint</em>, and <em>Composite</em> on every frame.</p>
+      </div>
+    </div>
+
+    <div>
+      <h2>Compositor Only (Good)</h2>
+      <div class="box good-box">Compositor</div>
+      <div class="info">
+        <p>Uses <code>transform: translateX()</code>.</p>
+        <p><strong>Result:</strong> Triggers <em>Composition</em> only. The main thread is free for other tasks.</p>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
