@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High Performance CSS Animation Comparison</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 2rem;
+            line-height: 1.5;
+            background: #f4f4f9;
+        }
+        .container {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        .box-wrapper {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            flex: 1;
+            min-width: 300px;
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+        .box {
+            width: 50px;
+            height: 50px;
+            border-radius: 4px;
+            position: absolute;
+        }
+
+        /* BAD IMPLEMENTATION: Triggers Layout & Paint */
+        .bad-box {
+            background: #ff4d4d;
+            top: 100px;
+            left: 20px;
+            /* Animation using 'left' triggers Layout recalculation every frame */
+            animation: move-left 3s infinite ease-in-out;
+        }
+
+        @keyframes move-left {
+            0%, 100% { left: 20px; }
+            50% { left: 250px; }
+        }
+
+        /* GOOD IMPLEMENTATION: Compositor Only */
+        .good-box {
+            background: #2ecc71;
+            top: 100px;
+            left: 20px;
+            /* Animation using 'transform' is handled entirely by the compositor */
+            animation: move-transform 3s infinite ease-in-out;
+            /* Promoting to its own layer avoids repainting the container */
+            will-change: transform;
+        }
+
+        @keyframes move-transform {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(230px); }
+        }
+
+        .label {
+            font-weight: bold;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        .description {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 100px;
+        }
+        code {
+            background: #eee;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+
+        /* ACCESSIBILITY: Support Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            .box {
+                animation-play-state: paused !important;
+            }
+            .accessibility-note {
+                display: block;
+                color: #d35400;
+                font-weight: bold;
+            }
+        }
+        .accessibility-note { display: none; }
+    </style>
+</head>
+<body>
+    <h1>Animation Performance Comparison</h1>
+    <p>Open Browser DevTools > Rendering and enable <strong>Paint Flashing</strong> to see the difference.</p>
+
+    <div class="accessibility-note">Note: Animations are paused because prefers-reduced-motion is active.</div>
+
+    <div class="container">
+        <!-- BAD CASE -->
+        <div class="box-wrapper">
+            <span class="label">❌ Bad: Animating <code>left</code></span>
+            <div class="box bad-box"></div>
+            <div class="description">
+                <strong>Mechanism:</strong> Triggers <code>Layout -> Paint -> Composite</code>.<br><br>
+                <strong>Impact:</strong> The main thread must recalculate the geometry of the box and potentially its container every frame. High CPU usage, prone to jank.
+            </div>
+        </div>
+
+        <!-- GOOD CASE -->
+        <div class="box-wrapper">
+            <span class="label">✅ Good: Animating <code>transform</code></span>
+            <div class="box good-box"></div>
+            <div class="description">
+                <strong>Mechanism:</strong> Triggers <code>Composite</code> only.<br><br>
+                <strong>Impact:</strong> The element is promoted to a GPU layer. Moving it doesn't affect document flow or require repainting. 60fps even on slow devices.
+            </div>
+        </div>
+    </div>
+</body>
+</html>
