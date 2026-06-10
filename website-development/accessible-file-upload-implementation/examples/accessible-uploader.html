@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessible File Uploader Example</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            line-height: 1.5;
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .upload-container {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            transition: border-color 0.2s, background-color 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .upload-container.drag-active {
+            border-color: #0056b3;
+            background-color: #f0f7ff;
+        }
+
+        .upload-container:focus-within {
+            outline: 3px solid #0056b3;
+            outline-offset: 4px;
+        }
+
+        /* Visually hide the native input but keep it accessible */
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .upload-button {
+            display: inline-block;
+            background-color: #0056b3;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            font-weight: bold;
+            pointer-events: none; /* Let the container handle the click */
+        }
+
+        .file-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 2rem;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+        }
+
+        .remove-button {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .remove-button:hover {
+            background: #c82333;
+        }
+
+        .progress-container {
+            margin-top: 0.5rem;
+            width: 100%;
+        }
+
+        progress {
+            width: 100%;
+            height: 1rem;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Document Upload</h1>
+    <p>Upload your supporting documents (PDF, JPG, PNG). Maximum 5MB per file.</p>
+
+    <!-- The Drop Zone / Container -->
+    <div id="drop-zone" class="upload-container" role="region" aria-labelledby="upload-label" tabindex="-1">
+        <label id="upload-label" for="file-input">
+            <span id="instructions">Drag and drop files here or</span>
+            <span class="upload-button">Browse Files</span>
+        </label>
+        <input type="file" id="file-input" class="visually-hidden" multiple accept=".pdf,.jpg,.jpeg,.png">
+    </div>
+
+    <!-- Live Region for status updates -->
+    <div id="status-announcer" class="sr-only" aria-live="polite"></div>
+
+    <!-- List of files -->
+    <ul id="file-list" class="file-list">
+        <!-- Files will be injected here -->
+    </ul>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const fileList = document.getElementById('file-list');
+        const announcer = document.getElementById('status-announcer');
+
+        // Handle drag events
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('drag-active'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('drag-active'), false);
+        });
+
+        // Handle dropped files
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        });
+
+        // Handle selected files via input
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        // Allow clicking the drop zone to trigger the input
+        // Note: Clicking the label/button already triggers the input;
+        // this handler catches clicks in the "empty" space of the container.
+        dropZone.addEventListener('click', (e) => {
+            if (e.target === dropZone || e.target === document.getElementById('instructions')) {
+                fileInput.click();
+            }
+        });
+
+        function handleFiles(files) {
+            const fileArray = [...files];
+            announcer.textContent = `${fileArray.length} file(s) added.`;
+
+            fileArray.forEach(file => {
+                addFileToList(file);
+            });
+        }
+
+        function addFileToList(file) {
+            const li = document.createElement('li');
+            li.className = 'file-item';
+
+            const fileId = 'file-' + Math.random().toString(36).substr(2, 9);
+
+            li.innerHTML = `
+                <div>
+                    <span id="${fileId}-name"><strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB)</span>
+                    <div class="progress-container">
+                        <progress id="${fileId}-progress" value="0" max="100"></progress>
+                        <span class="sr-only" id="${fileId}-status">0% uploaded</span>
+                    </div>
+                </div>
+                <button class="remove-button" aria-label="Remove ${file.name}">Remove</button>
+            `;
+
+            fileList.appendChild(li);
+
+            // Simulate upload progress
+            simulateUpload(fileId, file.name);
+
+            // Handle removal
+            li.querySelector('.remove-button').addEventListener('click', (e) => {
+                e.stopPropagation(); // Don't trigger the drop zone click
+                li.remove();
+                announcer.textContent = `${file.name} removed.`;
+                dropZone.focus();
+            });
+        }
+
+        function simulateUpload(id, fileName) {
+            const progress = document.getElementById(`${id}-progress`);
+            const status = document.getElementById(`${id}-status`);
+            let value = 0;
+
+            const interval = setInterval(() => {
+                value += Math.floor(Math.random() * 20);
+                if (value >= 100) {
+                    value = 100;
+                    clearInterval(interval);
+                    announcer.textContent = `Upload complete for ${fileName}`;
+                }
+                progress.value = value;
+                status.textContent = `${value}% uploaded`;
+            }, 400);
+        }
+    </script>
+</body>
+</html>
