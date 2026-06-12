@@ -7,6 +7,7 @@ All notable changes to this project will be documented here. The format follows
 
 ### Added
 
+- `accessible-file-upload-implementation` skill to `website-development` category
 - `subscription-cancel-flow-optimization` skill to `website-growth` category
 - `AGENTS.md` Codex operating guide for release, review, and documentation
   stewardship alongside Claude Code
