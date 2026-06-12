@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessible File Uploader Example</title>
+    <style>
+        body { font-family: system-ui, sans-serif; line-height: 1.5; padding: 2rem; max-width: 600px; margin: 0 auto; }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+
+        .upload-container { border: 2px dashed #ccc; border-radius: 8px; padding: 2rem; text-align: center; transition: border-color 0.2s, background-color 0.2s; cursor: pointer; position: relative; }
+        .upload-container.drag-over { border-color: #0056b3; background-color: #f0f7ff; }
+        .upload-container:focus-within { outline: 2px solid #0056b3; outline-offset: 4px; }
+
+        .upload-label { cursor: pointer; color: #0056b3; font-weight: bold; text-decoration: underline; }
+
+        .file-list { list-style: none; padding: 0; margin-top: 2rem; }
+        .file-item { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; background: #f9f9f9; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 0.5rem; }
+
+        .remove-btn { background: #dc3545; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; min-width: 44px; min-height: 44px; }
+        .remove-btn:hover { background: #c82333; }
+    </style>
+</head>
+<body>
+
+    <h1>Upload Your Documents</h1>
+
+    <!-- ARIA Live Region for Status Updates -->
+    <div id="upload-status" class="sr-only" aria-live="polite"></div>
+
+    <form id="upload-form">
+        <div id="drop-zone" class="upload-container" tabindex="-1">
+            <input type="file" id="file-input" class="sr-only" multiple accept=".jpg,.jpeg,.png,.pdf">
+            <label for="file-input" class="upload-label">
+                Select files to upload
+            </label>
+            <p>or drag and drop them here (.jpg, .png, .pdf)</p>
+        </div>
+
+        <ul id="file-list" class="file-list">
+            <!-- Dynamically populated -->
+        </ul>
+
+        <button type="submit" style="margin-top: 1rem; padding: 0.75rem 1.5rem; font-size: 1rem;">
+            Upload Files
+        </button>
+    </form>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const fileList = document.getElementById('file-list');
+        const statusRegion = document.getElementById('upload-status');
+        let files = [];
+
+        function updateStatus(message) {
+            statusRegion.textContent = message;
+        }
+
+        function renderFileList() {
+            fileList.innerHTML = '';
+            files.forEach((file, index) => {
+                const li = document.createElement('li');
+                li.className = 'file-item';
+
+                const span = document.createElement('span');
+                span.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'remove-btn';
+                btn.textContent = 'Remove';
+                btn.setAttribute('aria-label', `Remove ${file.name}`);
+                btn.onclick = () => removeFile(index);
+
+                li.appendChild(span);
+                li.appendChild(btn);
+                fileList.appendChild(li);
+            });
+        }
+
+        function addFiles(newFiles) {
+            const validFiles = Array.from(newFiles).filter(f => {
+                const isValid = f.type.match('image.*') || f.type === 'application/pdf';
+                if (!isValid) updateStatus(`Error: ${f.name} is not a supported file type.`);
+                return isValid;
+            });
+
+            files = [...files, ...validFiles];
+            renderFileList();
+
+            if (validFiles.length > 0) {
+                const message = validFiles.length === 1
+                    ? `Added ${validFiles[0].name}. Total ${files.length} file(s).`
+                    : `Added ${validFiles.length} files. Total ${files.length} file(s).`;
+                updateStatus(message);
+            }
+        }
+
+        function removeFile(index) {
+            const fileName = files[index].name;
+            files.splice(index, 1);
+            renderFileList();
+
+            const message = `${fileName} removed. Total ${files.length} file(s).`;
+            updateStatus(message);
+
+            // Focus management: Return focus to drop zone if list is empty
+            if (files.length === 0) {
+                dropZone.focus();
+            } else {
+                // In a real app, you might want to focus the next remove button
+                const nextBtn = fileList.querySelector('button');
+                if (nextBtn) nextBtn.focus();
+            }
+        }
+
+        // Drag and Drop Events
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            addFiles(e.dataTransfer.files);
+        });
+
+        // Click on drop zone triggers input
+        // Check target to avoid double-trigger if label/input was clicked directly
+        dropZone.addEventListener('click', (e) => {
+            if (e.target !== fileInput && e.target.tagName !== 'LABEL') {
+                fileInput.click();
+            }
+        });
+
+        fileInput.addEventListener('change', () => {
+            addFiles(fileInput.files);
+        });
+
+        document.getElementById('upload-form').onsubmit = (e) => {
+            e.preventDefault();
+            if (files.length === 0) {
+                updateStatus('Error: Please select at least one file to upload.');
+                return;
+            }
+            alert(`Ready to upload ${files.length} files!`);
+        };
+    </script>
+</body>
+</html>
