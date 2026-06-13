@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AJAX Pagination Example</title>
+    <style>
+        .pagination {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            gap: 8px;
+            align-items: center;
+        }
+        .pagination-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            min-height: 44px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            text-decoration: none;
+            color: #333;
+            background: white;
+            cursor: pointer;
+        }
+        .pagination-link[aria-current="page"] {
+            background: #0056b3;
+            color: white;
+            border-color: #0056b3;
+            font-weight: bold;
+        }
+        .pagination-link[aria-disabled="true"] {
+            color: #999;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .content-area {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #eee;
+        }
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <main id="main-content">
+        <h1 id="results-heading">Product Results</h1>
+
+        <div id="product-list" class="content-area" aria-live="polite">
+            <!-- Simulated Content -->
+            <p>Showing products for Page 1...</p>
+            <ul>
+                <li>Product A</li>
+                <li>Product B</li>
+                <li>Product C</li>
+            </ul>
+        </div>
+
+        <nav aria-label="Pagination">
+            <ul class="pagination">
+                <li>
+                    <button class="pagination-link" id="prev-btn" aria-disabled="true">
+                        <span aria-hidden="true">&laquo;</span>
+                        <span class="sr-only">Previous Page</span>
+                    </button>
+                </li>
+                <li><button class="pagination-link" aria-current="page" aria-label="Page 1">1</button></li>
+                <li><button class="pagination-link" aria-label="Page 2">2</button></li>
+                <li><button class="pagination-link" aria-label="Page 3">3</button></li>
+                <li>
+                    <button class="pagination-link" id="next-btn">
+                        <span class="sr-only">Next Page</span>
+                        <span aria-hidden="true">&raquo;</span>
+                    </button>
+                </li>
+            </ul>
+        </nav>
+    </main>
+
+    <script>
+        const buttons = document.querySelectorAll('.pagination-link');
+        const contentArea = document.getElementById('product-list');
+        const resultsHeading = document.getElementById('results-heading');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                if (button.getAttribute('aria-disabled') === 'true' ||
+                    button.getAttribute('aria-current') === 'page') return;
+
+                const pageNum = e.target.textContent || "Next/Prev";
+
+                // 1. Update UI (Simulated)
+                contentArea.innerHTML = `<p>Loading Page ${pageNum}...</p>`;
+
+                setTimeout(() => {
+                    contentArea.innerHTML = `
+                        <p>Showing products for Page ${pageNum}...</p>
+                        <ul>
+                            <li>Product ${pageNum}1</li>
+                            <li>Product ${pageNum}2</li>
+                            <li>Product ${pageNum}3</li>
+                        </ul>
+                    `;
+
+                    // 2. Focus Management (CRITICAL FOR ACCESSIBILITY)
+                    // Move focus to the results heading so the user knows content has changed
+                    // and can start reading from the top.
+                    resultsHeading.setAttribute('tabindex', '-1');
+                    resultsHeading.focus();
+
+                    // 3. Update ARIA current state (In a real app, logic would be more robust)
+                    document.querySelector('[aria-current="page"]')?.removeAttribute('aria-current');
+                    if (!isNaN(pageNum)) {
+                        button.setAttribute('aria-current', 'page');
+                    }
+                }, 500);
+            });
+        });
+    </script>
+</body>
+</html>

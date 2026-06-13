@@ -1,0 +1,76 @@
+<!--
+  Pagination Blueprint Template
+  Usage: Use this semantic structure as a starting point for any pagination system.
+  Ensure that for AJAX systems, <a> tags are replaced with <button> tags.
+-->
+
+<nav aria-label="Pagination">
+  <ul class="pagination-list">
+    <!-- Previous Button -->
+    <li>
+      <a href="#prev" class="pagination-ctrl" aria-label="Previous Page">
+        <span aria-hidden="true">&lsaquo;</span>
+      </a>
+    </li>
+
+    <!-- Numerical Pages -->
+    <li>
+      <a href="#page1" class="pagination-link" aria-label="Go to Page 1">1</a>
+    </li>
+
+    <!-- Current Page Example -->
+    <li>
+      <a href="#page2" class="pagination-link" aria-label="Page 2" aria-current="page">2</a>
+    </li>
+
+    <!-- Ellipsis for large ranges (Decorative only) -->
+    <li aria-hidden="true">
+      <span class="pagination-ellipsis">&hellip;</span>
+    </li>
+
+    <li>
+      <a href="#page10" class="pagination-link" aria-label="Go to Page 10">10</a>
+    </li>
+
+    <!-- Next Button -->
+    <li>
+      <a href="#next" class="pagination-ctrl" aria-label="Next Page">
+        <span aria-hidden="true">&rsaquo;</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+
+<style>
+  .pagination-list {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+    gap: 0.5rem;
+  }
+
+  .pagination-link,
+  .pagination-ctrl {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.5rem;
+    border: 1px solid currentColor;
+    text-decoration: none;
+  }
+
+  .pagination-link[aria-current="page"] {
+    background-color: #000;
+    color: #fff;
+  }
+
+  /* Focus indicators are vital for keyboard navigation */
+  .pagination-link:focus,
+  .pagination-ctrl:focus {
+    outline: 3px solid orange;
+    outline-offset: 2px;
+  }
+</style>
