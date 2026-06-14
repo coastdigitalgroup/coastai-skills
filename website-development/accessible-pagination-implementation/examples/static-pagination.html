@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Static Pagination Example</title>
+  <style>
+    .pagination {
+      display: flex;
+      list-style: none;
+      padding: 0;
+      gap: 0.5rem;
+    }
+    .pagination a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      min-height: 44px;
+      text-decoration: none;
+      border: 1px solid #ccc;
+      color: #333;
+    }
+    .pagination a[aria-current="page"] {
+      background: #333;
+      color: white;
+      font-weight: bold;
+    }
+    .pagination .disabled {
+      opacity: 0.5;
+      pointer-events: none;
+      border-color: #eee;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Blog Archive</h1>
+
+  <ul>
+    <li>Post 1...</li>
+    <li>Post 2...</li>
+    <li>Post 3...</li>
+  </ul>
+
+  <!-- Standard Navigation Landmark -->
+  <nav aria-label="Blog pagination">
+    <ul class="pagination">
+      <li>
+        <a href="?page=1" class="disabled" aria-label="Previous Page" aria-disabled="true">
+          Prev
+        </a>
+      </li>
+      <li>
+        <a href="?page=1" aria-label="Page 1">1</a>
+      </li>
+      <li>
+        <a href="?page=2" aria-current="page" aria-label="Page 2">2</a>
+      </li>
+      <li>
+        <a href="?page=3" aria-label="Page 3">3</a>
+      </li>
+      <li>
+        <a href="?page=3" aria-label="Next Page">
+          Next
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+</body>
+</html>

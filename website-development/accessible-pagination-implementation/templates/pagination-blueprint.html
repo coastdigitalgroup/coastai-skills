@@ -1,0 +1,55 @@
+<!-- Reusable Pagination Blueprint -->
+<nav class="pagination-nav" aria-label="[Context, e.g., Search results] pagination">
+  <ul class="pagination-list">
+    <!-- Previous Button -->
+    <li class="pagination-item">
+      <button
+        id="pagination-prev"
+        class="pagination-btn"
+        aria-label="Previous Page"
+        [disabled or aria-disabled="true"]>
+        &laquo; Previous
+      </button>
+    </li>
+
+    <!-- Page Numbers (Dynamic) -->
+    <li class="pagination-item">
+      <button
+        class="pagination-btn"
+        aria-label="Page 1"
+        aria-current="page">
+        1
+      </button>
+    </li>
+
+    <li class="pagination-item">
+      <button
+        class="pagination-btn"
+        aria-label="Page 2">
+        2
+      </button>
+    </li>
+
+    <li class="pagination-item" aria-hidden="true">
+      <span class="pagination-ellipsis">&hellip;</span>
+    </li>
+
+    <li class="pagination-item">
+      <button
+        class="pagination-btn"
+        aria-label="Page 10">
+        10
+      </button>
+    </li>
+
+    <!-- Next Button -->
+    <li class="pagination-item">
+      <button
+        id="pagination-next"
+        class="pagination-btn"
+        aria-label="Next Page">
+        Next &raquo;
+      </button>
+    </li>
+  </ul>
+</nav>

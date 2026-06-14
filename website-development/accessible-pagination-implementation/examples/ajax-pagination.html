@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AJAX Pagination Example</title>
+  <style>
+    .pagination {
+      display: flex;
+      list-style: none;
+      padding: 0;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .pagination button {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      background: white;
+      cursor: pointer;
+    }
+    .pagination button[aria-current="page"] {
+      background: #0056b3;
+      color: white;
+      border-color: #0056b3;
+      font-weight: bold;
+    }
+    .pagination button:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+    .content-area:focus {
+      outline: none;
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Product Catalog</h1>
+
+  <!-- The content area that will be updated -->
+  <div id="results-count" class="sr-only" aria-live="polite">Showing page 1 of 5</div>
+
+  <div id="catalog-container">
+    <h2 id="catalog-heading" tabindex="-1">Page 1 Results</h2>
+    <ul id="catalog-list">
+      <li>Product A1</li>
+      <li>Product A2</li>
+      <li>Product A3</li>
+    </ul>
+  </div>
+
+  <!-- Pagination Landmark -->
+  <nav aria-label="Catalog pagination">
+    <ul class="pagination">
+      <li>
+        <button id="prev-page" disabled aria-label="Previous Page">
+          &laquo; Prev
+        </button>
+      </li>
+      <li>
+        <button class="page-num" aria-current="page" aria-label="Page 1">1</button>
+      </li>
+      <li>
+        <button class="page-num" aria-label="Page 2">2</button>
+      </li>
+      <li>
+        <button class="page-num" aria-label="Page 3">3</button>
+      </li>
+      <li>
+        <span>...</span>
+      </li>
+      <li>
+        <button class="page-num" aria-label="Page 5">5</button>
+      </li>
+      <li>
+        <button id="next-page" aria-label="Next Page">
+          Next &raquo;
+        </button>
+      </li>
+    </ul>
+  </nav>
+
+  <script>
+    const container = document.getElementById('catalog-container');
+    const heading = document.getElementById('catalog-heading');
+    const status = document.getElementById('results-count');
+    const pageButtons = document.querySelectorAll('.page-num');
+    const prevBtn = document.getElementById('prev-page');
+    const nextBtn = document.getElementById('next-page');
+
+    pageButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        const pageNum = parseInt(e.target.textContent);
+        updateContent(pageNum);
+      });
+    });
+
+    prevBtn.addEventListener('click', () => {
+      const currentPage = parseInt(document.querySelector('[aria-current="page"]').textContent);
+      if (currentPage > 1) updateContent(currentPage - 1);
+    });
+
+    nextBtn.addEventListener('click', () => {
+      const currentPage = parseInt(document.querySelector('[aria-current="page"]').textContent);
+      if (currentPage < 5) updateContent(currentPage + 1);
+    });
+
+    function updateContent(page) {
+      const pageStr = page.toString();
+      // Simulate AJAX delay
+      container.style.opacity = '0.5';
+
+      setTimeout(() => {
+        // Update Content
+        heading.textContent = `Page ${pageStr} Results`;
+        status.textContent = `Showing page ${pageStr} of 5`;
+
+        // Update ARIA attributes
+        pageButtons.forEach(btn => {
+          if (btn.textContent === pageStr) {
+            btn.setAttribute('aria-current', 'page');
+          } else {
+            btn.removeAttribute('aria-current');
+          }
+        });
+
+        // Update Prev/Next disabled states
+        prevBtn.disabled = page === 1;
+        nextBtn.disabled = page === 5;
+
+        container.style.opacity = '1';
+
+        // FOCUS MANAGEMENT: Move focus to the heading of the new results
+        // This ensures the screen reader starts reading the new content
+        // and the keyboard user's position is reset to the top of the list.
+        heading.focus();
+      }, 300);
+    }
+  </script>
+</body>
+</html>
