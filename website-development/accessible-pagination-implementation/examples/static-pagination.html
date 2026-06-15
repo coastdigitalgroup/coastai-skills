@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Static Pagination Example</title>
+  <style>
+    body { font-family: sans-serif; line-height: 1.5; padding: 2rem; }
+    .pagination { display: flex; list-style: none; padding: 0; gap: 0.5rem; align-items: center; }
+    .pagination-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      text-decoration: none;
+      color: #333;
+      border-radius: 4px;
+    }
+    .pagination-link:hover { background-color: #f0f0f0; }
+    .pagination-link[aria-current="page"] {
+      background-color: #0056b3;
+      color: white;
+      border-color: #0056b3;
+      font-weight: bold;
+    }
+    .pagination-link[aria-disabled="true"] {
+      color: #999;
+      pointer-events: none;
+      cursor: not-allowed;
+      border-color: #eee;
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Article Archive - Page 3</h1>
+
+  <main id="main-content">
+    <section>
+      <h2>Recent Articles</h2>
+      <ul>
+        <li>Understanding CSS Grid</li>
+        <li>Accessible Form Patterns</li>
+        <li>Performance Budgets for Beginners</li>
+      </ul>
+    </section>
+  </main>
+
+  <!-- Semantic Navigation Landmark -->
+  <nav aria-label="Pagination Navigation">
+    <ul class="pagination">
+      <!-- Previous Page -->
+      <li>
+        <a href="/archive?page=2" class="pagination-link" aria-label="Previous Page">
+          &laquo; <span class="sr-only">Previous</span>
+        </a>
+      </li>
+
+      <!-- Page 1 -->
+      <li>
+        <a href="/archive?page=1" class="pagination-link" aria-label="Go to page 1">1</a>
+      </li>
+
+      <!-- Truncation / Ellipsis (non-interactive) -->
+      <li aria-hidden="true">&hellip;</li>
+
+      <!-- Page 2 -->
+      <li>
+        <a href="/archive?page=2" class="pagination-link" aria-label="Go to page 2">2</a>
+      </li>
+
+      <!-- Current Page (Page 3) -->
+      <li>
+        <a href="/archive?page=3" class="pagination-link" aria-current="page" aria-label="Current Page, Page 3">3</a>
+      </li>
+
+      <!-- Page 4 -->
+      <li>
+        <a href="/archive?page=4" class="pagination-link" aria-label="Go to page 4">4</a>
+      </li>
+
+      <!-- Next Page -->
+      <li>
+        <a href="/archive?page=4" class="pagination-link" aria-label="Next Page">
+          <span class="sr-only">Next</span> &raquo;
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+</body>
+</html>

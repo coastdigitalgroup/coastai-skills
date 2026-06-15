@@ -1,0 +1,73 @@
+<!--
+  Pagination Blueprint: A semantic, ARIA-ready structure for pagination.
+  Replace 'href' with '#' and buttons if implementing as an AJAX control.
+-->
+<nav aria-label="Pagination Navigation">
+  <ul class="pagination-list">
+    <!-- Previous Button -->
+    <li>
+      <a href="?page=1" class="pagination-item" aria-label="Previous Page" id="prev-page">
+        <span aria-hidden="true">&laquo;</span>
+        <span class="sr-only">Previous</span>
+      </a>
+    </li>
+
+    <!-- Numerical Pages -->
+    <li>
+      <a href="?page=1" class="pagination-item" aria-label="Go to page 1">1</a>
+    </li>
+
+    <li>
+      <a href="?page=2" class="pagination-item" aria-current="page" aria-label="Current Page, Page 2">2</a>
+    </li>
+
+    <li>
+      <a href="?page=3" class="pagination-item" aria-label="Go to page 3">3</a>
+    </li>
+
+    <!-- Next Button -->
+    <li>
+      <a href="?page=3" class="pagination-item" aria-label="Next Page" id="next-page">
+        <span class="sr-only">Next</span>
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+
+<style>
+  /* Minimum viable styles for accessibility */
+  .pagination-list {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    gap: 8px;
+  }
+
+  .pagination-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px; /* Essential touch target size */
+    min-height: 44px;
+    text-decoration: none;
+    border: 1px solid currentColor;
+  }
+
+  .pagination-item[aria-current="page"] {
+    font-weight: bold;
+    background-color: #000;
+    color: #fff;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+</style>

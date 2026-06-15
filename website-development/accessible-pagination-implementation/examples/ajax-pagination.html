@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AJAX Pagination with Focus Management</title>
+  <style>
+    body { font-family: sans-serif; line-height: 1.5; padding: 2rem; max-width: 800px; margin: 0 auto; }
+    .results-container { border: 1px solid #ddd; padding: 1rem; margin-bottom: 2rem; min-height: 200px; }
+    .results-container:focus { outline: 2px solid #0056b3; outline-offset: 4px; }
+
+    .pagination { display: flex; list-style: none; padding: 0; gap: 0.5rem; align-items: center; }
+    .pagination-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      background: white;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .pagination-btn:hover { background-color: #f0f0f0; }
+    .pagination-btn[aria-current="page"] {
+      background-color: #0056b3;
+      color: white;
+      border-color: #0056b3;
+      font-weight: bold;
+    }
+    .pagination-btn:disabled {
+      color: #999;
+      cursor: not-allowed;
+      border-color: #eee;
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+    .loading { opacity: 0.5; pointer-events: none; }
+  </style>
+</head>
+<body>
+
+  <h1>Product Search</h1>
+
+  <!-- Live region for status updates -->
+  <div id="pagination-status" class="sr-only" aria-live="polite"></div>
+
+  <!-- Results container with tabindex="-1" to allow programmatic focus -->
+  <div id="results" class="results-container" tabindex="-1" aria-labelledby="results-heading">
+    <h2 id="results-heading">Search Results (Page 1)</h2>
+    <ul id="results-list">
+      <li>Product A - $10</li>
+      <li>Product B - $20</li>
+      <li>Product C - $30</li>
+    </ul>
+  </div>
+
+  <nav aria-label="Pagination Navigation">
+    <ul class="pagination">
+      <li>
+        <button id="prev-btn" class="pagination-btn" aria-label="Previous Page" disabled>
+          &laquo;
+        </button>
+      </li>
+      <li>
+        <button class="pagination-btn" aria-current="page" aria-label="Page 1" onclick="loadPage(1, this)">1</button>
+      </li>
+      <li>
+        <button class="pagination-btn" aria-label="Page 2" onclick="loadPage(2, this)">2</button>
+      </li>
+      <li>
+        <button class="pagination-btn" aria-label="Page 3" onclick="loadPage(3, this)">3</button>
+      </li>
+      <li>
+        <button id="next-btn" class="pagination-btn" aria-label="Next Page" onclick="loadPage(2, document.querySelector('[aria-label=\'Page 2\']'))">
+          &raquo;
+        </button>
+      </li>
+    </ul>
+  </nav>
+
+  <script>
+    /**
+     * Simulates an AJAX page load with focus management.
+     */
+    function loadPage(pageNum, btnElement) {
+      const resultsContainer = document.getElementById('results');
+      const resultsList = document.getElementById('results-list');
+      const resultsHeading = document.getElementById('results-heading');
+      const status = document.getElementById('pagination-status');
+      const prevBtn = document.getElementById('prev-btn');
+      const nextBtn = document.getElementById('next-btn');
+
+      // 1. Visual loading state
+      resultsContainer.classList.add('loading');
+
+      // Simulate network delay
+      setTimeout(() => {
+        // 2. Update Content
+        resultsHeading.textContent = `Search Results (Page ${pageNum})`;
+        resultsList.innerHTML = `
+          <li>Product X - Page ${pageNum}</li>
+          <li>Product Y - Page ${pageNum}</li>
+          <li>Product Z - Page ${pageNum}</li>
+        `;
+
+        // 3. Update ARIA States on Buttons
+        document.querySelectorAll('.pagination-btn').forEach(btn => {
+          btn.removeAttribute('aria-current');
+        });
+        btnElement.setAttribute('aria-current', 'page');
+
+        // Update Prev/Next button states (simplified logic)
+        prevBtn.disabled = (pageNum === 1);
+        nextBtn.disabled = (pageNum === 3);
+
+        // 4. Update Live Region Status
+        status.textContent = `Showing page ${pageNum} of 3. Results updated.`;
+
+        // 5. CRITICAL: Manage Focus
+        // Move focus to the results container so the screen reader starts reading the new content
+        resultsContainer.classList.remove('loading');
+        resultsContainer.focus();
+
+        // Optional: Scroll to top of results
+        resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      }, 500);
+    }
+  </script>
+
+</body>
+</html>
