@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessible File Upload Example</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --error-color: #dc2626;
+            --success-color: #16a34a;
+            --bg-color: #f8fafc;
+            --border-color: #cbd5e1;
+            --drop-zone-bg: #ffffff;
+            --drop-zone-active-bg: #eff6ff;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 2rem;
+            background-color: var(--bg-color);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 { font-size: 1.5rem; margin-bottom: 2rem; }
+        h2 { font-size: 1.25rem; margin-top: 3rem; margin-bottom: 1rem; }
+
+        /* --- Before: Basic Implementation --- */
+        .before-example {
+            padding: 1.5rem;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        /* --- After: Robust Implementation --- */
+        .upload-container {
+            position: relative;
+            padding: 2rem;
+            background: var(--drop-zone-bg);
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .upload-container.drag-over {
+            border-color: var(--primary-color);
+            background-color: var(--drop-zone-active-bg);
+            transform: scale(1.02);
+        }
+
+        .upload-container:focus-within {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 4px;
+        }
+
+        /* Visually hide the native input but keep it accessible */
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .upload-trigger {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            margin-bottom: 1rem;
+        }
+
+        .upload-trigger:hover { background-color: #1d4ed8; }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .preview-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .remove-btn:hover { background: rgba(0, 0, 0, 0.8); }
+
+        .status-message {
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-error { color: var(--error-color); }
+        .status-success { color: var(--success-color); }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Accessible File Upload Comparison</h1>
+
+    <h2>1. Before: Basic Native Input</h2>
+    <div class="before-example">
+        <label for="basic-upload">Upload profile picture:</label>
+        <input type="file" id="basic-upload" accept="image/*">
+        <p><small>Issues: No drag-and-drop, no previews, no clear feedback on success/failure.</small></p>
+    </div>
+
+    <h2>2. After: Robust & Accessible Drop Zone</h2>
+    <div class="after-example">
+        <!-- 1. The main drop zone container -->
+        <div id="drop-zone" class="upload-container" role="region" aria-labelledby="upload-title">
+            <h3 id="upload-title" class="visually-hidden">File Upload</h3>
+
+            <p>Drag and drop your images here, or</p>
+
+            <!-- 2. The custom trigger and hidden native input -->
+            <label for="enhanced-upload" class="upload-trigger">Choose Files</label>
+            <input type="file"
+                   id="enhanced-upload"
+                   class="visually-hidden"
+                   accept="image/png, image/jpeg, image/webp"
+                   multiple>
+
+            <p><small>Supported: PNG, JPG, WebP (Max 2MB per file)</small></p>
+
+            <!-- 3. Status announcements for Screen Readers -->
+            <div id="upload-status" class="visually-hidden" aria-live="polite"></div>
+
+            <!-- 4. Visible status for all users -->
+            <div id="visible-status" class="status-message"></div>
+
+            <!-- 5. Preview grid -->
+            <div id="preview-grid" class="preview-grid"></div>
+        </div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('enhanced-upload');
+        const previewGrid = document.getElementById('preview-grid');
+        const statusSR = document.getElementById('upload-status');
+        const statusVisible = document.getElementById('visible-status');
+
+        const MAX_SIZE = 2 * 1024 * 1024; // 2MB
+        const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
+
+        // Prevent default browser behavior for drag events
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
+        // Toggle visual state on drag over
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('drag-over'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('drag-over'), false);
+        });
+
+        // Handle dropped files
+        dropZone.addEventListener('drop', (e) => {
+            const files = Array.from(e.dataTransfer.files);
+            handleFiles(files);
+        });
+
+        // Handle input change
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            handleFiles(files);
+        });
+
+        function handleFiles(files) {
+            let errorCount = 0;
+            let successCount = 0;
+
+            files.forEach(file => {
+                if (!ALLOWED_TYPES.includes(file.type)) {
+                    updateStatus(`Error: "${file.name}" is not a supported image type.`, 'error');
+                    errorCount++;
+                    return;
+                }
+                if (file.size > MAX_SIZE) {
+                    updateStatus(`Error: "${file.name}" exceeds the 2MB size limit.`, 'error');
+                    errorCount++;
+                    return;
+                }
+
+                createPreview(file);
+                successCount++;
+            });
+
+            if (successCount > 0) {
+                const msg = `Successfully added ${successCount} file${successCount > 1 ? 's' : ''}.`;
+                updateStatus(msg, 'success');
+            }
+        }
+
+        function createPreview(file) {
+            const reader = new FileReader();
+            const previewId = `preview-${Math.random().toString(36).substr(2, 9)}`;
+
+            const div = document.createElement('div');
+            div.className = 'preview-item';
+            div.id = previewId;
+
+            const img = document.createElement('img');
+            img.alt = `Preview of ${file.name}`;
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-btn';
+            removeBtn.innerHTML = '&times;';
+            removeBtn.setAttribute('aria-label', `Remove ${file.name}`);
+            removeBtn.onclick = () => {
+                div.remove();
+                URL.revokeObjectURL(img.src);
+                updateStatus(`Removed ${file.name}.`, 'success');
+            };
+
+            const objectUrl = URL.createObjectURL(file);
+            img.src = objectUrl;
+
+            div.appendChild(img);
+            div.appendChild(removeBtn);
+            previewGrid.appendChild(div);
+        }
+
+        function updateStatus(message, type) {
+            // Update Screen Reader live region
+            statusSR.textContent = message;
+
+            // Update Visible UI
+            statusVisible.textContent = message;
+            statusVisible.className = `status-message status-${type}`;
+
+            // Clear visible message after 5 seconds if success
+            if (type === 'success') {
+                setTimeout(() => {
+                    if (statusVisible.textContent === message) {
+                        statusVisible.textContent = '';
+                    }
+                }, 5000);
+            }
+        }
+    </script>
+</div>
+
+</body>
+</html>
