@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessible File Upload Example</title>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; line-height: 1.5; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+        .example-section { margin-bottom: 3rem; padding: 1.5rem; border: 1px solid #ccc; border-radius: 8px; }
+        h2 { margin-top: 0; }
+
+        /* The "Visually Hidden" pattern - essential for accessible custom inputs */
+        .visually-hidden {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+
+        /* Enhanced Drop Zone Styles */
+        .drop-zone {
+            border: 2px dashed #005a9c;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            background-color: #f0f7ff;
+            transition: background-color 0.2s, border-color 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .drop-zone.is-dragging {
+            background-color: #e0efff;
+            border-color: #003d6b;
+            outline: 2px solid #005a9c;
+        }
+
+        .drop-zone:focus-within {
+            outline: 3px solid #ffbf47;
+            outline-offset: 2px;
+        }
+
+        .drop-zone__prompt {
+            font-size: 1.1rem;
+            color: #005a9c;
+            font-weight: bold;
+        }
+
+        .drop-zone__subtext {
+            display: block;
+            font-size: 0.9rem;
+            color: #555;
+            margin-top: 0.5rem;
+        }
+
+        /* File List Styles */
+        .file-list {
+            margin-top: 1rem;
+            list-style: none;
+            padding: 0;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+        }
+
+        .file-item__name { font-weight: 500; }
+        .file-item__size { color: #666; font-size: 0.85rem; margin-left: 0.5rem; }
+
+        .remove-btn {
+            background: #d11a2a;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .remove-btn:hover { background: #a31420; }
+
+        .error-message {
+            color: #d11a2a;
+            font-weight: bold;
+            margin-top: 1rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>File Upload Implementation Comparison</h1>
+
+    <!-- BAD EXAMPLE -->
+    <section class="example-section">
+        <h2>❌ Inaccessible Pattern (Common)</h2>
+        <p>A simple div with a click listener. It looks nice but is invisible to keyboard users and screen readers.</p>
+        <div style="border: 2px dashed #ccc; padding: 2rem; text-align: center; background: #eee;" onclick="alert('This only works for mouse users!')">
+            Drag files here or click to upload
+        </div>
+    </section>
+
+    <!-- GOOD EXAMPLE -->
+    <section class="example-section">
+        <h2>✅ Accessible Pattern (Recommended)</h2>
+        <p>Uses a semantic label linked to a hidden input, supports drag-and-drop, and announces updates via ARIA live regions.</p>
+
+        <form id="upload-form">
+            <div id="drop-zone" class="drop-zone">
+                <label for="file-input" class="drop-zone__prompt">
+                    Drag & Drop files here or click to upload
+                    <span class="drop-zone__subtext">Accepted: JPG, PNG, PDF (Max 5MB)</span>
+                </label>
+                <!-- Visually hidden but remains in the tab order -->
+                <input type="file" id="file-input" name="files" multiple
+                       class="visually-hidden"
+                       accept=".jpg,.jpeg,.png,.pdf"
+                       aria-describedby="file-instructions">
+            </div>
+
+            <div id="file-instructions" class="visually-hidden">
+                You can upload multiple JPG, PNG, or PDF files. Maximum size per file is 5MB.
+            </div>
+
+            <div id="error-display" class="error-message" role="alert"></div>
+
+            <ul id="file-list" class="file-list">
+                <!-- Selected files will appear here -->
+            </ul>
+
+            <!-- ARIA Live region for announcements -->
+            <div id="upload-status" class="visually-hidden" aria-live="polite"></div>
+        </form>
+    </section>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const fileList = document.getElementById('file-list');
+        const statusRegion = document.getElementById('upload-status');
+        const errorDisplay = document.getElementById('error-display');
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, e => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
+        // Toggle highlight class
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('is-dragging'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('is-dragging'), false);
+        });
+
+        // Handle dropped files
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        });
+
+        // Handle selected files via dialog
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            const fileArray = Array.from(files);
+            errorDisplay.style.display = 'none';
+
+            fileArray.forEach(file => {
+                // Basic validation example
+                if (file.size > 5 * 1024 * 1024) {
+                    showError(`File "${file.name}" is too large (max 5MB).`);
+                    return;
+                }
+
+                addFileToList(file);
+            });
+
+            const count = fileList.children.length;
+            announceStatus(`${fileArray.length} files added. Total: ${count} files selected.`);
+        }
+
+        function addFileToList(file) {
+            const li = document.createElement('li');
+            li.className = 'file-item';
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'file-item__name';
+            nameSpan.textContent = file.name;
+
+            const sizeSpan = document.createElement('span');
+            sizeSpan.className = 'file-item__size';
+            sizeSpan.textContent = `(${(file.size / 1024).toFixed(1)} KB)`;
+            nameSpan.appendChild(sizeSpan);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'remove-btn';
+            removeBtn.textContent = 'Remove';
+            removeBtn.setAttribute('aria-label', `Remove ${file.name}`);
+
+            removeBtn.onclick = () => {
+                li.remove();
+                announceStatus(`${file.name} removed.`);
+                fileInput.value = ''; // Simplification: in a real app, you'd manage a file array
+            };
+
+            li.appendChild(nameSpan);
+            li.appendChild(removeBtn);
+            fileList.appendChild(li);
+        }
+
+        function announceStatus(message) {
+            statusRegion.textContent = message;
+        }
+
+        function showError(message) {
+            errorDisplay.textContent = message;
+            errorDisplay.style.display = 'block';
+            announceStatus(`Error: ${message}`);
+        }
+    </script>
+</body>
+</html>

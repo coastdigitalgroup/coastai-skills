@@ -1,0 +1,38 @@
+<!--
+  Reusable Blueprint for an Accessible File Upload Component.
+  Integrates with upload-styles.css and upload-handler.js
+-->
+<div class="upload-container" id="upload-widget">
+    <div class="upload-drop-zone" id="drop-zone">
+        <!-- The label acts as the visual trigger and maintains link to the input -->
+        <label for="file-upload-input" class="upload-label">
+            <span class="upload-icon" aria-hidden="true">📤</span>
+            <span class="upload-text"><strong>Click to upload</strong> or drag and drop</span>
+            <span class="upload-hint" id="upload-constraints">SVG, PNG, JPG or GIF (max. 800x400px)</span>
+        </label>
+
+        <!-- Native input is hidden visually but stays in tab order -->
+        <input
+            type="file"
+            id="file-upload-input"
+            class="visually-hidden"
+            multiple
+            accept="image/*"
+            aria-describedby="upload-constraints upload-error-msg"
+        >
+    </div>
+
+    <!-- Error message region -->
+    <div id="upload-error-msg" class="upload-error" role="alert" aria-live="assertive"></div>
+
+    <!-- File selection feedback -->
+    <div class="upload-preview">
+        <h3 class="preview-title">Selected files</h3>
+        <ul id="file-preview-list" class="preview-list">
+            <!-- Items injected by upload-handler.js -->
+        </ul>
+    </div>
+
+    <!-- ARIA Live region for non-visual status updates -->
+    <div id="upload-announcer" class="visually-hidden" aria-live="polite"></div>
+</div>
