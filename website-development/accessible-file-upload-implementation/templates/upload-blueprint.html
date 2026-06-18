@@ -1,0 +1,40 @@
+<div class="upload-component" id="upload-component">
+  <!-- Visually hidden label for the uploader -->
+  <label for="upload-input" class="sr-only">Upload files</label>
+
+  <!--
+    Native input is the primary focusable element.
+    It is kept in the tab order via opacity/positioning.
+  -->
+  <input type="file"
+         id="upload-input"
+         class="upload-input"
+         multiple
+         accept="image/*">
+
+  <!--
+    Interactive Drop Zone (Visual Sibling).
+    It does NOT have tabindex="0" because the input itself handles keyboard focus.
+  -->
+  <div class="upload-drop-zone"
+       id="drop-zone"
+       role="region"
+       aria-label="File Upload Drop Zone">
+    <div class="upload-prompt">
+      <span aria-hidden="true">📤</span>
+      <p>Drag and drop files or <span class="upload-link">browse</span></p>
+    </div>
+  </div>
+
+  <!-- ARIA Live Region for accessibility announcements -->
+  <div id="upload-announcer"
+       class="sr-only"
+       aria-live="polite"
+       aria-atomic="true">
+  </div>
+
+  <!-- Container for file previews -->
+  <ul id="upload-list" class="upload-list">
+    <!-- Dynamically populated file items -->
+  </ul>
+</div>

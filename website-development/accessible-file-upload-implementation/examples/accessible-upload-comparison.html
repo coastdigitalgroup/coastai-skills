@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessible File Upload Example</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --error-color: #dc2626;
+            --bg-color: #f8fafc;
+            --border-color: #cbd5e1;
+            --text-color: #1e293b;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            line-height: 1.5;
+            color: var(--text-color);
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            background-color: #fff;
+        }
+
+        h1 { border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; }
+        section { margin-bottom: 4rem; padding: 2rem; border-radius: 8px; background: var(--bg-color); }
+        h2 { margin-top: 0; }
+
+        /* Inaccessible Example Styles */
+        .bad-uploader {
+            border: 2px dashed #ccc;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+        }
+        .bad-uploader input { display: none; } /* CRITICAL FAILURE: Removes from tab order */
+
+        /* Accessible Example Styles */
+        .upload-container {
+            position: relative;
+        }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 3rem;
+            text-align: center;
+            transition: all 0.2s ease;
+            background: white;
+            cursor: pointer;
+            outline: none;
+        }
+
+        /* Focus state linked to the hidden input */
+        .file-input:focus + .drop-zone {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+            background: rgba(37, 99, 235, 0.02);
+        }
+
+        .drop-zone--active {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+            transform: scale(1.01);
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .file-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .file-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            position: relative;
+        }
+
+        .file-preview {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 4px;
+            background: #eee;
+        }
+
+        .file-info {
+            font-size: 0.875rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .remove-btn {
+            background: white;
+            border: 1px solid var(--border-color);
+            color: var(--error-color);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            width: fit-content;
+        }
+
+        .remove-btn:hover, .remove-btn:focus {
+            background: #fee2e2;
+            border-color: var(--error-color);
+        }
+
+        .status-msg {
+            margin-top: 1rem;
+            font-weight: 600;
+            min-height: 1.5em;
+        }
+
+        .error { color: var(--error-color); }
+        .success { color: #059669; }
+    </style>
+</head>
+<body>
+
+    <h1>File Upload Accessibility Comparison</h1>
+
+    <!-- BEFORE: Inaccessible Implementation -->
+    <section>
+        <h2>❌ Inaccessible Implementation</h2>
+        <p>Issues: Hidden input removed from tab order, no keyboard support, no screen reader feedback on drop.</p>
+        <div class="bad-uploader" onclick="document.getElementById('bad-input').click()">
+            <span class="upload-icon">📁</span>
+            Drag files here or click to upload
+            <input type="file" id="bad-input" multiple>
+        </div>
+    </section>
+
+    <!-- AFTER: Accessible Implementation -->
+    <section>
+        <h2>✅ Accessible Implementation</h2>
+        <p>Features: Focusable via Tab, Screen Reader announcements, Drag-and-Drop syncing, Accessible removal buttons.</p>
+
+        <div class="upload-container" id="uploader-1">
+            <label for="file-upload-input" class="visually-hidden">Upload files</label>
+            <input type="file"
+                   id="file-upload-input"
+                   class="file-input visually-hidden"
+                   multiple
+                   accept="image/*">
+
+            <div class="drop-zone"
+                 id="drop-zone"
+                 role="region"
+                 aria-label="File Upload Drop Zone"
+                 onclick="document.getElementById('file-upload-input').click()">
+                <span class="upload-icon" aria-hidden="true">📤</span>
+                <p><strong>Drag and drop</strong> images or <span style="color: var(--primary-color); text-decoration: underline;">browse</span></p>
+                <p style="font-size: 0.875rem; color: #64748b;">Supported: JPG, PNG, GIF (Max 5MB)</p>
+            </div>
+
+            <!-- ARIA Live region for announcements -->
+            <div id="upload-status"
+                 class="status-msg visually-hidden"
+                 aria-live="polite"
+                 aria-atomic="true">
+            </div>
+
+            <ul class="file-list" id="file-list">
+                <!-- Files will be injected here -->
+            </ul>
+        </div>
+    </section>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-upload-input');
+        const fileList = document.getElementById('file-list');
+        const statusMsg = document.getElementById('upload-status');
+
+        // Map to track object URLs for cleanup
+        const objectUrls = new Map();
+        let uploadedFiles = [];
+
+        // Drag & Drop Handlers
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.add('drop-zone--active');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.remove('drop-zone--active');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            const newFiles = [...files];
+
+            newFiles.forEach(file => {
+                // Validation
+                if (!file.type.startsWith('image/')) {
+                    announceStatus(`Error: File "${file.name}" is not an image.`, 'error');
+                    return;
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                    announceStatus(`Error: File "${file.name}" exceeds 5MB limit.`, 'error');
+                    return;
+                }
+
+                uploadedFiles.push(file);
+                renderFile(file);
+            });
+
+            if (newFiles.length > 0) {
+                announceStatus(`${newFiles.length} file(s) added. Total: ${uploadedFiles.length}`);
+            }
+        }
+
+        function renderFile(file) {
+            const li = document.createElement('li');
+            li.className = 'file-item';
+
+            // Use URL.createObjectURL for better performance and consistency with skill recommendations
+            const previewUrl = URL.createObjectURL(file);
+            objectUrls.set(file, previewUrl);
+
+            const img = document.createElement('img');
+            img.src = previewUrl;
+            img.alt = ""; // Decorative if filename is present
+            img.className = 'file-preview';
+            li.appendChild(img);
+
+            const info = document.createElement('div');
+            info.className = 'file-info';
+            info.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-btn';
+            removeBtn.textContent = 'Remove';
+            removeBtn.setAttribute('aria-label', `Remove ${file.name}`);
+            removeBtn.onclick = () => {
+                // Cleanup
+                const url = objectUrls.get(file);
+                if (url) URL.revokeObjectURL(url);
+                objectUrls.delete(file);
+
+                uploadedFiles = uploadedFiles.filter(f => f !== file);
+                li.remove();
+                announceStatus(`Removed ${file.name}.`);
+                // Move focus back to the uploader for logical continuity
+                fileInput.focus();
+            };
+
+            li.appendChild(info);
+            li.appendChild(removeBtn);
+            fileList.appendChild(li);
+        }
+
+        function announceStatus(msg, type = 'success') {
+            statusMsg.textContent = msg;
+            // Briefly show visually for non-SR users too
+            const visualStatus = document.createElement('div');
+            visualStatus.className = `status-msg ${type}`;
+            visualStatus.textContent = msg;
+
+            // Clear existing visual status
+            const existing = document.querySelector('.upload-container > .status-msg:not(.visually-hidden)');
+            if (existing) existing.remove();
+
+            dropZone.after(visualStatus);
+            setTimeout(() => visualStatus.remove(), 5000);
+        }
+    </script>
+</body>
+</html>

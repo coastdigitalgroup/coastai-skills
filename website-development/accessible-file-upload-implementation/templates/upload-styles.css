@@ -1,0 +1,91 @@
+/* Basic Styles for Accessible File Uploader */
+
+.upload-component {
+  max-width: 500px;
+  position: relative;
+}
+
+/* Visually Hidden Utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* The native input is kept in the tab order but visually hidden */
+.upload-input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.upload-drop-zone {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 40px;
+  text-align: center;
+  background: #fafafa;
+  transition: border-color 0.2s, background-color 0.2s;
+  cursor: pointer;
+}
+
+/* Highlight the zone when the native input receives focus via Tab */
+.upload-input:focus + .upload-drop-zone,
+.upload-drop-zone:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.upload-drop-zone.is-active {
+  background-color: #eff6ff;
+  border-color: #2563eb;
+}
+
+.upload-link {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.upload-list {
+  margin-top: 20px;
+  padding: 0;
+  list-style: none;
+}
+
+.upload-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.remove-file {
+  background: none;
+  border: none;
+  color: #dc2626;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.remove-file:hover,
+.remove-file:focus {
+  background-color: #fee2e2;
+  border-radius: 4px;
+  outline: 2px solid #dc2626;
+}
