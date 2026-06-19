@@ -7,6 +7,7 @@ All notable changes to this project will be documented here. The format follows
 
 ### Added
 
+- `customer-case-study-optimization` skill to `website-growth` category
 - `subscription-cancel-flow-optimization` skill to `website-growth` category
 - `AGENTS.md` Codex operating guide for release, review, and documentation
   stewardship alongside Claude Code
