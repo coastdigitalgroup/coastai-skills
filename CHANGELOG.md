@@ -7,6 +7,7 @@ All notable changes to this project will be documented here. The format follows
 
 ### Added
 
+- `hero-design-system` skill to `website-design` category
 - `subscription-cancel-flow-optimization` skill to `website-growth` category
 - `AGENTS.md` Codex operating guide for release, review, and documentation
   stewardship alongside Claude Code
