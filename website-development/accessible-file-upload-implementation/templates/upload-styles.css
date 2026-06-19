@@ -1,0 +1,110 @@
+/* Accessible File Upload Styles */
+
+.upload-zone {
+  --upload-primary: #2563eb;
+  --upload-bg: #f8fafc;
+  --upload-border: #cbd5e1;
+
+  border: 2px dashed var(--upload-border);
+  background: var(--upload-bg);
+  padding: 2rem;
+  border-radius: 0.75rem;
+  text-align: center;
+  transition: border-color 0.2s, background-color 0.2s;
+  position: relative;
+}
+
+.upload-zone.is-active {
+  border-color: var(--upload-primary);
+  background-color: #eff6ff;
+}
+
+/* Accessible hidden input */
+.sr-only-focusable {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sr-only-focusable:focus + .upload-trigger {
+  outline: 2px solid var(--upload-primary);
+  outline-offset: 4px;
+}
+
+.upload-trigger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: var(--upload-primary);
+  font-weight: 500;
+}
+
+.upload-trigger:hover {
+  text-decoration: underline;
+}
+
+.upload-hint {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-top: 1rem;
+}
+
+.upload-list {
+  margin-top: 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.upload-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: white;
+  border: 1px solid var(--upload-border);
+  border-radius: 0.375rem;
+  margin-bottom: 0.5rem;
+}
+
+.upload-item-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 1rem;
+}
+
+.upload-item-remove {
+  background: #fee2e2;
+  color: #991b1b;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.upload-item-remove:hover {
+  background: #fecaca;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
