@@ -1,0 +1,19 @@
+<div class="upload-zone" id="upload-zone">
+  <!-- Hidden native input, but focusable -->
+  <input type="file" id="file-input" class="sr-only-focusable" multiple accept="image/*" aria-describedby="upload-hint">
+
+  <label for="file-input" class="upload-trigger">
+    <span class="upload-icon" aria-hidden="true">📤</span>
+    <span class="upload-text">Choose files or drag and drop</span>
+  </label>
+
+  <p class="upload-hint" id="upload-hint">Maximum file size: 5MB. Supported formats: PNG, JPG.</p>
+</div>
+
+<!-- ARIA Live Region for Status Updates -->
+<div id="upload-status" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+<!-- File List Container -->
+<ul id="upload-list" class="upload-list" aria-label="Selected files">
+  <!-- Items will be injected here via JavaScript -->
+</ul>

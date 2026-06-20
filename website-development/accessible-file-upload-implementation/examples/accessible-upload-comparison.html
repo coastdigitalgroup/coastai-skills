@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accessible File Upload Example</title>
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --error-color: #dc2626;
+      --border-color: #d1d5db;
+      --bg-hover: #eff6ff;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.5;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .upload-container {
+      border: 2px dashed var(--border-color);
+      border-radius: 0.5rem;
+      padding: 2rem;
+      text-align: center;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .upload-container.is-dragover {
+      border-color: var(--primary-color);
+      background-color: var(--bg-hover);
+    }
+
+    .upload-container:focus-within {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 4px;
+    }
+
+    .file-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .upload-label {
+      display: block;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    .upload-label:hover {
+      text-decoration: underline;
+    }
+
+    .file-list {
+      margin-top: 2rem;
+      list-style: none;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1rem;
+    }
+
+    .file-item {
+      border: 1px solid var(--border-color);
+      border-radius: 0.25rem;
+      padding: 0.5rem;
+      position: relative;
+      background: white;
+    }
+
+    .file-preview {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 0.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .file-info {
+      font-size: 0.875rem;
+      word-break: break-all;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: -0.5rem;
+      right: -0.5rem;
+      background: var(--error-color);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .remove-btn:focus {
+      outline: 2px solid black;
+      outline-offset: 2px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .status-region {
+      margin-top: 1rem;
+      font-weight: 500;
+    }
+
+    .error-msg {
+      color: var(--error-color);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Profile Picture Upload</h1>
+  <p>Select or drag and drop images to preview your profile pictures.</p>
+
+  <div id="drop-zone" class="upload-container">
+    <input type="file" id="file-upload" class="file-input" accept="image/*" multiple>
+    <label for="file-upload" class="upload-label">
+      <span>Click to upload</span> or drag and drop
+    </label>
+    <p class="file-types">PNG, JPG up to 5MB</p>
+  </div>
+
+  <!-- ARIA Live Region for Status Updates -->
+  <div id="status" class="status-region sr-only" aria-live="polite"></div>
+
+  <ul id="file-list" class="file-list">
+    <!-- Files will be injected here -->
+  </ul>
+
+  <script>
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-upload');
+    const fileList = document.getElementById('file-list');
+    const status = document.getElementById('status');
+
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, preventDefaults, false);
+      document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    // Highlight drop zone when item is dragged over it
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight(e) {
+      dropZone.classList.add('is-dragover');
+    }
+
+    function unhighlight(e) {
+      dropZone.classList.remove('is-dragover');
+    }
+
+    // Handle dropped files
+    dropZone.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      handleFiles(files);
+    }
+
+    // Handle selected files
+    fileInput.addEventListener('change', function() {
+      handleFiles(this.files);
+    });
+
+    function handleFiles(files) {
+      [...files].forEach(uploadFile);
+    }
+
+    function uploadFile(file) {
+      // Simple validation
+      if (!file.type.startsWith('image/')) {
+        announceStatus(`Error: ${file.name} is not an image.`, true);
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        announceStatus(`Error: ${file.name} is too large (max 5MB).`, true);
+        return;
+      }
+
+      const objectURL = URL.createObjectURL(file);
+
+      const listItem = document.createElement('li');
+      listItem.className = 'file-item';
+
+      const img = document.createElement('img');
+      img.src = objectURL;
+      img.alt = ''; // Decorative since filename is below
+      img.className = 'file-preview';
+
+      const info = document.createElement('div');
+      info.className = 'file-info';
+      info.textContent = file.name;
+
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'remove-btn';
+      removeBtn.innerHTML = '&times;';
+      removeBtn.setAttribute('aria-label', `Remove ${file.name}`);
+      removeBtn.onclick = () => {
+        listItem.remove();
+        URL.revokeObjectURL(objectURL);
+        announceStatus(`${file.name} removed.`);
+      };
+
+      listItem.appendChild(img);
+      listItem.appendChild(info);
+      listItem.appendChild(removeBtn);
+      fileList.appendChild(listItem);
+
+      announceStatus(`${file.name} uploaded successfully.`);
+    }
+
+    function announceStatus(message, isError = false) {
+      status.textContent = message;
+      if (isError) {
+        console.error(message);
+      }
+    }
+  </script>
+</body>
+</html>
