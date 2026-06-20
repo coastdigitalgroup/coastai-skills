@@ -1,0 +1,98 @@
+<!--
+  ACCESSIBLE FILE UPLOAD BLUEPRINT
+
+  This template provides the structural and programmatic foundation for an
+  accessible file upload component. It uses a visually-hidden native input
+  for core functionality and ARIA attributes for screen reader support.
+-->
+
+<div class="upload-wrapper">
+  <!-- 1. INSTRUCTIONS: Programmatically linked to the input -->
+  <p id="file-instructions" class="upload-hint">
+    Accepted formats: JPG, PNG, PDF (Max 5MB).
+  </p>
+
+  <!-- 2. DROP ZONE: Stylized container -->
+  <div id="drop-zone" class="upload-drop-zone">
+    <p>Drag and drop files here or</p>
+
+    <!-- 3. NATIVE INPUT: The functional core.
+         Keep it in the DOM and focusable but visually hidden. -->
+    <label for="file-upload" class="upload-trigger-btn">
+      Browse Files
+    </label>
+    <input
+      type="file"
+      id="file-upload"
+      name="file-upload"
+      class="visually-hidden"
+      aria-describedby="file-instructions"
+      multiple
+    >
+  </div>
+
+  <!-- 4. ERROR MESSAGE: Announced via role="alert" -->
+  <div id="upload-error" class="upload-error" role="alert" aria-live="assertive" hidden></div>
+
+  <!-- 5. FILE LIST: Where selected files are listed -->
+  <ul id="file-list" class="upload-file-list" aria-label="Selected files">
+    <!-- Template for JS injection:
+    <li class="file-item">
+      <span>filename.pdf</span>
+      <button type="button" aria-label="Remove filename.pdf">Remove</button>
+    </li>
+    -->
+  </ul>
+
+  <!-- 6. LIVE REGION: For non-critical status updates -->
+  <div id="upload-status" class="visually-hidden" aria-live="polite"></div>
+</div>
+
+<style>
+  /* Core Accessibility Styles */
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Ensure the label (trigger) looks like a button and has focus styles */
+  .upload-trigger-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #0066cc;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  /* IMPORTANT: Focus indicator for keyboard users */
+  .upload-drop-zone:focus-within {
+    outline: 2px solid #0066cc;
+    outline-offset: 4px;
+  }
+
+  .upload-drop-zone.dragover {
+    border-color: #0066cc;
+    background-color: #f0f7ff;
+  }
+</style>
+
+<script>
+  /**
+   * ACCESSIBLE UPLOAD HANDLER BLUEPRINT
+   *
+   * Essential logic to include:
+   * 1. Drag/Drop event prevention and CSS toggling.
+   * 2. Synchronizing e.dataTransfer.files with internal state.
+   * 3. Updating the ARIA live region (#upload-status) on change.
+   * 4. Managing focus when elements are removed from the list.
+   * 5. Revoking Object URLs for any previews.
+   */
+</script>
