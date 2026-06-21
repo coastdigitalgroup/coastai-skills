@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluid Typography vs. Media Queries</title>
+    <style>
+        :root {
+            /*
+               FLUID SCALE SYSTEM
+               Min: 320px Viewport -> 16px (1rem)
+               Max: 1280px Viewport -> 20px (1.25rem)
+               Formula: clamp(1rem, 0.8333rem + 0.5208vw, 1.25rem)
+            */
+            --fluid-body: clamp(1rem, 0.9167rem + 0.4167vw, 1.25rem);
+
+            /*
+               FLUID HEADING SYSTEM
+               Min: 320px Viewport -> 32px (2rem)
+               Max: 1280px Viewport -> 80px (5rem)
+               Formula: clamp(2rem, 1rem + 5vw, 5rem)
+            */
+            --fluid-h1: clamp(2rem, 1rem + 5vw, 5rem);
+
+            /* FLUID SPACING */
+            --fluid-gap: clamp(1.5rem, 0.5rem + 5vw, 4rem);
+
+            --color-bg: #f8f9fa;
+            --color-text: #212529;
+            --color-primary: #007bff;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            line-height: 1.5;
+            margin: 0;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            /* Apply fluid body size globally */
+            font-size: var(--fluid-body);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* COMPARISON SECTION */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        /* APPROACH 1: TRADITIONAL MEDIA QUERIES */
+        .traditional h1 {
+            font-size: 2rem;
+        }
+        @media (min-width: 768px) {
+            .traditional h1 { font-size: 3.5rem; }
+        }
+        @media (min-width: 1200px) {
+            .traditional h1 { font-size: 5rem; }
+        }
+
+        .traditional .spacer {
+            margin-bottom: 1.5rem;
+        }
+        @media (min-width: 768px) {
+            .traditional .spacer { margin-bottom: 3rem; }
+        }
+
+        /* APPROACH 2: FLUID CLAMP() */
+        .fluid h1 {
+            font-size: var(--fluid-h1);
+            line-height: 1.1;
+            margin: 0;
+        }
+
+        .fluid .spacer {
+            margin-bottom: var(--fluid-gap);
+        }
+
+        header {
+            text-align: center;
+            padding: 4rem 1rem;
+            background: white;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .label {
+            display: inline-block;
+            background: #e9ecef;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <h1>Fluid vs. Steppy</h1>
+            <p>Resize your browser to see the difference in how the typography and spacing behave.</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="comparison-grid">
+
+            <!-- TRADITIONAL BOX -->
+            <div class="card traditional">
+                <span class="label">Traditional Media Queries</span>
+                <h1>Responsive Growth</h1>
+                <div class="spacer"></div>
+                <p>
+                    This side uses standard media queries. Watch the heading closely as you resize.
+                    It "jumps" abruptly at 768px and 1200px. Between these points, the
+                    typography remains static, which often creates "too small" or "too large"
+                    awkward phases on specific device sizes (like large tablets).
+                </p>
+            </div>
+
+            <!-- FLUID BOX -->
+            <div class="card fluid">
+                <span class="label">Fluid clamp() Implementation</span>
+                <h1>Responsive Growth</h1>
+                <div class="spacer"></div>
+                <p>
+                    This side uses <code>clamp()</code>. The heading and the gap above this
+                    paragraph scale <strong>linearly</strong> with every single pixel of
+                    viewport width. There are no jumps. The design maintains its
+                    proportional harmony at 450px, 800px, and 1100px widths automatically.
+                </p>
+            </div>
+
+        </div>
+
+        <section style="margin-top: 4rem; padding: 2rem; background: #343a40; color: white; border-radius: 8px;">
+            <h2>The "Why"</h2>
+            <p>
+                In the <strong>Traditional</strong> approach, we had to write 6 lines of CSS and
+                2 media queries just for the heading.
+            </p>
+            <p>
+                In the <strong>Fluid</strong> approach, we defined a single variable
+                and applied it once. This leads to cleaner code and a more polished "app-like"
+                feel to websites.
+            </p>
+        </section>
+    </main>
+
+</body>
+</html>
