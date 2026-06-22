@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyboard Shortcut Example</title>
+    <style>
+        body { font-family: sans-serif; padding: 2rem; line-height: 1.5; max-width: 800px; margin: 0 auto; }
+        kbd {
+            background-color: #eee;
+            border-radius: 3px;
+            border: 1px solid #b4b4b4;
+            box-shadow: 0 1px 1px rgba(0,0,0,.2), 0 2px 0 0 rgba(255,255,255,.7) inset;
+            color: #333;
+            display: inline-block;
+            font-size: .85em;
+            font-weight: 700;
+            line-height: 1;
+            padding: 2px 4px;
+            white-space: nowrap;
+        }
+        .help-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 2rem;
+            z-index: 1000;
+        }
+        .help-overlay.active { display: block; }
+        .help-content {
+            background: #222;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 500px;
+            margin: 2rem auto;
+        }
+        .shortcut-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+        .command-palette {
+            display: none;
+            position: fixed;
+            top: 20%; left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            padding: 1rem;
+            width: 400px;
+            border-radius: 8px;
+            z-index: 1001;
+        }
+        .command-palette.active { display: block; }
+        .command-palette input { width: 100%; padding: 0.5rem; box-sizing: border-box; }
+        .status-msg { margin-top: 1rem; padding: 1rem; border: 1px solid #ddd; border-radius: 4px; display: none;}
+    </style>
+</head>
+<body>
+
+    <h1>Project Dashboard</h1>
+    <p>Press <kbd>?</kbd> to see all shortcuts.</p>
+
+    <div style="margin-bottom: 2rem;">
+        <button id="saveBtn" aria-keyshortcuts="Control+S">Save Project (<kbd id="modKey">Ctrl</kbd>+<kbd>S</kbd>)</button>
+        <button id="searchBtn" aria-keyshortcuts="Control+K">Search (<kbd id="modKey2">Ctrl</kbd>+<kbd>K</kbd>)</button>
+    </div>
+
+    <div>
+        <label for="comments">Add a comment (Shortcuts are disabled here):</label><br>
+        <textarea id="comments" rows="4" style="width: 100%"></textarea>
+    </div>
+
+    <div id="status" class="status-msg"></div>
+
+    <!-- Help Overlay -->
+    <div id="helpOverlay" class="help-overlay">
+        <div class="help-content">
+            <h2>Keyboard Shortcuts</h2>
+            <div class="shortcut-row"><span>Save Project</span> <kbd><span class="mod">Ctrl</span>+S</kbd></div>
+            <div class="shortcut-row"><span>Quick Search</span> <kbd><span class="mod">Ctrl</span>+K</kbd></div>
+            <div class="shortcut-row"><span>Show Help</span> <kbd>?</kbd></div>
+            <div class="shortcut-row"><span>Close Overlays</span> <kbd>Esc</kbd></div>
+            <button onclick="toggleHelp()" style="margin-top: 1rem;">Close</button>
+        </div>
+    </div>
+
+    <!-- Command Palette -->
+    <div id="commandPalette" class="command-palette">
+        <h3>Quick Search</h3>
+        <input type="text" placeholder="Type to search..." id="paletteInput">
+        <p><small>Press <kbd>Esc</kbd> to close</small></p>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
