@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Race Condition Management Example</title>
+    <style>
+        body { font-family: system-ui, sans-serif; padding: 2rem; max-width: 600px; margin: 0 auto; }
+        .search-container { margin-bottom: 2rem; }
+        input { width: 100%; padding: 0.5rem; font-size: 1.1rem; border: 1px solid #ccc; border-radius: 4px; }
+        #results { border: 1px solid #eee; padding: 1rem; min-height: 100px; border-radius: 4px; }
+        .result-item { padding: 0.5rem 0; border-bottom: 1px solid #fafafa; }
+        .status { color: #666; font-size: 0.9rem; margin-bottom: 0.5rem; }
+        .loading { opacity: 0.5; }
+    </style>
+</head>
+<body>
+
+    <h1>Search (Race-Safe)</h1>
+
+    <div class="search-container">
+        <label for="search-input">Search for items:</label>
+        <input type="text" id="search-input" placeholder="Type quickly to test race conditions...">
+    </div>
+
+    <div class="status" id="status">Ready</div>
+    <div id="results">
+        <p>Results will appear here...</p>
+    </div>
+
+    <script>
+        const input = document.getElementById('search-input');
+        const resultsContainer = document.getElementById('results');
+        const statusEl = document.getElementById('status');
+
+        // Step 1: Hold a reference to the current AbortController
+        let currentController = null;
+
+        input.addEventListener('input', async (e) => {
+            const query = e.target.value;
+
+            if (!query) {
+                resultsContainer.innerHTML = '<p>Results will appear here...</p>';
+                return;
+            }
+
+            // Step 2: Abort any pending requests
+            if (currentController) {
+                currentController.abort();
+            }
+
+            // Step 3: Create a new controller for the current request
+            currentController = new AbortController();
+            const { signal } = currentController;
+
+            resultsContainer.classList.add('loading');
+            statusEl.textContent = `Searching for "${query}"...`;
+
+            try {
+                // Mocking a network request with varying delay to simulate race conditions
+                // In a real app, this would be: fetch(`/api/search?q=${query}`, { signal })
+                const data = await mockFetch(`/api/search?q=${query}`, signal);
+
+                // Step 4: Render results (this only runs if the request wasn't aborted)
+                renderResults(data, query);
+                statusEl.textContent = `Showing results for "${query}"`;
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    console.log(`Successfully aborted request for query: ${query}`);
+                } else {
+                    console.error('Fetch error:', error);
+                    statusEl.textContent = 'Error fetching results.';
+                }
+            } finally {
+                // Only remove loading state if this is still the active controller
+                if (currentController.signal === signal) {
+                    resultsContainer.classList.remove('loading');
+                }
+            }
+        });
+
+        function renderResults(data, query) {
+            resultsContainer.innerHTML = data.length
+                ? data.map(item => `<div class="result-item">${item}</div>`).join('')
+                : `<p>No results found for "${query}"</p>`;
+        }
+
+        // Mock fetch function to simulate network delay
+        function mockFetch(url, signal) {
+            return new Promise((resolve, reject) => {
+                // Random delay between 200ms and 2000ms
+                const delay = Math.floor(Math.random() * 1800) + 200;
+                const timeoutId = setTimeout(() => {
+                    const query = url.split('=')[1];
+                    resolve([
+                        `Result 1 for ${query}`,
+                        `Result 2 for ${query}`,
+                        `Result 3 for ${query}`
+                    ]);
+                }, delay);
+
+                // Listen for the abort signal
+                signal.addEventListener('abort', () => {
+                    clearTimeout(timeoutId);
+                    reject(new DOMException('Aborted', 'AbortError'));
+                });
+            });
+        }
+    </script>
+</body>
+</html>
