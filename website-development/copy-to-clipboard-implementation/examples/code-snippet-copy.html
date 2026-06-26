@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessible Copy Code Example</title>
+    <style>
+        .code-block {
+            position: relative;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            margin: 2rem 0;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            background: #333;
+            color: white;
+            border: 1px solid #555;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.2s;
+        }
+
+        .copy-button:hover {
+            background: #444;
+        }
+
+        .copy-button:focus-visible {
+            outline: 2px solid #007bff;
+            outline-offset: 2px;
+        }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Copy to Clipboard Example</h1>
+
+    <div class="code-block">
+        <pre id="code-to-copy">npm install @example/package</pre>
+        <button
+            type="button"
+            class="copy-button"
+            id="copy-btn"
+            aria-label="Copy installation command"
+        >
+            Copy
+        </button>
+    </div>
+
+    <!-- Live region for screen reader announcements -->
+    <div id="copy-status" class="visually-hidden" aria-live="polite"></div>
+
+    <script>
+        const copyBtn = document.getElementById('copy-btn');
+        const codeElement = document.getElementById('code-to-copy');
+        const statusElement = document.getElementById('copy-status');
+
+        copyBtn.addEventListener('click', async () => {
+            const textToCopy = codeElement.textContent;
+
+            try {
+                // 1. Use the Clipboard API
+                await navigator.clipboard.writeText(textToCopy);
+
+                // 2. Provide Visual Feedback
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Copied!';
+                copyBtn.classList.add('success');
+
+                // 3. Provide Programmatic Feedback (Live Region)
+                statusElement.textContent = 'Command copied to clipboard';
+
+                // 4. Reset state after a delay
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.classList.remove('success');
+                    // Clear the status after announcement
+                    statusElement.textContent = '';
+                }, 2000);
+
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+                statusElement.textContent = 'Failed to copy command';
+                copyBtn.textContent = 'Error';
+
+                setTimeout(() => {
+                    copyBtn.textContent = 'Copy';
+                    statusElement.textContent = '';
+                }, 2000);
+            }
+        });
+    </script>
+
+</body>
+</html>
