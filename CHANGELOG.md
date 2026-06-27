@@ -7,6 +7,7 @@ All notable changes to this project will be documented here. The format follows
 
 ### Added
 
+- `copy-to-clipboard-implementation` skill to `website-development` category
 - `hero-design-system` skill to `website-design` category
 - `customer-case-study-optimization` skill to `website-growth` category
 - `subscription-cancel-flow-optimization` skill to `website-growth` category

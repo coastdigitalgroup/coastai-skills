@@ -1,0 +1,50 @@
+<!--
+  A semantic and accessible copy button blueprint.
+  Requires a matching script to handle the copy logic and update the live region.
+-->
+
+<div class="copy-wrapper">
+  <!-- The content to be copied -->
+  <div id="copy-target-123" class="copy-content">
+    Text to be copied goes here.
+  </div>
+
+  <!-- The Trigger -->
+  <button
+    type="button"
+    class="copy-trigger"
+    aria-label="Copy text to clipboard"
+    aria-describedby="copy-target-123"
+    data-copy-target="#copy-target-123"
+  >
+    <span class="copy-trigger-text" aria-hidden="true">Copy</span>
+  </button>
+
+  <!-- The Live Region (can be shared or unique) -->
+  <div
+    id="copy-status-123"
+    class="sr-only"
+    aria-live="polite"
+    role="status"
+  ></div>
+</div>
+
+<style>
+  /* Basic accessibility and layout styles */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  .copy-trigger:focus-visible {
+    outline: 2px solid blue;
+    outline-offset: 2px;
+  }
+</style>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Snippet Copy Example</title>
+    <style>
+        .code-container {
+            position: relative;
+            background: #f4f4f4;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 2rem 0;
+        }
+        pre { margin: 0; }
+        .copy-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+        }
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="code-container">
+        <pre id="code-snippet">npm install @coastdigitalgroup/coastai-skills</pre>
+        <button
+            type="button"
+            class="copy-button"
+            aria-label="Copy code to clipboard"
+            onclick="copyCode()"
+        >
+            <span class="button-text" aria-hidden="true">Copy</span>
+        </button>
+        <!-- ARIA Live Region for feedback -->
+        <div id="copy-status" class="sr-only" aria-live="polite"></div>
+    </div>
+
+    <script>
+        async function copyCode() {
+            const code = document.getElementById('code-snippet').innerText;
+            const button = document.querySelector('.copy-button');
+            const buttonText = button.querySelector('.button-text');
+            const status = document.getElementById('copy-status');
+
+            try {
+                await navigator.clipboard.writeText(code);
+
+                // Update UI for success
+                buttonText.textContent = 'Copied!';
+                status.textContent = 'Copied to clipboard';
+
+                // Reset after delay
+                setTimeout(() => {
+                    buttonText.textContent = 'Copy';
+                    status.textContent = '';
+                }, 2000);
+
+            } catch (err) {
+                // Update UI for error
+                buttonText.textContent = 'Failed';
+                status.textContent = 'Failed to copy to clipboard';
+                console.error('Clipboard error:', err);
+
+                setTimeout(() => {
+                    buttonText.textContent = 'Copy';
+                    status.textContent = '';
+                }, 2000);
+            }
+        }
+    </script>
+</body>
+</html>
