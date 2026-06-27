@@ -7,6 +7,7 @@ All notable changes to this project will be documented here. The format follows
 
 ### Added
 
+- `metric-and-statistic-system` skill to `website-design` category
 - `hero-design-system` skill to `website-design` category
 - `customer-case-study-optimization` skill to `website-growth` category
 - `subscription-cancel-flow-optimization` skill to `website-growth` category
