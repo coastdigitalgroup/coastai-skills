@@ -1,0 +1,22 @@
+/**
+ * Prevent Layout Shift during scroll lock.
+ * Use scrollbar-gutter for Chromium/Firefox, and this utility for Modal locks.
+ */
+
+html {
+  /* Modern browsers: keeps content from jumping when scrollbars appear/disappear */
+  scrollbar-gutter: stable;
+}
+
+/* Fallback for very old browsers or specific "Short Page" requirements */
+.force-scrollbar {
+  overflow-y: scroll;
+}
+
+/* Helper to ensure fixed elements are ready for JS-based padding compensation */
+.is-lockable-fixed {
+  position: fixed;
+  box-sizing: border-box;
+  /* transition padding if your modal has a transition */
+  transition: padding-right 0.3s ease;
+}
