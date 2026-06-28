@@ -1,0 +1,59 @@
+<!--
+  Copy Button Blueprint
+
+  This template provides a semantic and accessible structure for a copy button.
+  Replace [LABEL] and [CONTEXT] with specific values.
+-->
+
+<div class="copy-container">
+  <!--
+    1. The Trigger:
+    - Use aria-label to provide specific context if the visible text is just "Copy"
+    - aria-live is NOT on the button to avoid double-announcements or interruption
+  -->
+  <button
+    type="button"
+    class="copy-trigger"
+    id="copy-trigger-[ID]"
+    aria-label="Copy [CONTEXT] to clipboard"
+  >
+    <span class="copy-label">Copy</span>
+    <!-- Optional Icon -->
+    <svg aria-hidden="true" class="copy-icon" ...>...</svg>
+  </button>
+
+  <!--
+    2. The Live Region:
+    - Kept outside the button
+    - visually-hidden class ensures it doesn't affect layout
+    - aria-live="polite" ensures announcements don't cut off active speech
+  -->
+  <div
+    id="copy-status-[ID]"
+    class="visually-hidden"
+    aria-live="polite"
+    role="status"
+  ></div>
+</div>
+
+<style>
+  /* Basic Visually Hidden Utility */
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Container styling */
+  .copy-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+</style>
