@@ -1,0 +1,48 @@
+/*
+  Basic View Transition Overrides
+  ========================================================================== */
+
+/* Enable cross-document transitions (MPA) */
+@view-transition {
+  navigation: auto;
+}
+
+/* Customizing the default cross-fade duration */
+::view-transition-group(root) {
+  animation-duration: 0.3s;
+  animation-timing-function: ease-in-out;
+}
+
+/*
+  Handling Reduced Motion
+  It is best practice to simplify or disable transitions for users who
+  prefer reduced motion.
+*/
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/*
+  Example: Slide transition for the main content
+  Assumes the main element has view-transition-name: main-content;
+*/
+
+@keyframes slide-to-left {
+  to { transform: translateX(-30px); opacity: 0; }
+}
+
+@keyframes slide-from-right {
+  from { transform: translateX(30px); opacity: 0; }
+}
+
+::view-transition-old(main-content) {
+  animation: 0.2s ease-in both slide-to-left;
+}
+
+::view-transition-new(main-content) {
+  animation: 0.3s ease-out both slide-from-right;
+}
