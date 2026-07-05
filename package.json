@@ -1,6 +1,6 @@
 {
   "name": "@coastdigitalgroup/coastai-skills",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "MCP server for the coastai-skills library. Exposes website design, development, and growth skills to AI agents via search_skills, list_skills, and get_skill tools.",
   "repository": {
     "type": "git",

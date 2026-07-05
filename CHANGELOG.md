@@ -5,6 +5,8 @@ All notable changes to this project will be documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-07-05
+
 ### Added
 
 - `hero-design-system` skill to `website-design` category
@@ -19,8 +21,8 @@ All notable changes to this project will be documented here. The format follows
 - `RELEASE.md` release checklist covering skill validation, MCP behavior,
   documentation alignment, and package publishing gates
 - `typecheck` npm script (`tsc --noEmit`) for type-checking without emitting
-- `check` npm script to run typecheck, lint, and build as the full validation
-  gate
+- `validate` npm script to run typecheck, lint, build, skill validation, and
+  package packability checks as the full validation gate
 - `.github/copilot-instructions.md` GitHub Copilot support-role guidance with
   repository-specific coding, validation, and boundary expectations
 - `COPILOT.md` and `JULES.md` role-specific root guides for support assistance
@@ -52,8 +54,12 @@ All notable changes to this project will be documented here. The format follows
   changelog support, and role-boundary checks
 - `CODEX.md` now follows the production-readiness operating-guide structure used
   across the broader AI-maintained repository pattern
-- `check` npm script now runs typecheck, lint, build, skill validation, and
+- `validate` npm script now runs typecheck, lint, build, skill validation, and
   package packability checks as the full gate
+- Tooling `scripts/` directory is now excluded from MCP category discovery so
+  only real skill categories appear in `list_skills` metadata
+- README skill catalogue now lists all 130 validated skills by category for
+  release-facing package clarity
 - `README.md` now includes first-30-seconds positioning, package contract,
   when-to-use/when-not-to-use guidance, AI boundaries snapshot, local setup,
   troubleshooting, and validation/release sections

@@ -16,7 +16,7 @@ const __dirname = dirname(__filename)
 export const SKILLS_ROOT = join(__dirname, '..')
 
 const EXCLUDED_DIRS = new Set([
-  'src', 'dist', 'node_modules', 'bin', '.git', '.github', '.cursor'
+  'src', 'dist', 'node_modules', 'bin', 'scripts', '.git', '.github', '.cursor'
 ])
 
 function parseFrontmatter(content: string): { name: string; description: string } {

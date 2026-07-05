@@ -126,59 +126,148 @@ This package is CLI-first. There is no documented stable JavaScript API.
 
 ## Available skills
 
-### website-design
+The package currently includes 130 validated skills across three categories.
+Use `list_skills` for the current runtime catalogue and `get_skill(name)` for
+the full execution guidance.
 
-| Skill                       | Description                                                                                                     |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `accessible-color-system`   | Design and implement a systematic color palette that ensures WCAG 2.1 accessibility compliance                  |
-| `card-ui-system`            | Design and implement modular content containers with consistent hierarchy, structure, and action alignment      |
-| `empty-state-system`        | Design and implement purposeful zero-data screens that guide users toward clear actions                         |
-| `fluid-spacing-system`      | Design and implement a fluid spacing scale using CSS `clamp()` for consistent white space and rhythm            |
-| `fluid-typography-system`   | Design and implement responsive typography that scales smoothly across viewports using CSS `clamp()`            |
-| `form-design-system`        | Design and document systematic form interfaces with consistent anatomy, spacing, affordances, and accessibility |
-| `interactive-state-system`  | Define visual behavior for hover, focus, active, disabled, and other interaction states                         |
-| `overlay-and-dialog-system` | Design modals, drawers, popovers, and toasts with clear focus, context, and interruption rules                  |
-| `responsive-grid-system`    | Design and implement a flexible column-based layout system that scales across devices                           |
-| `site-navigation-system`    | Design and implement a structured, accessible, and responsive navigation framework                              |
-| `visual-hierarchy-system`   | Establish a clear order of importance using scale, color, contrast, and spacing                                 |
+### website-design (43 skills)
 
-### website-development
+- `accessible-color-system`
+- `accordion-ui-system`
+- `article-layout-system`
+- `badge-and-tag-system`
+- `banner-and-alert-system`
+- `breadcrumb-wayfinding-system`
+- `button-and-action-system`
+- `card-ui-system`
+- `carousel-and-slider-system`
+- `comparison-matrix-system`
+- `consent-and-preference-system`
+- `data-table-ui-system`
+- `elevation-and-depth-system`
+- `empty-state-system`
+- `file-upload-management-system`
+- `filter-and-sort-system`
+- `fluid-spacing-system`
+- `fluid-typography-system`
+- `form-design-system`
+- `hero-design-system`
+- `iconography-system`
+- `imagery-and-media-system`
+- `interactive-state-system`
+- `interface-motion-system`
+- `logo-grid-system`
+- `metric-and-statistic-system`
+- `overlay-and-dialog-system`
+- `page-header-system`
+- `pagination-system`
+- `pricing-table-ui-system`
+- `responsive-grid-system`
+- `review-and-rating-system`
+- `search-interface-system`
+- `section-composition-system`
+- `sidebar-navigation-system`
+- `site-footer-system`
+- `site-navigation-system`
+- `skeleton-state-system`
+- `step-progress-system`
+- `tab-ui-system`
+- `timeline-activity-system`
+- `user-avatar-system`
+- `visual-hierarchy-system`
 
-| Skill                                  | Description                                                                                                |
-| -------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `accessible-accordion-implementation`  | Implement accessible, animatable accordion and disclosure components                                       |
-| `accessible-carousel-implementation`   | Implement accessible, high-performance carousel and slider components using CSS Scroll Snap and WAI-ARIA   |
-| `accessible-combobox-implementation`   | Implement accessible comboboxes, custom selects, and autocompletes with robust focus and keyboard behavior |
-| `accessible-main-navigation`           | Build accessible, responsive main navigation with skip links and keyboard support                          |
-| `accessible-modal-dialog`              | Implement accessible modal dialogs with focus trapping and keyboard interactions                           |
-| `accessible-responsive-navigation`     | Build fully accessible responsive navigation systems                                                       |
-| `accessible-tabs-implementation`       | Implement accessible tabbed interfaces using WAI-ARIA roles and keyboard patterns                          |
-| `container-queries-implementation`     | Implement layout-aware components that respond to container dimensions rather than viewport size           |
-| `css-stacking-contexts`                | Debug and manage CSS layering with stacking contexts and z-index                                           |
-| `dark-mode-implementation`             | Implement a robust dark mode system that prevents flash and respects system preferences                    |
-| `responsive-data-tables`               | Make data tables readable and accessible across all screen sizes                                           |
-| `responsive-images`                    | Implement responsive images using `srcset`, `sizes`, and `<picture>`                                       |
-| `responsive-navigation-implementation` | Build navigation that transitions between mobile and desktop layouts accessibly                            |
-| `robust-form-implementation`           | Build accessible, resilient web forms using native APIs and ARIA best practices                            |
-| `skeleton-screen-implementation`       | Implement accessible skeleton screens to improve perceived performance                                     |
-| `web-font-optimization`                | Optimize web font loading to prevent layout shifts and invisible text                                      |
+### website-development (47 skills)
 
-### website-growth
+- `accessible-accordion-implementation`
+- `accessible-carousel-implementation`
+- `accessible-combobox-implementation`
+- `accessible-file-upload-implementation`
+- `accessible-main-navigation`
+- `accessible-modal-dialog`
+- `accessible-pagination-implementation`
+- `accessible-responsive-navigation`
+- `accessible-tabs-implementation`
+- `accessible-toast-implementation`
+- `accessible-tooltip-implementation`
+- `bfcache-optimization`
+- `container-queries-implementation`
+- `copy-to-clipboard-implementation`
+- `css-cascade-layers`
+- `css-grid-layout-implementation`
+- `css-stacking-contexts`
+- `cumulative-layout-shift-mitigation`
+- `dark-mode-implementation`
+- `fetch-race-condition-management`
+- `fluid-typography-and-spacing`
+- `focus-management-client-side-navigation`
+- `high-performance-css-animations`
+- `infinite-scroll-implementation`
+- `interaction-performance-optimization`
+- `keyboard-shortcut-implementation`
+- `mobile-viewport-implementation`
+- `multi-step-form-implementation`
+- `native-video-implementation`
+- `popover-api-implementation`
+- `print-style-optimization`
+- `resource-prioritization-strategy`
+- `responsive-data-tables`
+- `responsive-images`
+- `responsive-navigation-implementation`
+- `robust-form-implementation`
+- `rtl-layout-implementation`
+- `scroll-reveal-implementation`
+- `scrollbar-layout-shift-prevention`
+- `skeleton-screen-implementation`
+- `svg-optimization-implementation`
+- `table-of-contents-implementation`
+- `third-party-embed-optimization`
+- `url-state-synchronization`
+- `view-transitions-implementation`
+- `web-font-optimization`
+- `web-worker-implementation`
 
-| Skill                               | Description                                                                             |
-| ----------------------------------- | --------------------------------------------------------------------------------------- |
-| `checkout-flow-optimization`        | Audit and optimize the checkout process to reduce abandonment                           |
-| `exit-intent-recovery`              | Audit and optimize exit-intent interventions that recover abandoning users              |
-| `hero-section-optimization`         | Audit and optimize hero sections for clarity and conversion                             |
-| `internal-search-optimization`      | Audit and optimize site search to improve findability and reduce zero-results scenarios |
-| `landing-page-content-hierarchy`    | Optimize the logical flow and information architecture of landing pages                 |
-| `lead-capture-form-optimization`    | Reduce friction and increase conversion rates on lead generation forms                  |
-| `message-match-optimization`        | Align traffic sources with destination landing pages to reduce bounce rates             |
-| `pricing-page-optimization`         | Optimize pricing pages to reduce choice paralysis and improve conversion                |
-| `product-listing-page-optimization` | Reduce discovery friction on e-commerce category and listing pages                      |
-| `product-page-optimization`         | Optimize product detail pages to improve add-to-cart rates                              |
-| `social-proof-optimization`         | Audit and optimize trust signals to build credibility and reduce user anxiety           |
-| `upsell-cross-sell-optimization`    | Audit and optimize upsell and cross-sell strategies to increase AOV and CLV             |
+### website-growth (40 skills)
+
+- `404-page-recovery`
+- `about-us-page-optimization`
+- `cart-experience-optimization`
+- `checkout-flow-optimization`
+- `competitor-comparison-optimization`
+- `contextual-cta-optimization`
+- `conversational-conversion-optimization`
+- `customer-case-study-optimization`
+- `discount-and-coupon-optimization`
+- `exit-intent-recovery`
+- `guided-discovery-optimization`
+- `hero-section-optimization`
+- `interactive-demo-optimization`
+- `internal-search-optimization`
+- `landing-page-content-hierarchy`
+- `lead-capture-form-optimization`
+- `lead-magnet-optimization`
+- `localization-optimization`
+- `message-match-optimization`
+- `mobile-conversion-optimization`
+- `objection-handling-optimization`
+- `post-conversion-momentum`
+- `pricing-page-optimization`
+- `product-listing-page-optimization`
+- `product-page-optimization`
+- `referral-loop-optimization`
+- `return-visitor-optimization`
+- `search-snippet-optimization`
+- `social-auth-optimization`
+- `social-proof-optimization`
+- `subscription-cancel-flow-optimization`
+- `trial-to-paid-optimization`
+- `upsell-cross-sell-optimization`
+- `urgency-and-scarcity-optimization`
+- `user-onboarding-optimization`
+- `value-calculator-optimization`
+- `video-conversion-optimization`
+- `visual-hierarchy-and-scanning-patterns`
+- `waitlist-prelaunch-optimization`
+- `wishlist-optimization`
 
 ---
 
@@ -228,7 +317,7 @@ npm run validate
 | Command                 | What it does                                                   |
 | ----------------------- | -------------------------------------------------------------- |
 | `npm run build`         | Compiles TypeScript to `dist/`                                 |
-| `npm run validate`         | Runs typecheck, lint, and build                                |
+| `npm run validate`      | Runs typecheck, lint, build, skill checks, and package checks   |
 | `npm run check:skills`  | Validates skill frontmatter, naming, and support-folder policy |
 | `npm run check:package` | Validates packability with `npm pack --dry-run`                |
 | `npm run typecheck`     | Type-check without emitting files                              |
