@@ -96,7 +96,8 @@ Apply the `visual-hierarchy-system` to define the tablist:
 
 Apply `fluid-spacing-system` and `interactive-state-system`:
 
-- **Touch Targets:** Each tab trigger must be at least 44x44px.
+- **Touch Targets:** Each tab trigger should meet WCAG 2.2 SC 2.5.8 (24x24px
+  minimum); prefer 44x44px for primary tab UIs.
 - **Internal Gaps:** Use consistent spacing between tabs (usually `--space-s`
   or `--space-m`).
 - **Active Indicator:** Ensure the "Active" line or background is thick enough
@@ -129,10 +130,18 @@ Determine how the tablist handles narrow viewports:
 
 ## Constraints
 
-- **Accessibility:** Must use semantic roles: `role="tablist"`, `role="tab"`,
-  and `role="tabpanel"`.
-- **Keyboard Navigation:** Users must be able to move focus between tabs using
-  Arrow keys, and `Tab` into the active panel.
+- **Accessibility:** Follow the ARIA APG Tabs pattern — `role="tablist"` on the
+  container, `role="tab"` with `aria-selected` and `aria-controls` on each
+  trigger, and `role="tabpanel"` with `aria-labelledby` pointing back to its
+  tab. Only the active tab has `tabindex="0"`; inactive tabs use
+  `tabindex="-1"` (roving tabindex).
+- **Activation Model:** Prefer automatic activation (arrow keys move focus and
+  switch panel content immediately) for fast, lightweight panels. Use manual
+  activation (arrow keys move focus only; `Enter`/`Space` confirms) if
+  switching triggers an expensive network request.
+- **Keyboard Navigation:** Left/Right Arrow (or Up/Down for vertical tabs)
+  moves between tabs; `Home`/`End` jump to first/last tab; `Tab` moves focus
+  out of the tablist into the active panel.
 - **Contrast:** Active and Inactive states must meet WCAG AA (4.5:1 for text).
 - **Responsiveness:** Tabs must never cause horizontal page scrolling; the
   tablist itself should handle overflow.
@@ -154,8 +163,11 @@ Determine how the tablist handles narrow viewports:
 
 - [ ] All tabs are related to the same context.
 - [ ] Active state is visually distinct (more than just color).
-- [ ] Each tab trigger meets the 44x44px touch target minimum.
-- [ ] ARIA roles (`tablist`, `tab`, `tabpanel`) are correctly assigned.
-- [ ] Keyboard navigation (Arrow keys to switch focus) is supported.
+- [ ] Each tab trigger meets at least the WCAG 2.2 24x24px touch target
+      minimum (44x44px preferred).
+- [ ] ARIA roles (`tablist`, `tab`, `tabpanel`) are correctly assigned, with
+      `aria-selected` and roving `tabindex` implemented.
+- [ ] Keyboard navigation (Arrow keys, Home/End) is supported per the ARIA APG
+      Tabs pattern.
 - [ ] Responsive behavior (scroll, accordion, or select) is defined.
 - [ ] Content panels maintain a consistent visual relationship with the tabs.

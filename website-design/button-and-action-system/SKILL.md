@@ -132,7 +132,8 @@ Ensure actions remain usable on all viewports:
 - **Accessibility:** Text must meet WCAG AA contrast (4.5:1). Interactive
   elements must have a clear `focus` state (see `interactive-state-system`).
 - **Touch Targets:** All buttons must have a minimum interactive area of
-  44x44px, even if the visual element is smaller.
+  24x24px (WCAG 2.2 SC 2.5.8), even if the visual element is smaller; use
+  44x44px as the comfortable default for primary actions and mobile layouts.
 - **Truncation:** Button text should never truncate. If the label is too long,
   re-evaluate the copy or allow the button to wrap/expand.
 
@@ -153,7 +154,8 @@ Ensure actions remain usable on all viewports:
 
 - [ ] Every page/view has a clear Primary action.
 - [ ] Button variants (Primary, Secondary, Ghost, Danger) are used consistently.
-- [ ] Buttons meet the 44x44px minimum touch target requirement.
+- [ ] Buttons meet the WCAG 2.2 24x24px minimum touch target (2.5.8), with
+      44x44px used for primary and mobile actions.
 - [ ] Visual hierarchy is maintained when buttons are grouped together.
 - [ ] Focus states are distinct and high-contrast.
 - [ ] Button labels are concise and use "Action Verbs" (e.g., "Save," "Create,"

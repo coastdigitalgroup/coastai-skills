@@ -84,7 +84,8 @@ Choose patterns based on content density:
 
 Ensure users always know where they are:
 
-- **Active States:** Visually distinguish the current page link.
+- **Active States:** Visually distinguish the current page link and mark it
+  with `aria-current="page"` for assistive technology.
 - **Breadcrumbs:** Use for sites deeper than 3 levels.
 - **Consistent Placement:** Keep global navigation in the same location across
   all pages.
@@ -97,14 +98,16 @@ Determine how the navigation collapses:
   "Hamburger" menu.
 - **Priority Paring:** On mobile, move utility links (like "Search") out of the
   drawer and into the header if they are high-priority.
-- **Touch Targets:** Ensure all links are at least 44x44px for thumb
-  interaction.
+- **Touch Targets:** Meet WCAG 2.2 SC 2.5.8 (Target Size Minimum) at 24x24px
+  with adequate spacing; prefer 44x44px for primary thumb interaction targets.
 
 ### 5. Establish Accessibility
 
 - **Landmarks:** Use `<nav>` tags with unique `aria-labels` (e.g., "Main",
   "Footer").
-- **Keyboard Path:** Ensure a logical Tab order and visible focus states.
+- **Keyboard Path:** Ensure a logical Tab order and visible `:focus-visible`
+  states that are never obscured by sticky headers or overlays (WCAG 2.2 SC
+  2.4.11 Focus Not Obscured).
 - **Skip Links:** Provide a "Skip to Content" link for keyboard users.
 - **ARIA States:** Use `aria-expanded` and `aria-controls` for toggleable menus.
 
@@ -122,7 +125,7 @@ Determine how the navigation collapses:
 ## Constraints
 
 - **Accessibility:** Must be fully navigable by keyboard alone. Contrast for nav
-  links must meet WCAG AA (4.5:1).
+  links must meet WCAG AA (4.5:1). Touch targets meet WCAG 2.2 SC 2.5.8.
 - **Responsiveness:** Navigation must never overflow the viewport horizontally.
 - **Hierarchy:** Navigation should not compete with the page's H1 or Primary
   CTA.
@@ -146,5 +149,6 @@ Determine how the navigation collapses:
 - [ ] Keyboard users can access all links and close menus using only the
       keyboard.
 - [ ] Landmarks (`<nav>`) are correctly used and labeled.
-- [ ] Touch targets on mobile meet the 44x44px minimum.
+- [ ] Touch targets on mobile meet at least the WCAG 2.2 24x24px minimum
+      (44x44px preferred for primary actions).
 - [ ] "Skip to Content" link is present and functional.

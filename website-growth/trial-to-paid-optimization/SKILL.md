@@ -140,7 +140,7 @@ Verify the proposed strategy against the conversion heuristics below.
 - **Too Many Choices:** Presenting a complex 5-tier pricing table at the
   moment of upgrade. Keep the "Upgrade Path" simple.
 
-## Validation Methods
+## Validation Criteria
 
 - [ ] **Trial-to-Paid Conversion Rate (TPCR):** (Paid Conversions / Total Trials)
   * 100. Target: 5-15% lift.

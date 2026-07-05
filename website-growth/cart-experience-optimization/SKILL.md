@@ -122,7 +122,7 @@ Verify that the cart serves as a facilitator, not a roadblock.
 - **Broken Mobile Layout:** Large product tables that require horizontal
   scrolling on mobile devices.
 
-## Validation Methods
+## Validation Criteria
 
 - [ ] **Checkout Start Rate:** (Checkout Starts / Add to Carts) * 100. Target
   improvement: 10-20%.

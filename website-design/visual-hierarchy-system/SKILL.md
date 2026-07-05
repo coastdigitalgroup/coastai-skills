@@ -99,7 +99,9 @@ Check if the hierarchy supports common reading behaviors:
 ### 5. Document CSS Classes
 
 Translate the hierarchy into reusable classes (e.g., `.text-display-lg`,
-`.btn-primary`, `.text-muted`).
+`.btn-primary`, `.text-muted`). Use `clamp()` for fluid type scales (e.g.,
+`font-size: clamp(1.5rem, 4vw + 1rem, 3rem)`) so Level 1/2 headings scale
+smoothly between breakpoints instead of jumping at fixed media-query steps.
 
 ## Decision Rules
 
@@ -116,7 +118,10 @@ Translate the hierarchy into reusable classes (e.g., `.text-display-lg`,
 ## Constraints
 
 - **Accessibility:** Never use color alone to indicate priority. Ensure contrast
-  ratios (WCAG AA) are maintained even for Level 2/3 text.
+  ratios (WCAG AA) are maintained even for Level 2/3 text. If using
+  `color-mix()` or tinted brand colors for lower-priority text, verify
+  computed contrast still passes — subtle tints on light or dark backgrounds
+  can silently drop below 4.5:1.
 - **Mobile Responsiveness:** Hierarchy often shifts from horizontal (Desktop) to
   vertical (Mobile). Ensure the Priority 1 element remains "Above the Fold" on
   mobile.

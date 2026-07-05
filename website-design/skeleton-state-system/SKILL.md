@@ -93,6 +93,9 @@ Skeletons should feel "alive" but not distracting:
   left to right.
 - **Synchronization:** If multiple skeletons are on screen, ensure their
   animations are synchronized to prevent visual chaos.
+- **Reduced Motion:** Wrap the shimmer keyframe animation in an
+  `@media (prefers-reduced-motion: reduce)` query that disables movement and
+  falls back to a static or gently opacity-pulsing bone.
 
 ### 5. Define the "Hand-off" Transition
 
@@ -120,7 +123,11 @@ Plan the exit of the skeleton:
 
 - **Accessibility:** Skeletons must be marked with `aria-hidden="true"` so
   screen readers don't try to "read" the empty bars. The parent container
-  should use `aria-busy="true"` while loading.
+  should use `aria-busy="true"` while loading, and ideally hold a visually
+  hidden `aria-live="polite"` region that announces "Loading" and then the
+  completion state once content replaces the skeleton — do not use
+  `aria-live` on the skeleton bones themselves. Respect
+  `prefers-reduced-motion` for the shimmer effect.
 - **Contrast:** The skeleton colors must be distinct from the background but
   not so high-contrast that they look like active content.
 - **Responsiveness:** Skeleton bones must scale using the same grid/flex logic
@@ -145,6 +152,8 @@ Plan the exit of the skeleton:
 - [ ] Aspect ratios for images/videos are reserved using fixed containers.
 - [ ] Shimmer animation is subtle and moves left-to-right.
 - [ ] Text-heavy areas use bones that simulate natural line lengths.
-- [ ] `aria-hidden="true"` is applied to the skeleton elements.
+- [ ] `aria-hidden="true"` is applied to the skeleton elements, and the
+      loading container uses `aria-busy="true"`.
+- [ ] Shimmer animation respects `prefers-reduced-motion: reduce`.
 - [ ] The transition from skeleton to content is a smooth fade (200ms approx).
 - [ ] Skeleton does not appear for loads faster than 300ms.

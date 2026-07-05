@@ -103,7 +103,9 @@ content regardless of parent `z-index` or `overflow`.
 
 - **Basic:** Use absolute positioning.
 - **Advanced:** Use the **CSS Anchor Positioning API** to pin the popover to the
-  trigger button without JavaScript.
+  trigger button without JavaScript. It reached Baseline in 2026 (Chrome 125+,
+  Firefox 132+, Safari 18.2+), though `@position-try` edge-flipping needs
+  Safari 18.4+.
 - **Fallback:** Use a JS library (like Floating UI) to calculate positions if
   Anchor Positioning is not yet supported in the target browsers.
 

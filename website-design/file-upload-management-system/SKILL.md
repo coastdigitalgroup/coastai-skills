@@ -49,7 +49,7 @@ The File Upload and Management System provides a methodology for designing the e
 Establish a clear invitation for interaction:
 - **Idle State:** Use a dashed or solid border with an icon (usually a cloud-up or paperclip) and a clear instruction (e.g., "Drag & Drop or Click to Upload").
 - **Drag-Over State:** Change the background color or border style to provide immediate feedback that the area is ready to receive the file.
-- **Mobile Fallback:** Ensure the drop zone remains a large, tappable button (min 44x44px) that opens the native system file picker.
+- **Mobile Fallback:** Ensure the drop zone remains a large, tappable button (min 24x24px per WCAG 2.2 SC 2.5.8, 44x44px recommended) that opens the native system file picker.
 
 ### 2. Establish the Upload Queue
 
@@ -92,8 +92,10 @@ Define how users interact with their uploaded assets:
 
 - **Accessibility:**
   - The drop zone must be focusable and operable via the `Space` or `Enter` keys.
-  - Use `aria-live` to announce upload progress and completion to screen readers.
+  - Use `aria-live="polite"` to announce upload progress and completion to screen readers (avoid flooding with every percentage tick).
   - File inputs must have a hidden but accessible `<label>`.
+  - Ensure focus is never trapped behind the drop zone or progress list (WCAG 2.4.11 Focus Not Obscured) — sticky headers or toasts must not cover the focused element.
+  - Touch targets for Cancel/Retry/Delete actions must meet at least 24x24px (WCAG 2.2 SC 2.5.8); 44x44px is preferred for primary actions.
 - **Responsiveness:** Drop zones should be fluid and never cause horizontal overflow.
 - **Contrast:** Progress bars and error messages must meet WCAG AA (4.5:1) contrast ratios.
 
@@ -113,4 +115,4 @@ Define how users interact with their uploaded assets:
 - [ ] Users can cancel or remove files from the queue.
 - [ ] ARIA live regions are used for status updates.
 - [ ] Layout is responsive and handles long file names gracefully.
-- [ ] All interactive elements meet the 44x44px touch target minimum.
+- [ ] All interactive elements meet the WCAG 2.2 24x24px touch target minimum (44x44px preferred).

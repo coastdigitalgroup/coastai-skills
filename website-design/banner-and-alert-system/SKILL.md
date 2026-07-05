@@ -121,10 +121,12 @@ Each alert should follow a consistent internal hierarchy:
 
 - **Accessibility:** Use `role="alert"` for high-priority errors and
   `role="status"` for lower-priority updates. Ensure a 4.5:1 contrast ratio for
-  text.
+  text. If a global banner is sticky/fixed, verify it never permanently
+  obscures a focused element as content scrolls (WCAG 2.2 SC 2.4.11).
 - **Typography:** Use a clear font size (min 14px) and avoid all-caps for long
   descriptions.
-- **Mobile Reach:** Ensure dismiss buttons are at least 44x44px touch targets.
+- **Mobile Reach:** Ensure dismiss buttons meet the WCAG 2.2 SC 2.5.8 minimum
+  of 24x24px, sized up to 44x44px where layout allows.
 
 ## Common Failure Patterns
 
@@ -142,7 +144,8 @@ Each alert should follow a consistent internal hierarchy:
 - [ ] Every alert uses an icon and color combination that matches its gravity.
 - [ ] Global banners are positioned at the top of the hierarchy.
 - [ ] Inline alerts are placed in close proximity to their related content.
-- [ ] All interactive elements (Close, CTA) meet touch target requirements.
+- [ ] All interactive elements (Close, CTA) meet the WCAG 2.2 24x24px minimum
+      touch target (2.5.8).
 - [ ] High-priority alerts use appropriate ARIA roles (`alert`).
 - [ ] Dismissible banners remember their state (or have a logic for when to
       reappear).

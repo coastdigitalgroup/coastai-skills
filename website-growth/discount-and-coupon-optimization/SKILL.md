@@ -134,7 +134,7 @@ Verify that the promotion is profitable, clear, and non-distracting.
 - **Complex Requirements:** "Buy 3 items from Category A and 1 from Category B
   to save 10% on the cheapest item" is too complex for users to calculate.
 
-## Validation Methods
+## Validation Criteria
 
 - [ ] **Cart Abandonment Rate:** Monitor if hiding the promo code box or using
   auto-apply reduces abandonment.

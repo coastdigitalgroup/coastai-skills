@@ -92,9 +92,13 @@ Avoid repetition by alternating between layout patterns:
 Use visual cues to signal a change in topic:
 
 - **Background Alternating:** Switch between White, Light Gray, or Brand
-  colors to "bucket" sections.
+  colors to "bucket" sections. Derive tinted backgrounds from a single brand
+  token with `color-mix()` (e.g., `color-mix(in oklch, var(--brand) 6%, white)`)
+  instead of hand-picking a separate gray/tint per section, so the palette
+  stays consistent as the brand color changes.
 - **Vertical Spacing:** Use consistent top/bottom padding (from the
-  `fluid-spacing-system`) to create "breathing room."
+  `fluid-spacing-system`), ideally with `clamp()` so section padding scales
+  smoothly between mobile and desktop instead of jumping at breakpoints.
 - **Dividers:** Use subtle lines or angled SVG transitions for a more modern
   or dynamic feel.
 
@@ -132,7 +136,8 @@ Plan how sections collapse:
 - **Heading Hierarchy:** Each major section should start with an `<h2-h6>`
   that follows the logical document outline.
 - **Responsiveness:** Section padding should scale down on mobile (e.g.,
-  `--space-3xl` on desktop becomes `--space-xl` on mobile).
+  `--space-3xl` on desktop becomes `--space-xl` on mobile); prefer a `clamp()`
+  expression over discrete breakpoint overrides.
 - **Spacing Consistency:** The space *between* sections should be consistent
   unless a shift in topic requires a larger "break."
 

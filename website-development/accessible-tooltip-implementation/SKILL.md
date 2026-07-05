@@ -81,8 +81,11 @@ standards and provide a robust user experience.
 - **CSS Anchoring:** For simple layouts, use absolute positioning relative to a
   `position: relative` parent.
 - **Dynamic Positioning:** For complex layouts (scrollable containers, edge
-  detection), use a library like Floating UI or the native Anchor Positioning
-  API.
+  detection), use a library like Floating UI or the native CSS Anchor
+  Positioning API (`anchor()`, `position-anchor`). Anchor Positioning reached
+  Baseline in 2026 (Chrome 125+, Firefox 132+, Safari 18.2+), though automatic
+  edge-flipping via `@position-try` requires Safari 18.4+. Provide a Floating
+  UI fallback if you must support older Safari.
 - **Safety:** Ensure the tooltip doesn't get cut off by `overflow: hidden` on
   parent containers.
 

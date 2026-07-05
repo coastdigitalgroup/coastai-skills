@@ -87,6 +87,11 @@ Depth isn't just about shadows; it's also about light reflection:
   maintain pure white while the base is off-white.
 - **Dark Mode:** Higher elevation elements MUST become lighter (using semi-
   transparent white overlays) to simulate being closer to the light source.
+- **Implementation:** Use `color-mix(in oklch, var(--surface-base) 100%, white
+  X%)` (or an equivalent OKLCH-based token function) to generate each
+  elevation tier's surface color programmatically, rather than hand-picking a
+  new hex value per tier. OKLCH keeps perceived lightness steps uniform across
+  hues, which flat hex adjustments do not guarantee.
 
 ### 4. Create Interaction "Lifts"
 
@@ -123,7 +128,9 @@ Prevent "Z-Index Wars" by using a 10-step or 100-step scale:
 
 - **Accessibility:** Elevation cues (shadows) should supplement, not replace,
   structural cues. Ensure elements have enough contrast or borders to be
-  identifiable without the shadow.
+  identifiable without the shadow. Elevated overlays (modals, dropdowns) must
+  never render on top of a focus indicator in a way that clips or hides it
+  (WCAG 2.2 SC 2.4.11).
 - **Performance:** Avoid `box-shadow` on elements that animate frequently or
   sit inside high-frequency scroll containers.
 - **Responsiveness:** Large shadows can "bleed" off the screen on mobile;
@@ -152,3 +159,5 @@ Prevent "Z-Index Wars" by using a 10-step or 100-step scale:
       shifts.
 - [ ] Shadows do not cause horizontal or vertical overflow on mobile.
 - [ ] Elements are distinguishable even if shadows are removed (A11y check).
+- [ ] Higher-elevation layers never obscure focus indicators on elements
+      beneath or within them (WCAG 2.2 SC 2.4.11).

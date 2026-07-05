@@ -135,7 +135,7 @@ Verify the proposed demo against the growth heuristics below.
 - **Gating the Start:** Asking for an email before the user has seen a
   single pixel of the product value.
 
-## Validation Methods
+## Validation Criteria
 
 - **Demo-to-Lead Conversion Rate:** (Leads Generated from Demo / Total Demo
   Starts). Target: >5% for ungated, >15% for mid-gated.

@@ -120,9 +120,13 @@ Multi-step indicators are notorious for breaking on mobile:
 ## Constraints
 
 - **Accessibility:**
-  - Use `role="progressbar"` for continuous bars.
+  - Use `role="progressbar"` with `aria-valuenow`, `aria-valuemin`,
+    `aria-valuemax`, and a human-readable `aria-valuetext` (e.g., "Step 2 of
+    4: Payment") for continuous bars.
   - Use `aria-current="step"` to identify the active step in a sequence.
   - Ensure contrast ratios for active vs. inactive steps meet WCAG AA (4.5:1).
+  - If steps are clickable, their targets must meet WCAG 2.2 SC 2.5.8 (24x24px
+    minimum, 44px preferred) and expose visible `:focus-visible` states.
 - **Hierarchy:** The progress indicator should be a guide, not the main focus.
   It usually sits at the top (horizontal) or left (vertical) of the content.
 - **Responsiveness:** Must not cause horizontal overflow.

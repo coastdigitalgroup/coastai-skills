@@ -20,7 +20,8 @@ for the end user.
 
 - Defining component behavior for a design system or UI library.
 - Auditing an existing site for "dead" or non-responsive interactions.
-- Ensuring WCAG 2.1 compliance for focus indicators and interactive affordances.
+- Ensuring WCAG 2.2 compliance for focus indicators, target size, and
+  interactive affordances.
 - Standardizing feedback patterns (e.g., all destructive actions behave the same
   way).
 
@@ -83,13 +84,17 @@ are.
 
 - **Rule:** The focus indicator must have a contrast ratio of at least 3:1
   against the background AND against the non-focused state of the component.
+- **Rule (WCAG 2.2 SC 2.4.11):** The focus indicator must never be fully hidden
+  by other content (e.g., a sticky header covering a focused element on scroll).
+  At least part of the indicator must always remain visible.
 
 ### 4. Optimize for Touch (Mobile)
 
 Since hover states don't exist on touch devices:
 
 - Ensure `active` states provide immediate feedback.
-- Verify touch targets are at least 44x44px.
+- Verify touch targets meet WCAG 2.2 SC 2.5.8 (minimum 24x24px), and prefer
+  44x44px where layout allows for comfortable thumb reach.
 - Remove hover-dependent information (use tooltips on tap or persistent labels).
 
 ### 5. Document Transitions
@@ -134,8 +139,9 @@ Define how the change happens:
 ## Validation Criteria
 
 - [ ] Every interactive element has a defined Hover, Focus, and Active state.
-- [ ] Focus indicators meet the 3:1 contrast requirement.
-- [ ] Touch targets are at least 44x44px for all mobile interactive elements.
+- [ ] Focus indicators meet the 3:1 contrast requirement and are never fully
+      obscured by other content (WCAG 2.2 SC 2.4.11).
+- [ ] Touch targets meet at least 24x24px (WCAG 2.2 SC 2.5.8), 44x44px preferred.
 - [ ] No critical information is hidden behind a hover-only interaction.
 - [ ] Disabled states are visually distinct and have `pointer-events: none` (or
       equivalent logic).

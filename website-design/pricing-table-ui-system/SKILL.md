@@ -109,6 +109,9 @@ Map how the grid collapses for smaller screens:
   Plan Name and Price visible as the user scrolls through features.
 - **Plan Comparison Mode:** On mobile, allow users to "swipe" between tiers
   to compare them horizontally if a vertical stack is too long.
+- **Container Queries:** Prefer container queries over viewport breakpoints
+  for the tier card itself, since pricing grids are often embedded in
+  varying-width contexts (e.g., a homepage section vs. a full pricing page).
 
 ## Decision Rules
 
@@ -126,12 +129,15 @@ Map how the grid collapses for smaller screens:
 
 ## Constraints
 
-- **Accessibility:** Toggles must be keyboard-accessible. Price text must meet
-  WCAG AA contrast (4.5:1).
+- **Accessibility:** Toggles must be keyboard-accessible and expose their
+  state via `aria-checked` or `aria-pressed`. Price text must meet WCAG AA
+  contrast (4.5:1), and all interactive targets (toggle, CTA buttons) must
+  meet the WCAG 2.2 24x24px minimum target size (2.5.8).
 - **Responsiveness:** Pricing cards must never have a fixed width; they should
   be fluid within the `responsive-grid-system`.
 - **Currency Support:** Design for varying currency symbol lengths (e.g., "$10"
-  vs. "1,000 kr").
+  vs. "1,000 kr") and use logical CSS properties (`margin-inline`,
+  `padding-inline`) so layouts adapt correctly for RTL locales.
 
 ## Common Failure Patterns
 

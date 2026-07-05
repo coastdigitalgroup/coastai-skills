@@ -135,19 +135,19 @@ Plan how the card survives different viewports:
 
 - **Vertical to Horizontal:** For mobile, a card might switch from an
   image-on-top layout to an image-on-the-left layout to save vertical space.
-- **Truncation:** Decide if long titles or descriptions should be truncated with
-  ellipses after N lines.
 
 Verify accessibility before sign-off:
 
 - **Heading Levels:** Ensure card titles use appropriate heading levels (usually
   H3 or H4) to maintain the page's document outline.
-- **Touch Targets:** Any interactive element within the card must be at least
-  44x44px.
+- **Touch Targets:** Any interactive element within the card must meet WCAG 2.2
+  SC 2.5.8 (minimum 24x24px, with adequate spacing if smaller targets are
+  unavoidable); prefer 44x44px where space allows.
 - **Alt Text:** Every anchor image must have descriptive alt text or be marked
   as decorative.
 - **Keyboard Navigation:** Every interactive element inside a card must be
-  reachable via `Tab` and have a clear focus indicator.
+  reachable via `Tab` and have a focus indicator that is not clipped or hidden
+  by sibling cards or sticky headers (WCAG 2.2 SC 2.4.11, Focus Not Obscured).
 
 ## Decision Rules
 
@@ -180,6 +180,11 @@ Verify accessibility before sign-off:
   links for screen readers.
 - **Performance:** Avoid excessively large images; use `srcset` to serve
   appropriately sized assets for the card container.
+- **Layout:** Prefer CSS Grid with `auto-fill`/`auto-fit` and `clamp()`-based
+  gaps over fixed breakpoints so cards reflow naturally; use container queries
+  (`@container`) when a card's internal layout must adapt to its own width
+  rather than the viewport (e.g., the same card in a full-width grid and a
+  narrow sidebar).
 
 ## Common Failure Patterns
 
@@ -207,6 +212,6 @@ Verify accessibility before sign-off:
 - [ ] Cards in a grid align correctly and handle varying content lengths
       gracefully.
 - [ ] Heading levels follow a logical hierarchy within the page.
-- [ ] Touch targets meet the 44x44px minimum.
-- [ ] Accessibility: The card's heading level follows the page's logical
-      structure.
+- [ ] Touch targets meet WCAG 2.2 SC 2.5.8 (24x24px minimum).
+- [ ] Focus indicators are never obscured by overlapping cards, images, or
+      sticky elements (WCAG 2.2 SC 2.4.11).

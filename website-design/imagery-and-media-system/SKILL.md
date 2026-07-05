@@ -100,7 +100,13 @@ Images must change their "crop" to fit different screen shapes:
 - **The Mobile Pivot:** Switch from a horizontal desktop crop (16:9) to a square
   or portrait crop (1:1 or 4:5) on mobile to maximize viewport usage.
 - **Scale over Stretch:** Never allow an image to lose its aspect ratio; use
-  `object-fit: cover` to maintain proportions while filling the container.
+  `object-fit: cover` to maintain proportions while filling the container, and
+  reserve space with the CSS `aspect-ratio` property so the layout doesn't shift
+  before the asset loads.
+- **Art-Directed Crops:** Use the `<picture>` element with multiple `<source>`
+  breakpoints when a different crop (not just a different size) is needed per
+  viewport; use `srcset`/`sizes` on a single `<img>` when only resolution
+  changes, not composition.
 
 ### 5. Define Composition Patterns
 
@@ -124,6 +130,9 @@ Determine how media interacts with the surrounding layout:
   fails to load or isn't provided, using a brand-colored brand-neutral graphic.
 - **Video Interaction:** Always provide a "Play/Pause" control and never
   auto-play video with sound.
+- **Reserve Space:** Every media container must have a defined `aspect-ratio`
+  or explicit `width`/`height` so the browser can reserve layout space before
+  the asset downloads.
 
 ## Constraints
 
@@ -156,3 +165,5 @@ Determine how media interacts with the surrounding layout:
 - [ ] All semantic images have descriptive `alt` text defined.
 - [ ] Media does not cause horizontal overflow or layout distortion.
 - [ ] A clear visual style (art direction) is maintained across all assets.
+- [ ] Every media container reserves space via `aspect-ratio` or explicit
+      dimensions to prevent Cumulative Layout Shift (CLS).

@@ -118,7 +118,8 @@ Divide actions into priority tiers:
 - **Accessibility:** Header titles must use `<h1>`. Breadcrumbs must use `<nav>`
   with `aria-label="Breadcrumb"`.
 - **Contrast:** Status badges and actions must meet WCAG AA contrast
-  requirements.
+  requirements. Action buttons must meet WCAG 2.2 SC 2.5.8 target size
+  (minimum 24x24px, 44x44px preferred on mobile sticky bars).
 - **Responsiveness:** Headers must handle long titles gracefully (truncation vs.
   wrapping).
 

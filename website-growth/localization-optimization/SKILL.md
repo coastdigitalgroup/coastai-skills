@@ -101,7 +101,7 @@ Verify that the localized experience is seamless, trustworthy, and performant.
 - **Hidden Switchers:** Placing the language/region switcher at the very bottom of a long page where it can't be found.
 - **Mixed-Language Experience:** Having a translated landing page that links to an untranslated (English) app or checkout.
 
-## Validation Methods
+## Validation Criteria
 
 - [ ] **CVR Lift by Locale:** Measure the conversion rate increase within specific target countries after localization.
 - [ ] **Bounce Rate by Region:** Track the reduction in bounce rates for international visitors on localized landing pages.

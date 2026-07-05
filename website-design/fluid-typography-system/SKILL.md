@@ -79,7 +79,7 @@ Apply the generated CSS variables to the design.
 ## Decision Rules
 
 - **Accessibility First:** The `min-size` for body text should rarely be below `1rem` (16px).
-- **User Preference:** Always use `rem` units for the final output so user browser font-size settings are respected.
+- **User Preference:** Always use `rem` units for the final output so user browser font-size settings are respected. Never use `vw`-only sizing without `rem`-based min/max clamping — pure viewport units ignore the user's browser zoom and font-size preferences and can fail WCAG 1.4.4 (Resize Text).
 - **Scale Intensity:** Use smaller ratios for mobile-heavy sites to prevent headings from becoming overly large on small screens.
 
 ## Constraints
@@ -93,7 +93,7 @@ Apply the generated CSS variables to the design.
 - **Incorrect Math:** Resulting in text that shrinks when the screen gets larger.
 - **Unit Mismatch:** Mixing `px` and `rem` in ways that break browser zooming.
 - **Over-scaling:** Headings becoming so large on 4K monitors that they dominate the entire viewport.
-- **Accessibility:** Forgetting to test how the fluid scale behaves when a user zooms in (WCAG 1.4.4).
+- **Accessibility:** Forgetting to test how the fluid scale behaves when a user zooms in or increases the OS/browser base font size (WCAG 1.4.4 Resize Text, WCAG 1.4.10 Reflow).
 
 ## Validation Criteria
 
@@ -102,3 +102,6 @@ Apply the generated CSS variables to the design.
 - [ ] All text is legible at 320px width.
 - [ ] Headings maintain a clear hierarchy relative to body text.
 - [ ] The system uses `rem` units for the base and `clamp()` for the fluid behavior.
+- [ ] Text reflows without loss of content or function at 400% browser zoom
+      (WCAG 1.4.10 Reflow) and respects the user's font-size preference (WCAG
+      1.4.4).

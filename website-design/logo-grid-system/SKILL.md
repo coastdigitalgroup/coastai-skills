@@ -79,8 +79,10 @@ Create a "Normalization Container" (a fixed-aspect-ratio box, usually square or
 
 Choose a style that balances the site's aesthetic with brand recognition:
 - **Muted/Monochrome (Standard):** Convert all logos to a single color (usually
-  a dark gray or the background color's "knockout"). This prevents a "rainbow
-  effect" that distracts from the primary CTA.
+  a dark gray or the background color's "knockout"), typically via `filter:
+  grayscale(1)` plus a reduced `opacity`, or `color-mix()` when working with
+  single-color SVG masks. This prevents a "rainbow effect" that distracts from
+  the primary CTA.
 - **Hover/Reveal:** Keep logos muted by default and reveal their original brand
   colors only on hover.
 - **Full Color:** Only use when the logos themselves are the primary draw (e.g.,

@@ -66,7 +66,11 @@ without visual fatigue.
 The most critical factor in readability is the number of characters per line:
 - **Optimal Range:** 45 to 75 characters (including spaces).
 - **Desktop Implementation:** Usually translates to a `max-width` between
-  `600px` and `800px` (or `60ch` to `80ch`).
+  `600px` and `800px`, or simply `max-width: 75ch` — the `ch` unit tracks the
+  font's actual character width, so it stays correct across typeface changes.
+- **Fluid Sizing:** Use `clamp()` for headings and body text (e.g.,
+  `font-size: clamp(1rem, 0.9rem + 0.5vw, 1.125rem)`) so type scales with the
+  viewport instead of jumping at breakpoints.
 - **Centering:** Center the container to reduce eye-strain from wide head
   movements.
 
@@ -89,6 +93,9 @@ Prevent "Wall of Text" fatigue by introducing visual variety:
   or border) for secondary information.
 - **Images/Media:** Define rules for "Contained" (inline) vs. "Wide" (breaking
   the container width) vs. "Full-Bleed" media.
+- **Heading Wrap:** Apply `text-wrap: balance` to headings and pull quotes
+  (with a fallback for unsupported browsers) to avoid orphaned single words on
+  the last line.
 
 ### 4. Build Navigation and Wayfinding
 
@@ -124,7 +131,9 @@ Maintain legibility as the screen shrinks:
 - **Accessibility:** Text must meet WCAG AA (4.5:1) contrast. Font size should
   never be smaller than 16px (1rem) for body copy.
 - **Responsiveness:** Containers must be fluid (use `max-width` instead of
-  fixed `width`).
+  fixed `width`). For components inside the article (callouts, embedded
+  media) that need to adapt to their own container rather than the viewport,
+  use container queries (`@container`).
 - **Hierarchy:** H1 must be the most prominent, but body text must be the
   most comfortable to read.
 

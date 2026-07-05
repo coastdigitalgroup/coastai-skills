@@ -127,7 +127,8 @@ Metrics are rarely shown in isolation. Group them using `responsive-grid-system`
   "Revenue: 12,000 dollars, up 5% from last month"). Ensure color contrast for
   trend indicators meets WCAG AA (4.5:1).
 - **Responsiveness:** Metric values must never overflow their containers. Use
-  fluid typography or "shrink-to-fit" logic for very large numbers.
+  fluid typography (CSS `clamp()`) or "shrink-to-fit" logic for very large
+  numbers.
 - **Consistency:** All metrics in a single group must use the same rounding,
   alignment, and trend style.
 

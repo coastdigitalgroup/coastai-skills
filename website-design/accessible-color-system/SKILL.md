@@ -1,7 +1,7 @@
 ---
 name: accessible-color-system
 description:
-  Design and implement a systematic color palette that ensures WCAG 2.1
+  Design and implement a systematic color palette that ensures WCAG 2.2
   accessibility compliance. Trigger this skill when asked to define brand
   colors, create UI themes, or establish a visual system for a website.
 ---
@@ -53,15 +53,19 @@ To generate an accessible color system, you need:
    which background colors.
 3. **Semantic Mapping:** Defined roles for colors (e.g.,
    `--color-action-primary`, `--color-surface-muted`).
-4. **CSS Custom Properties:** A production-ready block of CSS variables.
+4. **CSS Custom Properties:** A production-ready block of CSS variables,
+   optionally using `color-mix()` to derive hover/active tints from a single
+   base token instead of hand-picking every state color.
 
 ## Workflow
 
 ### 1. Generate Tonal Scales
 
 Expand the base colors into scales (e.g., 50 to 900). Use a tool or formula that
-maintains consistent lightness steps. _Tip: Ensure your Primary 500 or 600 is
-the "brand" version._
+maintains consistent lightness steps. Working in the OKLCH color space (rather
+than HSL) produces more perceptually even lightness steps across hues, which
+makes contrast easier to predict before testing. _Tip: Ensure your Primary 500
+or 600 is the "brand" version._
 
 ### 2. Define Neutrals
 
@@ -80,11 +84,14 @@ Assign colors to functional roles:
 
 ### 4. Perform Contrast Validation
 
-Test pairings using WCAG 2.1 formulas:
+Test pairings using WCAG formulas (1.4.3, 1.4.11):
 
 - **Normal Text:** 4.5:1 for AA, 7:1 for AAA.
 - **Large Text (>18pt):** 3:1 for AA, 4.5:1 for AAA.
-- **UI Components/Icons:** 3:1 for AA.
+- **UI Components/Icons:** 3:1 for AA (non-text contrast, 1.4.11).
+- **Focus Indicators:** 3:1 against adjacent colors, and the indicator must not
+  be hidden by sticky headers or other content (WCAG 2.2 SC 2.4.11, Focus Not
+  Obscured).
 
 ### 5. Create Pairing Rules
 
@@ -106,8 +113,9 @@ Document which text colors can go on which backgrounds. _Example: White text
 
 - **Responsiveness:** Colors must maintain contrast on mobile screens where
   glare or low-quality displays might reduce visibility.
-- **Accessibility:** Must meet at least WCAG 2.1 AA standards for all functional
-  elements.
+- **Accessibility:** Must meet at least WCAG 2.2 AA standards for all functional
+  elements, including the 2.4.11 requirement that focus indicators remain
+  visible and unobscured.
 - **Hierarchy:** Use color saturation and contrast to guide the eye; more
   important elements (CTAs) should have higher visual weight.
 

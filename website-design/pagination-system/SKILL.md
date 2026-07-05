@@ -81,11 +81,14 @@ Establish the visual hierarchy of the pagination bar:
 
 Use the `fluid-spacing-system` to ensure targets are usable:
 
-- **Tap Targets:** Every page number and button must be at least 44x44px.
+- **Tap Targets:** Every page number and button should be at least 44x44px; if
+  visual density requires smaller controls, WCAG 2.2 (2.5.8 Target Size
+  Minimum) sets an absolute floor of 24x24px with adequate spacing between
+  targets to avoid accidental activation.
 - **Internal Gaps:** Use consistent spacing (e.g., `--space-xs`) between page
   numbers to avoid misclicks.
 
-### 4. Establish Accessibility (WCAG AA)
+### 4. Establish Accessibility (WCAG AA/AAA)
 
 - **Landmark:** Wrap the pagination in a `<nav>` element with
   `aria-label="pagination"`.
@@ -94,7 +97,8 @@ Use the `fluid-spacing-system` to ensure targets are usable:
   programmatically disabled (e.g., `aria-disabled="true"`) when on the first
   page.
 - **Keyboard Path:** Users must be able to `Tab` through each page number and
-  control.
+  control, and the focused control must never be fully hidden by sticky
+  headers/footers (WCAG 2.2, 2.4.11 Focus Not Obscured).
 
 ### 5. Plan Responsive Adaptations
 
@@ -122,7 +126,8 @@ Map the transition from desktop to mobile:
 
 - **Accessibility:** Pagination must be keyboard navigable and screen-reader
   friendly. Labels must be descriptive (e.g., "Go to page 5" instead of just
-  "5").
+  "5"). Interactive targets must meet at least the WCAG 2.2 24x24px minimum
+  (2.5.8), with 44x44px preferred for primary Previous/Next controls.
 - **Responsiveness:** The pagination bar must never cause horizontal overflow
   or overlap other UI elements.
 - **Visual Hierarchy:** The pagination should be visually distinct from the
@@ -145,7 +150,8 @@ Map the transition from desktop to mobile:
 
 - [ ] Current page is visually distinct and has `aria-current="page"`.
 - [ ] Navigation is wrapped in a `<nav>` with a descriptive `aria-label`.
-- [ ] Tap targets are at least 44x44px.
+- [ ] Tap targets meet at least the 24x24px WCAG 2.2 minimum (44x44px for
+      primary Previous/Next controls).
 - [ ] Disabled states (Previous on Page 1, Next on Last Page) are clear and
       programmatically defined.
 - [ ] Responsive behavior is defined (compact view for mobile).

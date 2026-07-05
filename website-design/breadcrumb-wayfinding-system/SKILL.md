@@ -112,8 +112,11 @@ Map the mobile experience:
 ## Constraints
 
 - **Accessibility:** Must be wrapped in a `<nav>` element with
-  `aria-label="Breadcrumb"`.
+  `aria-label="Breadcrumb"`, containing an ordered list (`<ol>`) of items so
+  screen readers announce position and total count.
 - **Contrast:** Links and separators must meet WCAG AA (4.5:1) requirements.
+- **Touch Targets:** Breadcrumb links must meet the WCAG 2.2 SC 2.5.8 minimum
+  of 24x24px, even though the visible text may be smaller.
 - **Length:** Breadcrumb labels should match the page titles exactly (or use a
   shortened version if the title is excessively long).
 
@@ -134,7 +137,8 @@ Map the mobile experience:
 
 - [ ] The trail starts with the Home/Root node.
 - [ ] The current page is the last item and is NOT clickable.
-- [ ] The breadcrumbs are wrapped in a `<nav aria-label="Breadcrumb">` landmark.
+- [ ] The breadcrumbs are wrapped in a `<nav aria-label="Breadcrumb">` landmark
+      containing an `<ol>` list.
 - [ ] Visual separators are used and have a lower contrast than the links.
 - [ ] The trail adapts gracefully to mobile viewports (truncation or "Back" link).
 - [ ] Spacing between items is consistent and follows the fluid spacing system.

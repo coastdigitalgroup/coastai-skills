@@ -72,7 +72,7 @@ Use color to communicate meaning without forcing the user to read:
 
 If the tag is interactive:
 - **Hover/Focus:** Apply a subtle background shift or border change.
-- **Removable:** Include a clear "X" icon with a minimum hit area (24px inside the tag or 44px total for the tag).
+- **Removable:** Include a clear "X" icon with a minimum hit area of 24x24px (WCAG 2.2 SC 2.5.8), sized up to 44x44px where layout allows for comfortable touch use.
 
 ### 5. Determine Placement and Hierarchy
 
@@ -91,7 +91,7 @@ If the tag is interactive:
 
 - **Accessibility:** Text inside badges/tags must meet WCAG AA (4.5:1 contrast). Interactive tags must be keyboard navigable.
 - **Responsiveness:** Tags in a group should wrap to the next line (`flex-wrap: wrap`) rather than overflowing the container.
-- **Touch Targets:** Removable tags must have a large enough target for the "close" action (min 44x44px for the interactive zone).
+- **Touch Targets:** Removable tags must have a large enough target for the "close" action (min 24x24px per WCAG 2.2 SC 2.5.8; 44x44px preferred).
 
 ## Common Failure Patterns
 
@@ -105,6 +105,6 @@ If the tag is interactive:
 - [ ] Badges and tags are visually distinct from buttons.
 - [ ] Semantic colors are used consistently (e.g., Green always means Success).
 - [ ] Contrast ratios meet WCAG AA (4.5:1) for all color variations.
-- [ ] Interactive tags include focus states and appropriate touch targets.
+- [ ] Interactive tags include focus states and touch targets of at least 24x24px (WCAG 2.2 SC 2.5.8).
 - [ ] Elements wrap gracefully on mobile viewports.
 - [ ] Icons are used alongside color for critical status indicators.

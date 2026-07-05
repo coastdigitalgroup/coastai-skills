@@ -97,8 +97,12 @@ The "Social over Form" rule:
 ### 4. Implement "One-Tap" and Autolayout
 
 Reduce interaction cost to zero.
-- **Google One-Tap:** Implement the floating prompt that appears in the top
-  right of the screen (on desktop) or bottom (on mobile).
+- **Google One-Tap / FedCM:** Implement the floating prompt that appears in the
+  top right of the screen (on desktop) or bottom (on mobile). Google has moved
+  this flow to the browser-native Federated Credential Management (FedCM) API;
+  legacy One-Tap integrations that don't use FedCM are being deprecated in
+  Chrome and will fail silently in third-party-cookie-restricted contexts, so
+  verify the FedCM migration status before relying on this pattern.
 - **Credential Management API:** Allow the browser to automatically sign the
   user back in if they have a saved session.
 - **The "Pre-Filled" Flow:** If a user clicks a social button, ensure any data
@@ -150,7 +154,7 @@ Verify the strategy against the authentication growth heuristics.
 - **Mobile Scaling:** Using social buttons that are too small for easy tapping
   on small screens.
 
-## Validation Methods
+## Validation Criteria
 
 - [ ] **Signup Conversion Rate (CVR):** Measure the percentage of users who
   successfully reach the "Welcome" dashboard after landing on the signup page.

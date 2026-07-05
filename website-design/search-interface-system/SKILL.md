@@ -80,6 +80,10 @@ Reduce the "distance to result" by providing immediate feedback:
   the dropdown.
 - **Focused State:** Use `interactive-state-system` to clearly highlight the
   currently selected suggestion for keyboard users.
+- **ARIA Pattern:** Model the input/listbox relationship on the ARIA APG
+  Combobox pattern (`role="combobox"` with `aria-expanded`,
+  `aria-controls`, and `aria-activedescendant` pointing at the highlighted
+  `role="option"`) rather than inventing a custom interaction model.
 
 ### 3. Establish the Results Page (SERP) Hierarchy
 
@@ -124,7 +128,9 @@ Search on mobile is a dedicated mode, not a widget:
 
 - **Accessibility:** The search input must have a visible label (or `aria-label`).
   Keyboard users must be able to navigate the autocomplete list using arrow
-  keys.
+  keys, select with `Enter`, and dismiss with `Escape` without losing their
+  typed query. All interactive targets (clear button, suggestion rows) must
+  meet the WCAG 2.2 24x24px minimum target size (2.5.8).
 - **Responsiveness:** Autocomplete dropdowns must never exceed the viewport
   width.
 - **Contrast:** Highlighting matching text must meet WCAG AA contrast ratios
@@ -146,7 +152,8 @@ Search on mobile is a dedicated mode, not a widget:
 - [ ] Search entry point is visible within 2 seconds of page scan.
 - [ ] Autocomplete dropdown includes rich metadata (images/labels) where
       appropriate.
-- [ ] Keyboard navigation (Arrows, Enter, Escape) is fully defined for search.
+- [ ] Keyboard navigation (Arrows, Enter, Escape) is fully defined for search,
+      following the ARIA APG combobox pattern.
 - [ ] Mobile search opens a full-screen mode with immediate keyboard focus.
 - [ ] Search results page echoes the query and highlights matching terms.
 - [ ] Skeleton states are used for results loading.

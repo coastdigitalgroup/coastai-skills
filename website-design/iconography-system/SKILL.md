@@ -126,7 +126,8 @@ Link icons to the `interactive-state-system`:
 - **Accessibility:** Icons used as links or buttons MUST have a text alternative
   for screen readers.
 - **Touch Targets:** Icons inside buttons must not reduce the hit area below
-  44x44px.
+  24x24px (WCAG 2.2 SC 2.5.8 minimum); 44x44px is preferred for primary
+  icon-only actions.
 - **Responsiveness:** On small screens, icons may need to be simplified or
   removed if they crowd the text, though often they help mobile scanning.
 
@@ -152,4 +153,6 @@ Link icons to the `interactive-state-system`:
       alternatives.
 - [ ] Decorative icons are marked with `aria-hidden="true"`.
 - [ ] Icons maintain a 3:1 contrast ratio against their background.
+- [ ] Icon-only interactive elements meet the WCAG 2.2 24x24px touch target
+      minimum (44x44px preferred).
 - [ ] Visual metaphors are clear and standard (no "guessing").

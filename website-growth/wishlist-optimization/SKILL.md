@@ -132,7 +132,7 @@ Leverage the data to bring users back.
 - **Mobile Unfriendly:** Using tiny icons that are difficult to tap on
   touchscreens.
 
-## Validation Methods
+## Validation Criteria
 
 - [ ] **Wishlist-to-Cart Conversion:** Measure the % of users who eventually
   move a wishlist item into their cart.

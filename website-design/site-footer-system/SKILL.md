@@ -86,7 +86,9 @@ Map the transition from Desktop to Mobile:
 - **Stacking:** Multi-column layouts should stack into a single column.
 - **Accordion Pattern:** For very "fat" footers, consider collapsing link groups
   into accordions on mobile to reduce page length.
-- **Touch Targets:** Ensure all links are easy to tap (min 44px height).
+- **Touch Targets:** Ensure all links are easy to tap. Meet WCAG 2.2 SC 2.5.8
+  (Target Size Minimum) — interactive targets at least 24x24px, with adequate
+  spacing between adjacent links; prefer 44px+ for primary touch targets.
 
 ### 5. Add Semantic & Accessibility Layers
 
@@ -109,7 +111,8 @@ Map the transition from Desktop to Mobile:
 ## Constraints
 
 - **Accessibility:** Must be reachable via keyboard Tab order. All links must
-  have visible focus states.
+  have visible focus states that are never obscured by sticky headers or
+  cookie banners (WCAG 2.2 SC 2.4.11 Focus Not Obscured).
 - **Responsiveness:** Columns must not overflow or become too narrow
   (min-width).
 - **Legality:** Must include mandatory links required by local regulations

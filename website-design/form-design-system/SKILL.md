@@ -108,7 +108,8 @@ Map how the form survives smaller viewports:
 - **Stacking:** Multi-column layouts on desktop must stack into a single column
   on mobile.
 - **Touch Targets:** Ensure all interactive zones (radios, checkboxes, buttons)
-  are at least 44x44px.
+  are at least 24x24px (WCAG 2.2 SC 2.5.8 minimum); 44x44px is preferred and
+  should be the default for primary submit actions.
 
 ## Decision Rules
 
@@ -126,9 +127,13 @@ Map how the form survives smaller viewports:
 
 ## Constraints
 
-- **Accessibility:** Labels must be programmatically linked to inputs. Contrast
-  ratios for text and borders must meet WCAG AA (4.5:1 for text, 3:1 for UI
-  components).
+- **Accessibility:** Labels must be programmatically linked to inputs (`<label
+  for>` or wrapping). Contrast ratios for text and borders must meet WCAG AA
+  (4.5:1 for text, 3:1 for UI components). Error messages must be
+  programmatically associated with their input via `aria-describedby`, and
+  invalid fields must set `aria-invalid="true"`. Focus indicators must not be
+  hidden behind sticky headers, toasts, or overlays (WCAG 2.4.11 Focus Not
+  Obscured).
 - **Responsiveness:** Form fields must never overflow their container or have
   fixed widths that exceed mobile viewports.
 - **Visual Hierarchy:** Error messages must be visually distinct from helper
@@ -153,7 +158,7 @@ Map how the form survives smaller viewports:
 - [ ] Form follows a logical, single-column vertical scan path.
 - [ ] Error states use a combination of color, icons, and text.
 - [ ] Focus indicators are high-contrast and clearly visible.
-- [ ] Interactive elements (inputs, buttons) meet the 44x44px touch target
-      minimum.
+- [ ] Interactive elements (inputs, buttons) meet the WCAG 2.2 24x24px touch
+      target minimum (44x44px preferred).
 - [ ] Layout transitions gracefully to a single column on mobile viewports.
 - [ ] Primary, secondary, and tertiary actions have a clear visual hierarchy.

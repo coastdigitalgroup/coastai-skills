@@ -50,6 +50,8 @@ for data sharing.
    Transparent, Minimalist, Reassuring).
 4. **Layout Context:** Where the banner should sit (Bottom Bar, Floating Box,
    Full-screen Modal).
+5. **Browser Signals:** Whether the site must detect and honor Global Privacy
+   Control (GPC) or "Do Not Track" signals as a valid opt-out.
 
 ## Outputs
 
@@ -109,6 +111,19 @@ Consent is a dynamic state; users must be able to change their mind:
   bottom-left) that re-opens the preference center.
 - **Footer Link:** A dedicated "Cookie Settings" link in the `site-footer-system`.
 
+### 6. Respect Browser-Level Opt-Out Signals
+
+For jurisdictions that recognize automated opt-out mechanisms (e.g., CCPA/CPRA
+recognition of Global Privacy Control):
+- **Detect and Apply:** If a GPC signal is present, treat it as a valid
+  "Reject" or "opt-out of sale/sharing" signal and reflect that state in the
+  preference center without requiring the user to re-toggle it manually.
+- **No Re-Prompting:** Do not re-show the initial banner solely to ask the user
+  to override a GPC signal they already sent.
+- **Transparency:** Surface the detected signal in the preference center (e.g.,
+  "We detected a Global Privacy Control signal and have applied your
+  opt-out") so the state is not silently applied.
+
 ## Decision Rules
 
 - **The "Equal Weight" Rule:** If your region requires "Reject All" (like the EU),
@@ -120,11 +135,16 @@ Consent is a dynamic state; users must be able to change their mind:
   instead of "Process pixel-based telemetry."
 - **Layered Disclosure:** Keep the initial banner simple. Move the 20-paragraph
   policy list into the Preference Center or a dedicated Privacy Policy page.
+- **The "Honor the Signal" Rule:** A detected GPC opt-out takes precedence over
+  a stale local "accept all" cookie; do not let a cached consent record
+  override a fresh browser-level opt-out signal.
 
 ## Constraints
 
 - **Accessibility:** Banners must be reachable via keyboard. Preference modals
-  must trap focus. All toggles must have clear ARIA labels.
+  must trap focus, and the focus indicator must remain visible and unobscured
+  while trapped (WCAG 2.2 SC 2.4.11). All toggles must have clear ARIA labels
+  and meet the 24x24px minimum target size (SC 2.5.8).
 - **Contrast:** Button text and toggles must meet WCAG AA (4.5:1) contrast.
 - **Responsiveness:** Banners must never overlap primary mobile navigation
   (like a bottom nav bar). Switch to a full-screen drawer if a floating box is
@@ -150,6 +170,9 @@ Consent is a dynamic state; users must be able to change their mind:
 - [ ] Non-essential categories are toggled OFF by default (for strict compliance).
 - [ ] A persistent trigger (icon or footer link) allows users to re-open settings.
 - [ ] Information is layered (Simple Banner -> Detailed Preference Center).
-- [ ] Toggles and buttons meet 44x44px touch target minimums.
-- [ ] Accessibility: Focus management is handled for preference modals.
+- [ ] Toggles and buttons meet WCAG 2.2 SC 2.5.8 (24x24px minimum touch target).
+- [ ] Accessibility: Focus management is handled for preference modals, and
+      focus indicators are never obscured (WCAG 2.2 SC 2.4.11).
 - [ ] Contrast ratios for all text and interactive states meet WCAG AA.
+- [ ] Global Privacy Control (or equivalent) signals are detected and honored
+      without re-prompting the user.

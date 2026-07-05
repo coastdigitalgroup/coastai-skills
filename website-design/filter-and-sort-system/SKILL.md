@@ -122,9 +122,13 @@ Distinguish between inclusion (Filtering) and prioritization (Sorting):
 ## Constraints
 
 - **Accessibility:** All filter controls must have visible focus rings and be
-  operable via keyboard. Use `aria-expanded` for collapsible facets.
+  operable via keyboard. Use `aria-expanded` for collapsible facets and
+  `aria-live="polite"` on the results count/container so screen reader users
+  know when results have updated.
 - **Responsiveness:** Filters must stack or move into a drawer on mobile to
-  avoid horizontal overflow or "squeezing" the content grid.
+  avoid horizontal overflow or "squeezing" the content grid. Prefer container
+  queries over viewport breakpoints when the filter bar can appear in more than
+  one layout context (e.g., sidebar vs. embedded widget).
 - **Contrast:** Ensure that active/selected states (e.g., a checked box or a
   blue chip) meet the 3:1 contrast ratio against the background.
 
@@ -151,5 +155,5 @@ Distinguish between inclusion (Filtering) and prioritization (Sorting):
 - [ ] The system provides a mobile-specific discovery pattern (e.g., Drawer).
 - [ ] Loading states (skeletons/spinners) are defined for when the results
       update.
-- [ ] All controls meet touch-target (44x44px) and keyboard accessibility
-      requirements.
+- [ ] All controls meet touch-target size (24x24px minimum per WCAG 2.2 SC
+      2.5.8, 44x44px preferred) and keyboard accessibility requirements.

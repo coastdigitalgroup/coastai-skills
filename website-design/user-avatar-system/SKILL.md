@@ -73,7 +73,7 @@ Avatars must never appear broken or empty:
 Communicate availability without cluttering the UI:
 - **Placement:** Usually the bottom-right corner of the avatar circle.
 - **Shapes:** Use solid circles for online, rings for away, and "cutouts" or symbols for busy/DND.
-- **Accessibility:** Use distinct shapes or icons for statuses (not just color) to support colorblind users.
+- **Accessibility:** Use distinct shapes or icons for statuses (not just color) to support colorblind users, and include visually hidden text (e.g., "Online") so the status is announced to screen readers, since a decorative dot alone conveys nothing to assistive technology.
 
 ### 4. Create Avatar Groups (Stacks)
 
@@ -99,7 +99,7 @@ Handle multiple users in a compact space:
 
 ## Constraints
 
-- **Accessibility:** Avatars must have an `aria-label` or `alt` text containing the user's name. If decorative (next to a name label), use `aria-hidden="true"`.
+- **Accessibility:** Avatars must have an `aria-label` or `alt` text containing the user's name. If decorative (next to a name label), use `aria-hidden="true"`. If the avatar is clickable (e.g., opens a profile menu), its hit area must meet WCAG 2.2 SC 2.5.8 (24x24px minimum) even when the visible avatar (e.g., XS at 20px) is smaller — pad the interactive wrapper, don't rely on the visual size alone.
 - **Responsiveness:** Avatars should maintain their aspect ratio (1:1) regardless of viewport. Use fixed pixel sizes or fluid scales that preserve the circle shape.
 - **Consistency:** Use the same size matrix across the entire application to prevent visual "noise" and misaligned lists.
 
@@ -118,5 +118,6 @@ Handle multiple users in a compact space:
 - [ ] Initial-based avatars meet WCAG AA contrast requirements.
 - [ ] Presence indicators are visually distinct and include shape-based cues.
 - [ ] Avatar stacks use consistent overlapping and overflow logic.
-- [ ] All avatars have appropriate `alt` text or `aria-label` definitions.
+- [ ] All avatars have appropriate `alt` text or `aria-label` definitions, and presence status is announced via hidden text, not color/shape alone.
+- [ ] Clickable avatars have a hit area meeting WCAG 2.2 SC 2.5.8 (24x24px minimum) regardless of visual size.
 - [ ] Aspect ratio is locked at 1:1 using `object-fit: cover`.

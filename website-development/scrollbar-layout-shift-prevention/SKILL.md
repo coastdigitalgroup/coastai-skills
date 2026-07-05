@@ -135,8 +135,10 @@ html {
 - **Dynamic Resize:** If the user changes their system scrollbar settings (e.g.,
   plugging in a mouse on macOS), the width may change. Re-calculate on
   significant lifecycle events.
-- **Browser Support:** `scrollbar-gutter` is supported in Chromium and Firefox
-  but was later to arrive in Safari.
+- **Browser Support:** `scrollbar-gutter` is supported in Chromium and Firefox.
+  Safari does not support it as of 2026, but this matters less there since
+  macOS/iOS Safari defaults to overlay scrollbars that don't consume layout
+  width in the first place.
 - **User Preference:** Avoid forcing scrollbars on users who prefer a clean,
   minimal UI unless it's critical for layout integrity.
 

@@ -114,7 +114,10 @@ Handle edge cases in data length:
 ## Constraints
 
 - **Accessibility:** Must use semantic `<table>` tags. Headers must have
-  `scope="col"`. Captions must be used for context.
+  `scope="col"`. Captions must be used for context. Sticky headers must not
+  obscure the focus indicator of cells or row actions scrolled beneath them
+  (WCAG 2.2 SC 2.4.11). Inline action buttons/links must meet the 24x24px
+  minimum target size (SC 2.5.8).
 - **Responsiveness:** Tables must follow patterns from `responsive-data-tables`
   (Scroll, Stack, or Toggle) when viewports shrink.
 - **Contrast:** Header text and status indicators must meet WCAG AA (4.5:1).
@@ -141,3 +144,6 @@ Handle edge cases in data length:
 - [ ] Empty cells use a placeholder (e.g., —) instead of being blank.
 - [ ] Interactive states (Hover/Select) are clearly defined.
 - [ ] The design handles long content gracefully (truncation or wrapping).
+- [ ] Sticky headers never obscure focus indicators on rows or cell actions
+      (WCAG 2.2 SC 2.4.11).
+- [ ] Row actions meet the 24x24px minimum target size (WCAG 2.2 SC 2.5.8).

@@ -101,11 +101,18 @@ Map how many items are visible at once:
 ### 5. Implement Controls and Accessibility
 
 - **Keyboard Support:** Users must be able to use `ArrowLeft` and `ArrowRight` to
-  move between items.
+  move between items; `Tab` should move to the next focusable control, not
+  between every slide.
 - **Motion Control:** If using auto-play, provide a visible "Pause" button and
-  stop the animation on hover or focus.
-- **ARIA Roles:** Use `role="region"` with an `aria-label` for the carousel, and
-  `aria-roledescription="carousel"`.
+  stop the animation on hover, focus, and whenever `prefers-reduced-motion:
+  reduce` is set (do not rely on hover/focus alone).
+- **ARIA Roles:** Follow the ARIA APG carousel pattern — `role="region"` with an
+  `aria-label` on the container, `aria-roledescription="carousel"`, and
+  `aria-live="polite"` (or `"off"` during auto-play) on the slide track so
+  screen readers announce changes without being overwhelmed.
+- **Focus Visibility:** Ensure the focus indicator on arrows, dots, and slide
+  content is never obscured by adjacent slides or a sticky reveal edge (WCAG
+  2.2 SC 2.4.11).
 
 ## Decision Rules
 
@@ -123,10 +130,12 @@ Map how many items are visible at once:
 ## Constraints
 
 - **Accessibility:** Must support `prefers-reduced-motion`. All interactive
-  controls (arrows/dots) must meet the 44x44px touch target minimum.
+  controls (arrows/dots) must meet WCAG 2.2 SC 2.5.8 (24x24px minimum target
+  size, 44x44px preferred for primary arrows).
 - **Responsiveness:** Items must be fluid. The carousel container must never
   cause horizontal page overflow; the overflow must be contained within the
-  component.
+  component. Use `clamp()` for item width/gap so items-per-view scales
+  smoothly instead of jumping at fixed breakpoints.
 - **Perceived Performance:** Use `skeleton-state-system` for items that are not
   yet loaded or are off-screen.
 
@@ -146,9 +155,12 @@ Map how many items are visible at once:
 ## Validation Criteria
 
 - [ ] A "Partial Reveal" or clear visual indicator of hidden content is present.
-- [ ] Navigation controls (Arrows/Bullets) have a minimum 44x44px touch area.
-- [ ] Keyboard navigation (`Arrows`) and focus management are implemented.
+- [ ] Navigation controls (Arrows/Bullets) meet WCAG 2.2 SC 2.5.8 (24x24px
+      minimum touch area).
+- [ ] Keyboard navigation (`Arrows`) and focus management are implemented, and
+      focus indicators are never obscured (WCAG 2.2 SC 2.4.11).
 - [ ] `scroll-snap` is used to ensure items align to the grid.
-- [ ] Auto-play (if used) can be paused by the user.
+- [ ] Auto-play (if used) can be paused by the user and stops automatically
+      under `prefers-reduced-motion`.
 - [ ] Responsive item counts are defined for all major breakpoints.
 - [ ] ARIA landmarks and labels are correctly applied for screen readers.

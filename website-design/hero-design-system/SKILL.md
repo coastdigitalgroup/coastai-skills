@@ -127,9 +127,13 @@ Plan how the layout transforms for smaller screens:
 ## Constraints
 
 - **Accessibility:** Text on images must meet WCAG AA (4.5:1) contrast.
-  Headlines must use semantic `<h1>` tags.
+  Headlines must use semantic `<h1>` tags. If the hero includes autoplaying
+  background video or animation, provide a visible pause control (WCAG 2.2.2)
+  and respect `prefers-reduced-motion`.
 - **Responsiveness:** The hero must never cause horizontal overflow. Layouts
   should be fluid, not fixed-height, to accommodate varying text lengths.
+  Avoid `100vh` locks on mobile, which misbehave with dynamic browser
+  chrome — prefer `100dvh` or a min-height with fluid padding.
 - **Performance:** Background videos should be muted and have a "poster" image
   fallback for slow connections.
 
@@ -153,3 +157,5 @@ Plan how the layout transforms for smaller screens:
 - [ ] Vertical spacing (padding/gaps) uses tokens from the fluid spacing system.
 - [ ] Layout remains functional and readable on mobile viewports.
 - [ ] Focal points in imagery are preserved during responsive stacking.
+- [ ] Autoplaying video/animation has a pause control and honors
+      `prefers-reduced-motion`.

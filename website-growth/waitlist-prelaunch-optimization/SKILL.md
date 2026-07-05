@@ -122,7 +122,7 @@ Plan the "Roll-out" to maximize activation.
 - **Broken Queue Logic:** Users moving *down* the list or positions not updating,
   which feels like a "scam."
 
-## Validation Methods
+## Validation Criteria
 - [ ] **Waitlist Conversion Rate (CVR):** (Signups / Landing Page Views) * 100.
   Target: >20% for high-intent niches.
 - [ ] **Viral Coefficient (K-factor):** (Avg. invites per user) * (Conversion rate

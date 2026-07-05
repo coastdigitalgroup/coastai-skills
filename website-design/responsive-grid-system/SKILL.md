@@ -59,16 +59,20 @@ Determine the "inner logic" of the grid.
 
 ### 3. Establish Container Behavior
 
-Decide if the grid is **Fluid** (scales as a percentage of viewport), **Fixed** (stays at a specific width until the next breakpoint), or **Adaptive** (a mix). *Recommendation:* Use a fluid grid with a fixed `max-width`.
+Decide if the grid is **Fluid** (scales as a percentage of viewport), **Fixed** (stays at a specific width until the next breakpoint), or **Adaptive** (a mix). *Recommendation:* Use a fluid grid with a fixed `max-width`, sized with `clamp()` (e.g., `max-width: clamp(320px, 90vw, 1440px)`) so the container scales smoothly instead of jumping at breakpoints.
 
 ### 4. Map Content to the Grid
 
-Assign components to span specific column counts.
+Assign components to span specific column counts using CSS Grid (`grid-template-columns: repeat(12, 1fr)` with `grid-column: span N`), not float or inline-block hacks.
 *Example:* A sidebar might span 3 columns on desktop (12-col grid), while the main content spans 9. On mobile, both would span all 4 columns (stacking).
+
+For components nested inside a grid cell that need to align to the parent grid's tracks (e.g., a card's internal header/body/footer lining up with sibling cards), use `subgrid` (`grid-template-columns: subgrid` or `grid-template-rows: subgrid`) rather than re-declaring a new independent grid.
+
+Where a component's internal layout depends on its own available space rather than the viewport (e.g., a card that should reflow from 1 to 2 columns based on the width of its container, not the screen), use a **container query** (`container-type: inline-size` on the wrapper, `@container (min-width: …)` on the child) instead of a media query.
 
 ### 5. Define Stacking & Ordering
 
-Determine how elements move when the screen shrinks. Usually, elements on the left stack on top of elements on the right.
+Determine how elements move when the screen shrinks. Usually, elements on the left stack on top of elements on the right. Use logical properties (`margin-inline`, `padding-block`) for grid gutters and margins so the system adapts correctly to RTL layouts without separate overrides.
 
 ## Decision Rules
 
@@ -76,10 +80,11 @@ Determine how elements move when the screen shrinks. Usually, elements on the le
 - **Consistency:** Use the same gutter width throughout a single breakpoint to maintain alignment.
 - **Mobile First:** Always design the 4-column mobile layout first to ensure core content is prioritized.
 - **The "Safety Zone":** Ensure outer margins are large enough to prevent content from touching the screen edges on mobile devices.
+- **Viewport vs. Container:** Use media queries for page-level, viewport-driven layout shifts (e.g., the overall column count). Use container queries when a component must adapt to its own box size regardless of viewport (e.g., the same card component reflowing differently in a sidebar vs. a full-width section).
 
 ## Constraints
 
-- **Accessibility:** Ensure that when columns shrink, text remains legible and tap targets (buttons) remain large enough (min 44x44px).
+- **Accessibility:** Ensure that when columns shrink, text remains legible and tap targets (buttons) remain large enough — WCAG 2.2 (2.5.8) sets an absolute floor of 24x24px, with 44x44px preferred for primary actions.
 - **Responsiveness:** No element should have a fixed pixel width that exceeds the mobile viewport width (avoid horizontal scrolling).
 - **Hierarchy:** Use the grid to reinforce importance; more important elements should typically span more columns or appear higher in the stack.
 
@@ -97,3 +102,5 @@ Determine how elements move when the screen shrinks. Usually, elements on the le
 - [ ] The transition between breakpoints feels logical and content remains readable.
 - [ ] Gutters and margins remain consistent across the entire page.
 - [ ] The system is implemented using relative units (%, fr, rem) rather than hardcoded pixels for column widths.
+- [ ] Container queries are used (instead of viewport media queries) for components whose layout should depend on their own box size.
+- [ ] Tap targets meet at least the WCAG 2.2 24x24px minimum.

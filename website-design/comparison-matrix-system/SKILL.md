@@ -123,7 +123,11 @@ Matrices are inherently horizontal; adapt them for vertical screens:
 ## Constraints
 
 - **Accessibility:** Row headers must be properly associated with cells using
-  `scope="row"` and `scope="col"`. Ensure high contrast for checkmarks and icons.
+  `scope="row"` and `scope="col"`. Ensure high contrast for checkmarks and
+  icons. Sticky column/row headers must not obscure the keyboard focus
+  indicator of cells or controls beneath them (WCAG 2.2 SC 2.4.11). Any
+  item-switcher or dropdown control on mobile must meet the 24x24px minimum
+  target size (SC 2.5.8).
 - **Responsiveness:** Horizontal scrolling must be intentional (e.g., within a
   container) and not break the global page layout.
 - **Visual Weight:** The "Lead Column" (attributes) should have a slightly
@@ -154,3 +158,7 @@ Matrices are inherently horizontal; adapt them for vertical screens:
       switching).
 - [ ] Row hover states are implemented to assist horizontal tracking.
 - [ ] All icons and text meet WCAG AA (4.5:1) contrast requirements.
+- [ ] Sticky headers do not obscure focus indicators on cells or controls
+      (WCAG 2.2 SC 2.4.11).
+- [ ] Mobile item-switcher controls meet the 24x24px minimum target size
+      (WCAG 2.2 SC 2.5.8).

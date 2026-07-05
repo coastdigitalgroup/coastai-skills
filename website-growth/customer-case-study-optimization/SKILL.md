@@ -129,7 +129,7 @@ Verify the optimized case study against the conversion heuristics below.
 - **Anonymous Customers:** "A leading bank" is significantly less persuasive
   than "Lloyds Bank."
 
-## Validation Methods
+## Validation Criteria
 
 - [ ] **CTA Click-Through Rate:** Measure how many users click the primary CTA
   after reading the case study.

@@ -92,6 +92,9 @@ Enable users to find the feedback most relevant to them:
 
 Ensure the collection process is frictionless:
 - **Initial Trigger:** Use large, interactive stars that change state on hover.
+  A radio-group of star inputs styled with the `:has()` selector (e.g.,
+  `label:has(~ input:checked)`) gives hover/selected fill states without extra
+  JavaScript.
 - **Progressive Disclosure:** Reveal the text input area only after a star
   rating is selected.
 - **Contextual Guidance:** Use placeholders like "What did you like or dislike?"
@@ -122,7 +125,9 @@ Ensure the collection process is frictionless:
 
 - **Accessibility:** Star ratings must use `aria-label` (e.g., "4 out of 5
   stars"). Interactive star inputs must be keyboard-accessible and use
-  `role="radiogroup"` or similar.
+  `role="radiogroup"` or similar, with each star at least 24x24px (WCAG 2.2,
+  2.5.8) — 44x44px preferred given how easily a small star target is
+  mis-tapped.
 - **Contrast:** Empty stars (background) must have a 3:1 contrast against the
   page background; filled stars must have 4.5:1 against the background or a
   strong border.

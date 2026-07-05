@@ -109,7 +109,12 @@ team.
   only larger units (L-3XL) should scale aggressively to prevent mobile layouts
   from feeling "exploded."
 - **Accessibility:** Ensure that even at the smallest scale, interactive
-  elements maintain a large enough hit area (minimum 44x44px including padding).
+  elements maintain a large enough hit area (minimum 24x24px per WCAG 2.2 SC
+  2.5.8, including padding; 44x44px preferred for primary actions).
+- **Container-Relative Spacing:** For spacing that should respond to a
+  component's container rather than the viewport (e.g., a card that can sit in
+  a narrow sidebar or a wide main column), use container query length units
+  (`cqi`/`cqw`) inside the `clamp()` formula instead of `vw`.
 
 ## Constraints
 
@@ -145,3 +150,6 @@ team.
 - [ ] The system uses `rem` units for the minimum and maximum bounds of the
       `clamp()` function.
 - [ ] Proximity and hierarchy are reinforced by the spacing choices.
+- [ ] Interactive elements retain at least a 24x24px hit area (WCAG 2.2 SC
+      2.5.8) at every point on the fluid scale, including the smallest
+      viewport.

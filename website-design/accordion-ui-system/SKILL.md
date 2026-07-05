@@ -99,7 +99,9 @@ Choose the behavior pattern:
 
 Apply `fluid-spacing-system` to the interior:
 
-- **Header Padding:** Ensure the touch target is at least 44x44px.
+- **Header Padding:** Ensure the touch target is at least 24x24px (WCAG 2.2
+  SC 2.5.8 minimum); prefer 44x44px where layout allows for comfortable touch
+  use.
 - **Panel Padding:** Use internal padding to create a clear relationship
   between the header and its content.
 - **Transitions:** Use subtle height or opacity transitions (200-300ms) to
@@ -108,8 +110,11 @@ Apply `fluid-spacing-system` to the interior:
 ### 5. Verify Accessibility and Responsiveness
 
 - **Keyboard:** Users must be able to `Tab` to headers and use `Enter/Space`
-  to toggle.
-- **ARIA:** Use `aria-expanded="true/false"` and `aria-controls`.
+  to toggle, per the ARIA APG Accordion pattern.
+- **ARIA:** Wrap each trigger in a heading element (`<h3><button
+  aria-expanded="true/false" aria-controls="panel-id">...</button></h3>`) and
+  give the panel `role="region"` with `aria-labelledby` pointing back to the
+  trigger when panels contain substantial content.
 - **Mobile:** Ensure long headers wrap gracefully and don't overlap icons.
 
 ## Decision Rules
@@ -126,8 +131,9 @@ Apply `fluid-spacing-system` to the interior:
 
 ## Constraints
 
-- **Accessibility:** Headers must use semantic heading tags (H2-H4) wrapped in
-  a button for keyboard access.
+- **Accessibility:** Headers must use semantic heading tags (H2-H4) containing
+  a `<button>` for keyboard access; meets WCAG 2.2 SC 2.5.8 minimum target size
+  (24x24px).
 - **Responsiveness:** Accordion width should be fluid (100% of parent). Panel
   content must be fully responsive.
 - **Hierarchy:** Accordion headers should never be visually more prominent
@@ -154,4 +160,4 @@ Apply `fluid-spacing-system` to the interior:
 - [ ] Internal spacing follows the fluid spacing system.
 - [ ] The exclusive/multi-open logic is appropriate for the content type.
 - [ ] The accordion transitions smoothly without breaking layout.
-- [ ] Mobile touch targets meet the 44x44px minimum.
+- [ ] Touch targets meet the WCAG 2.2 minimum of 24x24px (44x44px preferred).

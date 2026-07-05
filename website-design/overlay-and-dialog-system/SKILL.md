@@ -81,8 +81,18 @@ Apply `visual-hierarchy-system` to the overlay:
 ### 3. Establish Elevation and Backdrop
 
 - **Z-Index Strategy:** Ensure overlays sit in the correct stacking context.
+  Prefer the native `<dialog>` element for Modals — it manages its own
+  top-layer stacking, provides the `::backdrop` pseudo-element for the scrim,
+  and handles `Escape`-to-close natively.
 - **Backdrop (Scrim):** Use for Modals and Drawers to dim the background and
-  focus attention. Define if clicking the backdrop closes the overlay.
+  focus attention. Define if clicking the backdrop closes the overlay. With
+  `<dialog>`, style the scrim via `::backdrop` instead of a manually rendered
+  overlay `<div>`.
+- **Background Inertness:** When an overlay is open, the rest of the page must
+  be non-interactive and hidden from assistive tech. `<dialog>.showModal()`
+  does this automatically; for custom (non-`<dialog>`) overlays, apply the
+  `inert` attribute to the background content rather than relying on
+  `aria-hidden` alone.
 - **Shadows:** Use depth to indicate the overlay's position above the base
   layer.
 
@@ -120,8 +130,12 @@ Overlays must transform based on screen size:
 
 ## Constraints
 
-- **Accessibility:** Must be navigable by keyboard. Modals must trap focus.
-  Backdrops must be hidden from screen readers.
+- **Accessibility:** Must be navigable by keyboard. Modals must trap focus (the
+  native `<dialog>` element does this by default when opened via
+  `showModal()`). Background content must be made `inert` (or equivalent) so
+  screen reader and keyboard focus cannot escape into it. Use `role="dialog"`
+  or `role="alertdialog"` with `aria-modal="true"` and `aria-labelledby`
+  pointing to the title when not using the native element.
 - **Responsiveness:** Overlays must never cause horizontal scrolling. Content
   inside must be responsive.
 - **Hierarchy:** The overlay's H1/Title must be the most prominent element
@@ -148,3 +162,5 @@ Overlays must transform based on screen size:
 - [ ] "Click outside to close" logic is appropriate for the data risk.
 - [ ] Focus management and keyboard accessibility requirements are specified.
 - [ ] Elevation (shadows/backdrops) distinguishes the layer from the base page.
+- [ ] Background content is made `inert` (or the native `<dialog>` element is
+      used) whenever a Modal or Drawer is open.

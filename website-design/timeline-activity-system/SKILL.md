@@ -117,7 +117,10 @@ Apply `visual-hierarchy-system` to the content adjacent to each node:
 
 - **Accessibility:** Timelines must be navigable as a list (`<ul>` or `<ol>`).
   Nodes containing icons must have `aria-label` or hidden text for screen
-  readers.
+  readers. Wrap timestamps in a `<time datetime="...">` element so relative
+  labels ("2 hours ago") remain machine-readable. For live-updating activity
+  feeds, add new entries inside an `aria-live="polite"` region (not the whole
+  list) so screen reader users hear new events without losing their place.
 - **Responsiveness:** Timelines must never overflow the viewport. Horizontal
   timelines must switch to vertical or use a horizontal scroll on mobile.
 - **Visual Contrast:** The thread and nodes must meet a 3:1 contrast ratio
@@ -142,5 +145,8 @@ Apply `visual-hierarchy-system` to the content adjacent to each node:
 - [ ] Temporal grouping (e.g., "Today") is used to reduce cognitive load.
 - [ ] Responsive behavior (e.g., collapsing to a single column) is defined and
       functional.
-- [ ] Accessibility: The timeline is marked up as a semantic list.
+- [ ] Accessibility: The timeline is marked up as a semantic list, and
+      timestamps use `<time datetime="...">`.
+- [ ] Real-time feeds announce new entries via a scoped `aria-live="polite"`
+      region without disrupting screen reader focus.
 - [ ] Primary milestones are visually distinct from secondary activity.

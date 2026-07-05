@@ -118,7 +118,9 @@ If there is no direct "create" action (like in search), offer alternatives:
 ## Constraints
 
 - **Accessibility:** Empty state illustrations must have `aria-hidden="true"` or
-  be purely decorative. The text must meet WCAG AA contrast ratios.
+  be purely decorative. The text must meet WCAG AA contrast ratios. The
+  primary CTA and any secondary links/buttons must meet WCAG 2.2 SC 2.5.8
+  (24x24px minimum target size).
 - **Scale:** Empty states should not exceed the container width of the actual
   content they replace.
 - **Consistency:** Use the same visual style and layout for all empty states
@@ -144,5 +146,6 @@ If there is no direct "create" action (like in search), offer alternatives:
 - [ ] The visual hierarchy leads the eye from the visual to the CTA.
 - [ ] The tone matches the context (onboarding vs. search failure).
 - [ ] The state is accessible (contrast, keyboard navigation, screen reader
-      announcements).
+      announcements via `role="status"` or equivalent live region).
+- [ ] The primary CTA meets WCAG 2.2 SC 2.5.8 (24x24px minimum target size).
 - [ ] The layout is responsive and centered within its parent container.

@@ -126,6 +126,15 @@ Verify the new layout against the growth heuristics below.
 - **Device Responsiveness:** The hierarchy must be re-validated for mobile,
   where the F-pattern often collapses into a simple vertical scan.
 
+## Non-Goals
+
+- Visual design system creation (color palettes, typography scales, component
+  libraries) — this skill applies an existing design system, it doesn't build one.
+- Copywriting or messaging strategy; this skill governs how content is
+  arranged and weighted, not what it says.
+- Accessibility auditing beyond contrast ratios (e.g., screen reader order,
+  keyboard navigation), which requires a dedicated accessibility review.
+
 ## Common Failure Patterns
 
 - **The "Wall of Text":** Uniform blocks of text with no H2s or bolding,
@@ -137,7 +146,7 @@ Verify the new layout against the growth heuristics below.
 - **False Bottoms:** Using horizontal lines or large blocks of color that
   make it look like the page has ended, stopping the scroll.
 
-## Validation Methods
+## Validation Criteria
 
 - [ ] **Squint Test Success:** The primary CTA is clearly visible when
   blurred.

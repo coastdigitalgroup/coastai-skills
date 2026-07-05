@@ -76,7 +76,7 @@ Apply consistent visual feedback (from `interactive-state-system`):
 Map the sidebar's behavior across breakpoints:
 - **Desktop (>1200px):** Fixed, wide sidebar (240px-280px).
 - **Tablet (768px-1200px):** Collapsed "Rail" showing only icons, expanding on hover/click.
-- **Mobile (<768px):** Hidden by default, appearing as a full-screen drawer triggered by a hamburger icon.
+- **Mobile (<768px):** Hidden by default, appearing as a full-screen drawer triggered by a hamburger icon. Apply the `inert` attribute (or equivalent) to the main content while the drawer is open so keyboard and screen-reader users can't tab into content hidden behind it.
 
 ## Decision Rules
 
@@ -88,10 +88,10 @@ Map the sidebar's behavior across breakpoints:
 
 ## Constraints
 
-- **Accessibility:** The sidebar must be wrapped in a `<nav>` with a unique `aria-label`. Use `aria-expanded` for nested items.
+- **Accessibility:** The sidebar must be wrapped in a `<nav>` with a unique `aria-label`. Use `aria-expanded` for nested items. When the sidebar or its flyouts overlay content, ensure the currently focused item is never fully hidden behind another layer (WCAG 2.2, 2.4.11 Focus Not Obscured).
 - **Responsiveness:** The sidebar must not overlap content on desktop; it should push or squeeze the main content area.
 - **Visual Hierarchy:** Branding and Workspace switchers must be at the top; User settings and help must be at the bottom.
-- **Touch Targets:** All links and expand triggers must meet the 44x44px touch target minimum.
+- **Touch Targets:** All links and expand triggers must meet at least the WCAG 2.2 24x24px minimum target size (2.5.8); 44x44px is preferred for primary nav items given how frequently they're used.
 
 ## Common Failure Patterns
 
@@ -111,3 +111,5 @@ Map the sidebar's behavior across breakpoints:
 - [ ] Mobile and Tablet responsive states are defined and functional.
 - [ ] ARIA landmarks and states are correctly implemented.
 - [ ] Contrast ratios for text and indicators meet WCAG AA (4.5:1).
+- [ ] Touch targets meet at least the WCAG 2.2 24x24px minimum.
+- [ ] Mobile drawer applies `inert` (or equivalent) to background content while open.
