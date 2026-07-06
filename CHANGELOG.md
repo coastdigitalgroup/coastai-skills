@@ -5,6 +5,10 @@ All notable changes to this project will be documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `micro-survey-optimization` skill to `website-growth` category
+
 ## [0.2.0] — 2026-07-05
 
 ### Added
