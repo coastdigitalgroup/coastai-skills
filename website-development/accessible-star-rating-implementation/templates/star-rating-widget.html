@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /*
+     * ACCESSIBLE STAR RATING BOILERPLATE
+     * Natural Order (1-5) + CSS :has() for trailing fill
+     */
+
+    .rating-fieldset {
+      border: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .rating-legend {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      font-family: sans-serif;
+    }
+
+    .rating-container {
+      display: inline-flex;
+      gap: 2px;
+    }
+
+    /* Hide radio but keep reachable for keyboard */
+    .rating-container input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .rating-container label {
+      cursor: pointer;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* High contrast for empty state (approx 4.5:1 against white) */
+      color: #4b5563;
+      transition: color 0.1s ease, transform 0.1s ease;
+    }
+
+    .rating-container label svg {
+      width: 32px;
+      height: 32px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2px;
+    }
+
+    /*
+     * FILL LOGIC using :has()
+     * Fills labels that come BEFORE or ARE FOR the checked radio.
+     * Labels precede their inputs in the DOM.
+     */
+    .rating-container:has(input:checked) label:has(~ input:checked) svg,
+    .rating-container label:has(+ input:checked) svg {
+      fill: #b45309; /* High contrast Amber (approx 4.5:1 against white) */
+      stroke: #b45309;
+      color: #b45309;
+    }
+
+    /* HOVER TRAIL */
+    .rating-container label:hover svg,
+    .rating-container label:has(~ label:hover) svg {
+      color: #d97706;
+      transform: scale(1.1);
+    }
+
+    /* Focus State */
+    .rating-container input:focus-visible + label svg {
+      /* Not used because input follows label. Need to use label focus if input is focused. */
+    }
+
+    .rating-container:has(input:focus-visible) label:has(+ input:focus-visible) {
+        outline: 2px solid #2563eb;
+        outline-offset: 4px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+
+    .rating-status {
+      margin-top: 0.5rem;
+      font-size: 0.875rem;
+      color: #374151;
+      font-family: sans-serif;
+      min-height: 1.25rem;
+    }
+  </style>
+</head>
+<body>
+
+  <form id="rating-form">
+    <fieldset class="rating-fieldset">
+      <legend class="rating-legend">Rate your experience</legend>
+
+      <div class="rating-container">
+        <!--
+          Natural 1-5 Order for accessible keyboard nav.
+          Label precedes input to allow label:has(~ input:checked)
+        -->
+
+        <label for="star-1">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          <span class="sr-only">1 Star</span>
+        </label>
+        <input type="radio" id="star-1" name="experience" value="1" required>
+
+        <label for="star-2">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          <span class="sr-only">2 Stars</span>
+        </label>
+        <input type="radio" id="star-2" name="experience" value="2">
+
+        <label for="star-3">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          <span class="sr-only">3 Stars</span>
+        </label>
+        <input type="radio" id="star-3" name="experience" value="3">
+
+        <label for="star-4">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          <span class="sr-only">4 Stars</span>
+        </label>
+        <input type="radio" id="star-4" name="experience" value="4">
+
+        <label for="star-5">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          <span class="sr-only">5 Stars</span>
+        </label>
+        <input type="radio" id="star-5" name="experience" value="5">
+      </div>
+
+      <div class="rating-status" aria-live="polite" id="rating-announcer">
+        No rating selected
+      </div>
+    </fieldset>
+
+    <button type="submit" style="margin-top: 1rem;">Submit Review</button>
+  </form>
+
+  <script>
+    const form = document.getElementById('rating-form');
+    const announcer = document.getElementById('rating-announcer');
+
+    form.addEventListener('change', (e) => {
+      if (e.target.name === 'experience') {
+        const val = e.target.value;
+        announcer.textContent = `Selected ${val} out of 5 stars`;
+      }
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      if (!data.get('experience')) return;
+      alert('Thank you for your ' + data.get('experience') + ' star rating!');
+    });
+  </script>
+</body>
+</html>
