@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Overflow Breadcrumb Example</title>
+  <style>
+    :root {
+      --color-bg: #ffffff;
+      --color-text: #1a1a1a;
+      --color-link: #0066cc;
+      --color-separator: #94a3b8;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: var(--space-md);
+      background: #f8fafc;
+    }
+
+    /* Breadcrumb Container with Overflow */
+    .breadcrumb-container {
+      background: var(--color-bg);
+      padding: 0.75rem var(--space-md);
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+
+      /* Essential for horizontal scroll */
+      overflow-x: auto;
+      white-space: nowrap;
+
+      /* Hide scrollbar for cleaner look, but keep functionality */
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE/Edge */
+
+      /* Visual indicator of overflow (optional gradient mask) */
+      mask-image: linear-gradient(to right, black 90%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to right, black 90%, transparent 100%);
+    }
+
+    .breadcrumb-container::-webkit-scrollbar {
+      display: none; /* Chrome/Safari */
+    }
+
+    .breadcrumb-list {
+      display: inline-flex;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      align-items: center;
+    }
+
+    .breadcrumb-item {
+      display: flex;
+      align-items: center;
+      font-size: 0.875rem;
+    }
+
+    .breadcrumb-link {
+      color: var(--color-link);
+      text-decoration: none;
+      padding: 0.5rem 0.25rem;
+      transition: color 0.2s;
+    }
+
+    .breadcrumb-link:hover {
+      color: #004499;
+      text-decoration: underline;
+    }
+
+    .breadcrumb-separator {
+      color: var(--color-separator);
+      margin: 0 0.25rem;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    .breadcrumb-current {
+      color: var(--color-text);
+      font-weight: 500;
+      padding: 0.5rem 0.25rem;
+    }
+
+    /* Ensure touch targets are large enough */
+    @media (max-width: 640px) {
+      .breadcrumb-item {
+        font-size: 1rem; /* Larger text on mobile */
+      }
+      .breadcrumb-link, .breadcrumb-current {
+        padding: 0.75rem 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="breadcrumb-container" aria-label="Breadcrumb">
+    <ol class="breadcrumb-list">
+      <li class="breadcrumb-item">
+        <a href="/" class="breadcrumb-link">Documentation</a>
+        <span class="breadcrumb-separator" aria-hidden="true">/</span>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="/docs/api" class="breadcrumb-link">API Reference</a>
+        <span class="breadcrumb-separator" aria-hidden="true">/</span>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="/docs/api/endpoints" class="breadcrumb-link">Endpoints</a>
+        <span class="breadcrumb-separator" aria-hidden="true">/</span>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="/docs/api/endpoints/users" class="breadcrumb-link">User Management</a>
+        <span class="breadcrumb-separator" aria-hidden="true">/</span>
+      </li>
+      <li class="breadcrumb-item">
+        <span class="breadcrumb-current" aria-current="page">Get User by ID</span>
+      </li>
+    </ol>
+  </nav>
+
+  <main style="margin-top: 2rem;">
+    <h1>Get User by ID</h1>
+    <p>Retrieve detailed information about a specific user account.</p>
+    <div style="height: 100vh; background: #eee; border: 2px dashed #ccc; display: flex; align-items: center; justify-content: center;">
+      Content Area (Scroll to see breadcrumb stay sticky if implemented)
+    </div>
+  </main>
+
+</body>
+</html>

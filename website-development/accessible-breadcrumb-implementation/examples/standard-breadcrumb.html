@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Standard Accessible Breadcrumb Example</title>
+  <style>
+    :root {
+      --color-text: #1a1a1a;
+      --color-link: #0056b3;
+      --color-separator: #666;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: var(--space-md);
+      line-height: 1.5;
+    }
+
+    /* Breadcrumb Styles */
+    .breadcrumb-nav {
+      margin-bottom: var(--space-md);
+    }
+
+    .breadcrumb-list {
+      display: flex;
+      flex-wrap: wrap;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .breadcrumb-item {
+      display: flex;
+      align-items: center;
+    }
+
+    .breadcrumb-item:not(:last-child)::after {
+      content: "/";
+      margin: 0 var(--space-sm);
+      color: var(--color-separator);
+      /* Hide from screen readers if not using aria-hidden on a DOM element */
+      speak: none;
+    }
+
+    /* If we use a real character in HTML, we must aria-hide it.
+       In this example, we use CSS content which is ignored by many SRs,
+       but for best coverage, putting it in HTML is often safer. */
+
+    .breadcrumb-link {
+      color: var(--color-link);
+      text-decoration: none;
+      padding: 4px; /* Improve touch target */
+    }
+
+    .breadcrumb-link:hover,
+    .breadcrumb-link:focus {
+      text-decoration: underline;
+      outline: 2px solid var(--color-link);
+      outline-offset: 2px;
+    }
+
+    .breadcrumb-current {
+      color: var(--color-text);
+      font-weight: 600;
+      padding: 4px;
+    }
+
+    [aria-current="page"] {
+      text-decoration: none;
+    }
+
+    /* Screen reader only utility */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Project Management</h1>
+  </header>
+
+  <!--
+    ACCESSIBILITY FEATURES:
+    1. <nav> landmark identifies the section.
+    2. aria-label="Breadcrumb" distinguishes it from other navs.
+    3. <ol> communicates sequence and total steps.
+    4. Current page is NOT a link.
+    5. aria-current="page" identifies the active location.
+    6. Separators are purely visual (CSS-based here).
+  -->
+  <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+    <ol class="breadcrumb-list">
+      <li class="breadcrumb-item">
+        <a href="/" class="breadcrumb-link">Home</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="/projects" class="breadcrumb-link">Projects</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="/projects/marketing" class="breadcrumb-link">Marketing Campaign</a>
+      </li>
+      <li class="breadcrumb-item">
+        <span class="breadcrumb-current" aria-current="page">Tasks</span>
+      </li>
+    </ol>
+  </nav>
+
+  <main id="main-content">
+    <h2>Marketing Campaign Tasks</h2>
+    <p>This page lists all active tasks for the Q4 Marketing Campaign.</p>
+  </main>
+
+</body>
+</html>
