@@ -1,0 +1,22 @@
+<!--
+  Accessible Breadcrumb Boilerplate
+  Usage: Replace labels and hrefs with your dynamic data.
+-->
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <ol class="breadcrumb__list">
+    <li class="breadcrumb__item">
+      <a href="/" class="breadcrumb__link">Home</a>
+      <span class="breadcrumb__separator" aria-hidden="true">/</span>
+    </li>
+
+    <!-- Repeat for intermediate levels -->
+    <li class="breadcrumb__item">
+      <a href="/parent" class="breadcrumb__link">Parent Page</a>
+      <span class="breadcrumb__separator" aria-hidden="true">/</span>
+    </li>
+
+    <li class="breadcrumb__item">
+      <span class="breadcrumb__current" aria-current="page">Current Page</span>
+    </li>
+  </ol>
+</nav>

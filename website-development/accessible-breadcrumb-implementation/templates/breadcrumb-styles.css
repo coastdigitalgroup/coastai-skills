@@ -1,0 +1,71 @@
+/*
+  Base Styles for Accessible Breadcrumbs
+*/
+
+.breadcrumb {
+  --breadcrumb-gap: 0.5rem;
+  --breadcrumb-color-link: #0066cc;
+  --breadcrumb-color-current: #1a1a1a;
+  --breadcrumb-color-separator: #64748b;
+
+  font-size: 0.875rem;
+}
+
+.breadcrumb__list {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.breadcrumb__item {
+  display: flex;
+  align-items: center;
+}
+
+.breadcrumb__link {
+  color: var(--breadcrumb-color-link);
+  text-decoration: none;
+  padding: 0.25rem;
+}
+
+.breadcrumb__link:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb__link:focus {
+  outline: 2px solid var(--breadcrumb-color-link);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.breadcrumb__separator {
+  margin: 0 var(--breadcrumb-gap);
+  color: var(--breadcrumb-color-separator);
+  user-select: none;
+}
+
+.breadcrumb__current {
+  color: var(--breadcrumb-color-current);
+  font-weight: 500;
+  padding: 0.25rem;
+}
+
+/* Mobile: Horizontal Scrolling Pattern */
+@media (max-width: 480px) {
+  .breadcrumb {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    padding-bottom: 0.5rem; /* Space for scrollbar if visible */
+  }
+
+  .breadcrumb__list {
+    flex-wrap: nowrap;
+  }
+
+  .breadcrumb__item {
+    flex-shrink: 0;
+  }
+}
