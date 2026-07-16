@@ -1,0 +1,106 @@
+/* Scroll-Driven View Reveal Template */
+
+/* 1. Base Reveal Utility */
+.view-reveal-item {
+  --reveal-duration: 0.5s;
+  --reveal-delay: 0.1s;
+
+  /* Initial hidden state */
+  opacity: 0;
+  transform: translateY(2rem) scale(0.95);
+
+  /* Use with view-timeline */
+  animation: view-fade-reveal linear both;
+  animation-timeline: view();
+
+  /* Start when bottom of element hits 10% of viewport */
+  /* End when top of element hits 60% of viewport */
+  animation-range: entry 10% entry 60%;
+}
+
+@keyframes view-fade-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(2rem) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 2. Scroll-Linked Shadow/Shrink Header */
+.sticky-header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  padding: 1.5rem 0;
+  background: white;
+  z-index: 1000;
+  box-shadow: 0 0 0 transparent;
+
+  /* Use a named scroll timeline to detect scroll position */
+  animation: shrink-header linear both;
+  animation-timeline: scroll(root);
+
+  /* Transition occurs as soon as user scrolls past the top (0-100px) */
+  animation-range: 0 100px;
+}
+
+@keyframes shrink-header {
+  from {
+    padding: 1.5rem 0;
+    box-shadow: 0 0 0 transparent;
+  }
+  to {
+    padding: 0.75rem 0;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  }
+}
+
+/* 3. Parallax Image Wrapper */
+.parallax-container {
+  overflow: hidden;
+  position: relative;
+  aspect-ratio: 16/9;
+}
+
+.parallax-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 120%; /* Extra height for travel */
+  object-fit: cover;
+
+  /* Linked to viewport passage */
+  animation: parallax-travel linear both;
+  animation-timeline: view();
+  animation-range: cover 0% cover 100%;
+}
+
+@keyframes parallax-travel {
+  from { transform: translateY(-10%); }
+  to { transform: translateY(10%); }
+}
+
+/* 4. Motion Sensitivity Support */
+@media (prefers-reduced-motion: reduce) {
+  .view-reveal-item {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+
+  .parallax-img {
+    height: 100%;
+    transform: none;
+    animation: none;
+  }
+
+  .sticky-header {
+    animation: none;
+    padding: 1rem 0;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  }
+}
