@@ -1,0 +1,20 @@
+/*
+  Scroll-Timeline Boilerplate
+  Link an animation to the scroll position of a container.
+*/
+
+.scroll-container {
+  overflow-y: scroll;
+  scroll-timeline-name: --main-timeline;
+  scroll-timeline-axis: block; /* block = vertical, inline = horizontal */
+}
+
+.animated-element {
+  /* Keyframes must be defined elsewhere */
+  animation-name: my-animation;
+  animation-timeline: --main-timeline;
+
+  /* Duration is technically ignored but good for fallback */
+  animation-duration: 1ms;
+  animation-timing-function: linear;
+}

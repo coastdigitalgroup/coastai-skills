@@ -1,0 +1,24 @@
+/*
+  View-Timeline Boilerplate
+  Link an animation to the visibility of an element in the viewport.
+*/
+
+.trigger-element {
+  view-timeline-name: --item-timeline;
+  view-timeline-axis: block;
+}
+
+.target-element {
+  animation-name: reveal-effect;
+  animation-timeline: --item-timeline;
+
+  /*
+    Common Ranges:
+    cover: From entry 0% to exit 100% (Default)
+    entry: From entry 0% to entry 100%
+    exit:  From exit 0% to exit 100%
+  */
+  animation-range: entry 0% cover 50%;
+
+  animation-fill-mode: both;
+}
