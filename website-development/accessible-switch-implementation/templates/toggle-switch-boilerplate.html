@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accessible Toggle Switch Boilerplate</title>
+  <style>
+    /*
+     * ACCESSIBLE TOGGLE SWITCH CUSTOM PROPERTIES
+     */
+    :root {
+      --switch-width: 46px;
+      --switch-height: 24px;
+      --switch-padding: 3px;
+      --thumb-size: 18px;
+      --color-inactive: #64748b;
+      --color-active: #0d9488;
+      --color-focus: #3b82f6;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      color: #1e293b;
+      background-color: #f8fafc;
+      padding: 2rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: #475569;
+      font-size: 0.875rem;
+      margin-bottom: 2rem;
+    }
+
+    .panel {
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      margin-bottom: 1.5rem;
+    }
+
+    h2 {
+      font-size: 1.125rem;
+      margin-top: 0;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 0.5rem;
+    }
+
+    .form-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+    }
+
+    .form-row:not(:last-child) {
+      border-bottom: 1px solid #f8fafc;
+    }
+
+    .label-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      padding-right: 1rem;
+    }
+
+    .switch-title {
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .switch-description {
+      font-size: 0.75rem;
+      color: #64748b;
+    }
+
+    /*
+     * APPROACH 1: BUTTON-BASED SWITCH (role="switch")
+     */
+    .switch-button {
+      all: unset; /* Clear native button styles safely */
+      box-sizing: border-box;
+      width: var(--switch-width);
+      height: var(--switch-height);
+      background-color: var(--color-inactive);
+      border: 2px solid transparent;
+      border-radius: 9999px;
+      position: relative;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+      /* Enforce 44px minimum touch target height */
+      min-height: var(--switch-height);
+    }
+
+    /* Invisible helper to expand clickable area without affecting layout size */
+    .switch-button::after {
+      content: '';
+      position: absolute;
+      top: -10px;
+      bottom: -10px;
+      left: -10px;
+      right: -10px;
+    }
+
+    .switch-button .thumb {
+      display: block;
+      width: var(--thumb-size);
+      height: var(--thumb-size);
+      background-color: #ffffff;
+      border-radius: 50%;
+      position: absolute;
+      left: var(--switch-padding);
+      transition: left 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Active switch button */
+    .switch-button[aria-checked="true"] {
+      background-color: var(--color-active);
+    }
+
+    .switch-button[aria-checked="true"] .thumb {
+      left: calc(var(--switch-width) - var(--thumb-size) - var(--switch-padding) - 4px); /* Compensate borders */
+    }
+
+    /* Focus visible rings */
+    .switch-button:focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 4px;
+    }
+
+    /*
+     * APPROACH 2: INPUT CHECKBOX-BASED SWITCH (role="switch")
+     */
+    .switch-wrapper {
+      position: relative;
+      display: inline-block;
+      width: var(--switch-width);
+      height: var(--switch-height);
+    }
+
+    /* Hide checkbox but keep tab-focusable and reachable */
+    .switch-checkbox {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .switch-track {
+      box-sizing: border-box;
+      display: block;
+      width: 100%;
+      height: 100%;
+      background-color: var(--color-inactive);
+      border-radius: 9999px;
+      position: relative;
+      transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .switch-track .thumb {
+      display: block;
+      width: var(--thumb-size);
+      height: var(--thumb-size);
+      background-color: #ffffff;
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: var(--switch-padding);
+      transform: translateY(-50%);
+      transition: left 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Active state for checkbox input */
+    .switch-checkbox:checked + .switch-track {
+      background-color: var(--color-active);
+    }
+
+    .switch-checkbox:checked + .switch-track .thumb {
+      left: calc(var(--switch-width) - var(--thumb-size) - var(--switch-padding));
+    }
+
+    /* High Visibility Focus Ring */
+    .switch-checkbox:focus-visible + .switch-track {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 4px;
+    }
+
+    /* Expand tap area for the checkbox wrap */
+    .switch-wrapper::after {
+      content: '';
+      position: absolute;
+      top: -10px;
+      bottom: -10px;
+      left: -10px;
+      right: -10px;
+      z-index: 1; /* Keeps clickable input reachable */
+    }
+
+    /*
+     * SYSTEM CONTRAST MODE (FORCED COLORS fallback)
+     */
+    @media (forced-colors: active) {
+      .switch-button, .switch-track {
+        border: 2px solid ButtonText;
+      }
+      .switch-button[aria-checked="true"] .thumb,
+      .switch-checkbox:checked + .switch-track .thumb {
+        background-color: SelectedText;
+      }
+    }
+
+    /* Live Feed logs */
+    .log-box {
+      background-color: #0f172a;
+      color: #38bdf8;
+      font-family: monospace;
+      padding: 1rem;
+      border-radius: 6px;
+      font-size: 0.825rem;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Accessible Switch Patterns</h1>
+  <p class="subtitle">Complete, production-ready boilerplates using correct semantic elements, screen-reader markup, and focus states.</p>
+
+  <!-- PANEL 1: BUTTON APPROACH (RECOMMENDED FOR JS SETTINGS) -->
+  <section class="panel">
+    <h2>Approach 1: Button-Based Switch (JavaScript APIs)</h2>
+    <p style="font-size: 0.85rem; color: #475569; margin-bottom: 1rem;">
+      Ideal for setting changes that take effect immediately (e.g. settings panels, dynamic preferences). Relies on `role="switch"` and `aria-checked`.
+    </p>
+
+    <div class="form-row">
+      <div class="label-container">
+        <span id="label-wifi" class="switch-title">Wi-Fi Connection</span>
+        <span class="switch-description">Enable or disable local wireless networking</span>
+      </div>
+
+      <!-- Interactive Button Switch -->
+      <button type="button"
+              role="switch"
+              id="switch-wifi"
+              aria-checked="false"
+              aria-labelledby="label-wifi"
+              class="switch-button">
+        <span class="thumb"></span>
+      </button>
+    </div>
+
+    <div class="form-row">
+      <div class="label-container">
+        <span id="label-bluetooth" class="switch-title">Bluetooth Network</span>
+        <span class="switch-description">Allow system connections to peripheral devices</span>
+      </div>
+
+      <!-- Start off activated as an example -->
+      <button type="button"
+              role="switch"
+              id="switch-bluetooth"
+              aria-checked="true"
+              aria-labelledby="label-bluetooth"
+              class="switch-button">
+        <span class="thumb"></span>
+      </button>
+    </div>
+  </section>
+
+  <!-- PANEL 2: INPUT CHECKBOX APPROACH (RECOMMENDED FOR FORMS) -->
+  <section class="panel">
+    <h2>Approach 2: Checkbox-Based Switch (Native Forms)</h2>
+    <p style="font-size: 0.85rem; color: #475569; margin-bottom: 1rem;">
+      Ideal when participating in native HTML form submissions (`multipart/form-data` or `x-www-form-urlencoded`). Uses standard inputs with `role="switch"`.
+    </p>
+
+    <form id="preferences-form">
+      <div class="form-row">
+        <div class="label-container">
+          <label for="form-analytics" class="switch-title">Analytics Cookies</label>
+          <span class="switch-description">Allow anonymous usage statistics tracking</span>
+        </div>
+
+        <div class="switch-wrapper">
+          <input type="checkbox"
+                 role="switch"
+                 id="form-analytics"
+                 name="analytics"
+                 class="switch-checkbox">
+          <span class="switch-track" aria-hidden="true">
+            <span class="thumb"></span>
+          </span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="label-container">
+          <label for="form-marketing" class="switch-title">Personalized Offers</label>
+          <span class="switch-description">Receive customized email promotional campaigns</span>
+        </div>
+
+        <div class="switch-wrapper">
+          <input type="checkbox"
+                 role="switch"
+                 id="form-marketing"
+                 name="marketing"
+                 checked
+                 class="switch-checkbox">
+          <span class="switch-track" aria-hidden="true">
+            <span class="thumb"></span>
+          </span>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <!-- Live Feed Logger -->
+  <h3>Interaction Event Logger</h3>
+  <div class="log-box" id="event-logger">Waiting for user interactions...</div>
+
+  <script>
+    const logger = document.getElementById('event-logger');
+
+    function logEvent(message) {
+      const timestamp = new Date().toLocaleTimeString();
+      logger.innerHTML = `[${timestamp}] ${message}<br>` + logger.innerHTML;
+    }
+
+    // --- SCRIPTING FOR APPROACH 1 (BUTTONS) ---
+    const buttons = document.querySelectorAll('button[role="switch"]');
+
+    buttons.forEach(button => {
+      // Buttons natively activate on click for mouse, Space, and Enter keys
+      button.addEventListener('click', () => {
+        const isChecked = button.getAttribute('aria-checked') === 'true';
+        const nextState = !isChecked;
+
+        button.setAttribute('aria-checked', String(nextState));
+
+        const labelText = document.getElementById(button.getAttribute('aria-labelledby')).textContent;
+        logEvent(`Button-Switch changed: "${labelText}" is now <b>${nextState ? 'ON' : 'OFF'}</b>`);
+      });
+    });
+
+    // --- SCRIPTING FOR APPROACH 2 (CHECKBOX IN FORMS) ---
+    const checkboxes = document.querySelectorAll('.switch-checkbox');
+
+    checkboxes.forEach(checkbox => {
+      // Checkboxes natively toggle on mouse click and keyboard Space.
+      checkbox.addEventListener('change', () => {
+        const isChecked = checkbox.checked;
+        const labelText = document.querySelector(`label[for="${checkbox.id}"]`).textContent;
+        logEvent(`Form-Checkbox-Switch changed: "${labelText}" is now <b>${isChecked ? 'ON' : 'OFF'}</b>`);
+      });
+
+      // KEYBOARD GOTCHA: Native inputs of type checkbox do NOT trigger change events on the 'Enter' key.
+      // We manually implement 'Enter' behavior to align checkbox switches with standard native button expectations.
+      checkbox.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          checkbox.click(); // Standard click handles toggle and fires change correctly
+        }
+      });
+    });
+  </script>
+</body>
+</html>
