@@ -5,6 +5,10 @@ All notable changes to this project will be documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `meeting-scheduling-optimization` skill to `website-growth` category, improving calendar booking rates and show-up rates.
+
 ## [0.2.0] — 2026-07-05
 
 ### Added
