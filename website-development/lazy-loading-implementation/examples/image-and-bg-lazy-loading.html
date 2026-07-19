@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lazy Loading Implementation Example</title>
+  <style>
+    /* Global Styles */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      background-color: #f9fafb;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      background-color: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 0 10px 0;
+      font-size: 2.5rem;
+      color: #111827;
+    }
+
+    .subtitle {
+      color: #4b5563;
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Layout Spacing to force scroll */
+    .section-spacer {
+      padding: 100px 0;
+      border-bottom: 1px dashed #d1d5db;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      color: #1f2937;
+      margin-bottom: 24px;
+    }
+
+    /* -------------------------------------------------------------
+       1. LAYOUT STABILITY & PLACEHOLDER STYLING
+       We set background-color and aspect-ratio to prevent CLS.
+       ------------------------------------------------------------- */
+    .media-wrapper {
+      position: relative;
+      background-color: #e5e7eb; /* Light gray visual placeholder */
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Modern ratio control */
+    .ratio-16-9 {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16 / 9;
+    }
+
+    /* -------------------------------------------------------------
+       2. SMOOTH TRANSITION (FADE-IN ON LOAD)
+       Prevent harsh visual pop when the network finishes prefetching.
+       ------------------------------------------------------------- */
+    .lazy-img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0; /* Hidden initially */
+      transition: opacity 0.4s ease-in-out;
+    }
+
+    /* Triggered via JS image load event or custom observer class */
+    .lazy-img.loaded {
+      opacity: 1;
+    }
+
+    /* -------------------------------------------------------------
+       3. CUSTOM INTERSECTION OBSERVER FOR BACKGROUND IMAGES
+       ------------------------------------------------------------- */
+    .lazy-bg {
+      width: 100%;
+      height: 350px;
+      border-radius: 8px;
+      background-color: #e5e7eb;
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+      transition: background-image 0.5s ease-in-out, background-color 0.5s;
+    }
+
+    .lazy-bg.bg-loaded {
+      background-color: transparent;
+    }
+
+    .bg-content {
+      text-align: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 8px;
+      backdrop-filter: blur(4px);
+    }
+
+    /* -------------------------------------------------------------
+       4. ACCESSIBLE IFRAME FACADE / LAZY LOAD
+       ------------------------------------------------------------- */
+    .iframe-wrapper {
+      background-color: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .iframe-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      border-radius: 8px;
+    }
+
+    /* -------------------------------------------------------------
+       5. JAVASCRIPT-DISABLED FALLBACK (<noscript>)
+       Ensure images display correctly when JS is blocked or inactive.
+       ------------------------------------------------------------- */
+    /* Hide custom lazy-loaded images when javascript is off to let noscript take over */
+    .no-js .js-lazy {
+      display: none !important;
+    }
+
+    .no-js-warning {
+      display: none;
+      background-color: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      color: #b45309;
+      padding: 12px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+
+    .no-js .no-js-warning {
+      display: block;
+    }
+  </style>
+  <script>
+    // Set a class on the document element to style based on JS support
+    document.documentElement.classList.remove('no-js');
+  </script>
+  <!-- Fallback class if script is completely blocked -->
+  <noscript>
+    <style>
+      .js-lazy { display: none !important; }
+      .lazy-img { opacity: 1 !important; }
+    </style>
+  </noscript>
+</head>
+<body class="no-js">
+  <!-- Body class is overriden immediately if JavaScript executes -->
+  <script>document.body.className = '';</script>
+
+  <header>
+    <h1>Asset Progressive Preloading</h1>
+    <p class="subtitle">A master example showing native loading="lazy", custom background-image preloading, dynamic iframe triggers, and non-JS fallback strategies.</p>
+  </header>
+
+  <main class="container">
+    <div class="no-js-warning">
+      <strong>Notice:</strong> JavaScript is currently disabled in your browser. Below-the-fold assets are rendering using semantic <code>&lt;noscript&gt;</code> fallbacks.
+    </div>
+
+    <!-- ABOVE THE FOLD SECTION (CRITICAL) -->
+    <!-- DO NOT lazy-load above-the-fold media. This avoids LCP regressions. -->
+    <section class="section-spacer" style="padding-top: 40px;">
+      <h2 class="section-title">1. Above-the-Fold (Critical LCP Image)</h2>
+      <p>This image is part of the initial render. We explicitly avoid lazy loading to preserve the Largest Contentful Paint (LCP) speed. Instead, we use high priority fetching and asynchronous decoding.</p>
+
+      <div class="media-wrapper ratio-16-9">
+        <!-- CRITICAL LCP IMAGE (Eager load) -->
+        <img
+          src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
+          width="800"
+          height="450"
+          decoding="async"
+          fetchpriority="high"
+          alt="High priority above-the-fold landscape, rendering immediately without delay"
+          class="lazy-img loaded"
+        />
+      </div>
+    </section>
+
+    <!-- NATIVE INLINE LAZY LOADING -->
+    <section class="section-spacer">
+      <h2 class="section-title">2. Native Inline Lazy Loading (Below-the-Fold)</h2>
+      <p>Using the native <code>loading="lazy"</code> attribute. Notice we also assign exact dimensions (width/height) and CSS <code>aspect-ratio</code> to ensure the layout remains visually stable before the image completes downloading, preventing Cumulative Layout Shift (CLS).</p>
+
+      <div class="media-wrapper ratio-16-9">
+        <img
+          src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=800&q=80"
+          width="800"
+          height="450"
+          loading="lazy"
+          decoding="async"
+          alt="A misty mountain peak, loaded lazily as you scroll"
+          class="lazy-img js-native-lazy"
+          onload="this.classList.add('loaded')"
+        />
+      </div>
+    </section>
+
+    <!-- CUSTOM INTERSECTION OBSERVER FOR CSS BACKGROUND IMAGES -->
+    <section class="section-spacer">
+      <h2 class="section-title">3. Custom Scroll-to-Load Background Image</h2>
+      <p>Standard CSS background images defined in external stylesheets download immediately even if the element is buried deep below the fold. Here, we intercept this behavior by storing the URL inside a data attribute and binding a single <code>IntersectionObserver</code>.</p>
+
+      <div class="lazy-bg js-lazy-bg" data-bg="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=800&q=80">
+        <div class="bg-content">
+          <h3>Forest Wilderness</h3>
+          <p>This beautiful background image loads only when this block enters the 300px trigger boundary.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACCESSIBLE IFRAME/WIDGET LAZY LOADING -->
+    <section class="section-spacer">
+      <h2 class="section-title">4. Iframe / Dynamic Video Widget Lazy-Loading</h2>
+      <p>Heavy widgets (like interactive maps, video players, or ad slots) can degrade page responsiveness. We wrap them in a stable aspect-ratio container and trigger loading natively, or falling back to a script trigger.</p>
+
+      <div class="media-wrapper ratio-16-9 iframe-wrapper">
+        <!-- Native Iframe lazy loading is highly performant -->
+        <iframe
+          title="Responsive Embedded Video Player"
+          src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </section>
+
+    <!-- JAVASCRIPT-DISABLED FALLBACK (NOSCRIPT) -->
+    <section class="section-spacer">
+      <h2 class="section-title">5. Progressive Lazy Loading with &lt;noscript&gt; Fallback</h2>
+      <p>This image demonstrates custom script-driven lazy-loading with a perfect noscript wrapper. If JavaScript is disabled, the layout stylesheet hides the empty JS placeholder element, showing the direct noscript rendering cleanly to keep crawlers and JS-blocked browsers fully functional.</p>
+
+      <div class="media-wrapper ratio-16-9">
+        <!-- Placeholder image loaded first -->
+        <img
+          src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9' fill='%23e5e7eb'></svg>"
+          data-src="https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=800&q=80"
+          width="800"
+          height="450"
+          alt="Lush green forest floor"
+          class="lazy-img js-lazy"
+        />
+        <!-- Full-resolution fallback for non-JS context -->
+        <noscript>
+          <img
+            src="https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=800&q=80"
+            width="800"
+            height="450"
+            alt="Lush green forest floor (Non-JS rendering)"
+            class="lazy-img loaded"
+          />
+        </noscript>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    /* -------------------------------------------------------------
+       CUSTOM LAZY LOADING ENGINE
+       A highly optimized script demonstrating IntersectionObserver best practices
+       ------------------------------------------------------------- */
+    document.addEventListener("DOMContentLoaded", () => {
+
+      // 1. Double check native lazy load loading state for compatibility
+      // In some older engines, the onload event might fire immediately.
+      const nativeImages = document.querySelectorAll('.js-native-lazy');
+      nativeImages.forEach(img => {
+        if (img.complete) {
+          img.classList.add('loaded');
+        }
+      });
+
+      // 2. Custom IntersectionObserver for non-standard elements (backgrounds, dynamic images)
+      if ('IntersectionObserver' in window) {
+
+        // Setup observer with a 300px threshold on vertical scroll
+        const lazyObserver = new IntersectionObserver((entries, observer) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const element = entry.target;
+
+              // Handle background-image swap
+              if (element.classList.contains('js-lazy-bg')) {
+                const bgUrl = element.getAttribute('data-bg');
+                if (bgUrl) {
+                  // Preload image in memory first to prevent layout flash during fetch
+                  const imgLoader = new Image();
+                  imgLoader.src = bgUrl;
+                  imgLoader.onload = () => {
+                    element.style.backgroundImage = `url('${bgUrl}')`;
+                    element.classList.add('bg-loaded');
+                  };
+                }
+              }
+
+              // Handle standard image custom data-src swap
+              if (element.classList.contains('js-lazy')) {
+                const targetSrc = element.getAttribute('data-src');
+                if (targetSrc) {
+                  element.src = targetSrc;
+                  element.onload = () => {
+                    element.classList.add('loaded');
+                  };
+                }
+              }
+
+              // Stop tracking the element once it has been processed
+              observer.unobserve(element);
+            }
+          });
+        }, {
+          rootMargin: '0px 0px 300px 0px', // Trigger download 300px before appearing
+          threshold: 0.01
+        });
+
+        // Register custom background elements
+        document.querySelectorAll('.js-lazy-bg').forEach(bg => {
+          lazyObserver.observe(bg);
+        });
+
+        // Register custom non-JS fallback elements
+        document.querySelectorAll('.js-lazy').forEach(img => {
+          lazyObserver.observe(img);
+        });
+
+      } else {
+        // Fallback for extremely legacy browsers that do not support IntersectionObserver
+        // Fetch all assets eagerly as a graceful safety measure
+        document.querySelectorAll('.js-lazy-bg').forEach(bg => {
+          const url = bg.getAttribute('data-bg');
+          if (url) bg.style.backgroundImage = `url('${url}')`;
+        });
+
+        document.querySelectorAll('.js-lazy').forEach(img => {
+          const src = img.getAttribute('data-src');
+          if (src) {
+            img.src = src;
+            img.classList.add('loaded');
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
