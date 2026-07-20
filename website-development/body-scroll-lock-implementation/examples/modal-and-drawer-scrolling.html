@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Body Scroll Lock Demonstration (Desktop vs iOS Safari)</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg-dark: #0f172a;
+      --text-dark: #f8fafc;
+      --border-color: #cbd5e1;
+      --bg-light: #f1f5f9;
+      --bg-card: #ffffff;
+      --text-main: #334155;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--text-main);
+      background-color: var(--bg-light);
+      margin: 0;
+      padding: 0;
+      /* modern scrollbar layout shift prevention */
+      scrollbar-gutter: stable;
+    }
+
+    /* Long content to force scrolling on the background page */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    header {
+      border-bottom: 2px solid var(--border-color);
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+    }
+
+    .card {
+      background-color: var(--bg-card);
+      border-radius: 8px;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .btn {
+      display: inline-block;
+      background-color: var(--primary);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .btn:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background-color: #64748b;
+    }
+
+    .btn-secondary:hover {
+      background-color: #475569;
+    }
+
+    /* Bad/Standard scroll lock class (only works on desktop) */
+    .is-standard-locked {
+      overflow: hidden;
+    }
+
+    /* Robust scroll lock classes */
+    .is-robust-locked {
+      overflow: hidden;
+      /* Combined with JS touchmove listener cancellation */
+    }
+
+    /* Styles for the Modal Overlays */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(15, 23, 42, 0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      padding: 1rem;
+    }
+
+    .overlay.is-active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+      overflow: hidden; /* children will control scroll */
+    }
+
+    .modal-header {
+      padding: 1.25rem;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 1.25rem;
+      color: #0f172a;
+    }
+
+    .modal-body {
+      padding: 1.25rem;
+      overflow-y: auto;
+      flex: 1;
+      /* Enable inertia scrolling on iOS Safari */
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .modal-footer {
+      padding: 1.25rem;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+    }
+
+    /* Helper styles for scrollable terms section */
+    .terms-box {
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 1rem;
+      background-color: #f8fafc;
+      height: 150px;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: bold;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+
+    .badge-bad {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge-good {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+
+    code {
+      background-color: #f1f5f9;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Body Scroll Lock Demonstration</h1>
+      <p>This interactive demonstration compares a <strong>Standard Desktop Scroll Lock</strong> against a <strong>Robust Cross-Platform (iOS Safari-safe) Scroll Lock</strong>.</p>
+    </header>
+
+    <div class="card">
+      <span class="badge badge-bad">Standard Lock (Fails on iOS)</span>
+      <h2>Implementation A: Standard <code>overflow: hidden</code></h2>
+      <p>This implementation sets <code>overflow: hidden</code> on the <code>&lt;body&gt;</code> element when the modal is active.</p>
+      <p><strong>The iOS Bug:</strong> If you open this modal on an iPhone/iPad or inside a mobile responsive emulator with touch simulation, tapping the background backdrop or swiping on the modal header will still cause the underlying page content to scroll up and down. This results in the background shifting and breaking layout continuity.</p>
+      <button class="btn btn-secondary" id="open-standard-btn">Open Standard Modal</button>
+    </div>
+
+    <div class="card">
+      <span class="badge badge-good">Robust Lock (Works on iOS)</span>
+      <h2>Implementation B: Core iOS Touch Interception</h2>
+      <p>This implementation applies <code>overflow: hidden</code> on desktop, but activates a <code>touchmove</code> event coordinator for iOS touch users.</p>
+      <p><strong>The iOS Solution:</strong> It catches <code>touchmove</code> events on the document and prevents them, except inside marked container elements. Inside these scrollable elements, it measures finger movement (direction) to block scrolls at the extreme boundaries (fully scrolled up or down), preventing the scroll from leaking to the background <code>&lt;body&gt;</code>.</p>
+      <button class="btn" id="open-robust-btn">Open Robust Modal</button>
+    </div>
+
+    <!-- Long text filler to make background page scrollable -->
+    <div class="card">
+      <h3>Background Filler Content (To Enable Page Scrolling)</h3>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur sed nisl eget diam viverra sodales pretium non magna. Pellentesque molestie eros lectus, vitae molestie elit condimentum sed. In elementum diam ut eleifend tempor. Mauris et odio augue. In pretium rhoncus est vitae tristique. Vivamus cursus justo magna, ut scelerisque elit auctor scelerisque. Fusce vitae lectus id erat lacinia commodo sit amet sed sem. Curabitur placerat lectus nunc, id condimentum ligula tincidunt et. Nam vitae porta leo.</p>
+      <p>Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam porttitor purus vitae dictum laoreet. Phasellus sodales interdum leo, eget tincidunt eros tempus vitae. Fusce cursus nisl at lorem porta pretium. Morbi vel diam non mi scelerisque pretium sed in libero. Sed dictum ex at facilisis aliquam. Aliquam efficitur est felis, eu hendrerit nunc vulputate in. Pellentesque hendrerit felis eu magna aliquet convallis. Cras volutpat purus ut est euismod lacinia. Curabitur tempor turpis nec libero finibus lacinia. Duis nec massa non quam facilisis tempor.</p>
+      <p>Aenean condimentum nunc nec ipsum sollicitudin sollicitudin. Curabitur id pulvinar nibh, vitae accumsan metus. Vestibulum ut dolor feugiat, scelerisque sem a, rhoncus ex. Cras feugiat sem lectus, eu efficitur quam efficitur non. Praesent nisl turpis, pulvinar sit amet varius finibus, pellentesque eget leo. Cras sed eros in velit pellentesque dictum. Ut nec dui pellentesque, pulvinar ipsum eu, auctor diam. Nullam ac tellus sed turpis hendrerit interdum porta interdum sem. Sed sed iaculis erat, eleifend tempus magna. Nunc nisl ex, porttitor non efficitur hendrerit, placerat at dolor. Morbi dictum tortor a nibh porta luctus. Praesent quis elementum turpis, vitae eleifend leo. Cras imperdiet pretium nisl.</p>
+    </div>
+  </div>
+
+  <!-- Standard Modal Overlay -->
+  <div class="overlay" id="standard-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-labelledby="standard-title">
+      <div class="modal-header">
+        <h3 class="modal-title" id="standard-title">Standard Modal</h3>
+        <button class="close-btn" id="close-standard-btn" style="border: none; background: transparent; font-size: 1.5rem; cursor: pointer;">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>This modal only uses <code>overflow: hidden</code> on the body element. Try scrolling on this text area on an iOS device. If it's too short, notice that dragging on the title or backdrop still drags the background page behind it.</p>
+        <div class="terms-box">
+          <h4>Scrollable Content Box</h4>
+          <p>This is a nested scrollable box. Scroll to the top or bottom of this box on an iOS device. Once you hit the boundary, further dragging will leak the gesture to the body, causing the host page underneath to scroll!</p>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras porta, sapien at facilisis convallis, odio magna pulvinar leo, non lobortis est ex ut lorem. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Pellentesque ut molestie mi, id molestie nulla. Fusce vestibulum leo ut eleifend porttitor. Ut eu nulla elit.</p>
+        </div>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras elementum eros id enim tempus elementum.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="close-standard-footer-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Robust Modal Overlay -->
+  <div class="overlay" id="robust-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-labelledby="robust-title">
+      <div class="modal-header">
+        <h3 class="modal-title" id="robust-title">Robust iOS-Safe Modal</h3>
+        <button class="close-btn" id="close-robust-btn-x" style="border: none; background: transparent; font-size: 1.5rem; cursor: pointer;">&times;</button>
+      </div>
+      <div class="modal-body" id="robust-scrollable-body">
+        <p>This modal is fully locked using a touch-intercepting coordinate tracking system on iOS Safari.</p>
+        <div class="terms-box" id="robust-scrollable-terms">
+          <h4>Scrollable Content Box</h4>
+          <p>Scroll me to the top or bottom. Notice that even if you drag up/down repeatedly, the elastic bounce doesn't escape this modal. The host page under the dark backdrop is completely frozen and motionless!</p>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras porta, sapien at facilisis convallis, odio magna pulvinar leo, non lobortis est ex ut lorem. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Pellentesque ut molestie mi, id molestie nulla. Fusce vestibulum leo ut eleifend porttitor. Ut eu nulla elit.</p>
+        </div>
+        <p>Swipe on this paragraph or on the title above. You will see that touch gestures are safely captured and do not leak.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="close-robust-footer-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- State & DOM Selection ---
+    const standardOverlay = document.getElementById('standard-overlay');
+    const robustOverlay = document.getElementById('robust-overlay');
+
+    // Standard buttons
+    document.getElementById('open-standard-btn').addEventListener('click', () => {
+      document.body.classList.add('is-standard-locked');
+      standardOverlay.classList.add('is-active');
+      standardOverlay.setAttribute('aria-hidden', 'false');
+    });
+
+    const closeStandard = () => {
+      document.body.classList.remove('is-standard-locked');
+      standardOverlay.classList.remove('is-active');
+      standardOverlay.setAttribute('aria-hidden', 'true');
+    };
+    document.getElementById('close-standard-btn').addEventListener('click', closeStandard);
+    document.getElementById('close-standard-footer-btn').addEventListener('click', closeStandard);
+
+
+    // --- Robust Implementation ---
+
+    // Touch positions tracker
+    let touchStartY = 0;
+
+    // Detect if we are on iOS
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+    // List of scrollable containers inside the active overlay
+    let allowedScrollContainers = [];
+
+    // Master touchmove interceptor function
+    function touchMoveHandler(e) {
+      // 1. If we are touching an element that is NOT inside an allowed scroll container, block the scroll completely.
+      let isScrollableTarget = false;
+      let target = e.target;
+
+      while (target && target !== document) {
+        if (allowedScrollContainers.includes(target)) {
+          isScrollableTarget = true;
+          break;
+        }
+        target = target.parentNode;
+      }
+
+      if (!isScrollableTarget) {
+        // Not touching a scrollable element (e.g. touching header, footer, or dark backdrop) -> Lock background scroll.
+        if (e.cancelable) e.preventDefault();
+        return;
+      }
+
+      // 2. We are touching a scrollable container. We must calculate scroll direction to prevent elastic leaking.
+      const currentY = e.touches[0].clientY;
+      const deltaY = currentY - touchStartY;
+
+      const element = target; // target has been resolved to the scrollable container
+      const scrollTop = element.scrollTop;
+      const scrollHeight = element.scrollHeight;
+      const clientHeight = element.clientHeight;
+
+      // Scrolling Downwards (User pulls down, trying to see content above - element scrolls up)
+      if (deltaY > 0 && scrollTop <= 0) {
+        if (e.cancelable) e.preventDefault();
+      }
+      // Scrolling Upwards (User pulls up, trying to see content below - element scrolls down)
+      else if (deltaY < 0 && (scrollTop + clientHeight >= scrollHeight)) {
+        if (e.cancelable) e.preventDefault();
+      }
+    }
+
+    function touchStartHandler(e) {
+      touchStartY = e.touches[0].clientY;
+    }
+
+    function lockBodyScroll(overlayElement, scrollableSelectors = []) {
+      // Baseline locking for desktop
+      document.body.classList.add('is-robust-locked');
+
+      // iOS Safari specific setup
+      if (isIOS) {
+        // Collect references to any elements inside the modal that are allowed to scroll
+        allowedScrollContainers = scrollableSelectors.map(sel => document.querySelector(sel)).filter(Boolean);
+
+        // Bind touchstart and touchmove to document.
+        // passive: false is REQUIRED so preventDefault() can be successfully called.
+        document.addEventListener('touchstart', touchStartHandler, { passive: true });
+        document.addEventListener('touchmove', touchMoveHandler, { passive: false });
+      }
+    }
+
+    function unlockBodyScroll() {
+      // Unlock baseline desktop
+      document.body.classList.remove('is-robust-locked');
+
+      // Unbind iOS Touch listeners
+      if (isIOS) {
+        document.removeEventListener('touchstart', touchStartHandler);
+        document.removeEventListener('touchmove', touchMoveHandler);
+        allowedScrollContainers = [];
+      }
+    }
+
+    // Bind robust UI controls
+    document.getElementById('open-robust-btn').addEventListener('click', () => {
+      robustOverlay.classList.add('is-active');
+      robustOverlay.setAttribute('aria-hidden', 'false');
+
+      // Lock body scroll and mark our scrollable sections inside the robust modal
+      lockBodyScroll(robustOverlay, ['#robust-scrollable-body', '#robust-scrollable-terms']);
+    });
+
+    const closeRobust = () => {
+      unlockBodyScroll();
+      robustOverlay.classList.remove('is-active');
+      robustOverlay.setAttribute('aria-hidden', 'true');
+    };
+    document.getElementById('close-robust-btn-x').addEventListener('click', closeRobust);
+    document.getElementById('close-robust-footer-btn').addEventListener('click', closeRobust);
+
+  </script>
+</body>
+</html>
