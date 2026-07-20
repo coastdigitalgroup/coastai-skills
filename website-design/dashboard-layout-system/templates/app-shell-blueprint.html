@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard App Shell Blueprint</title>
+  <style>
+    /* ==========================================================================
+       DASHBOARD APPSHELL RESET & SYSTEM TOKENS
+       ========================================================================== */
+    :root {
+      /* Colors */
+      --color-bg-sidebar: #0f172a;
+      --color-text-sidebar: #94a3b8;
+      --color-text-sidebar-active: #ffffff;
+      --color-bg-sidebar-active: #1e293b;
+      --color-bg-canvas: #f8fafc;
+      --color-bg-card: #ffffff;
+      --color-border: #e2e8f0;
+      --color-primary: #2563eb;
+      --color-primary-focus: rgba(37, 99, 235, 0.2);
+
+      /* Typography & Spacing */
+      --font-system: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+
+      /* Animation */
+      --transition-speed: 0.2s;
+      --transition-curve: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Prevent browser dynamic chrome rubber-banding & lock viewport */
+    html, body {
+      height: 100%;
+      height: 100dvh;
+      width: 100%;
+      overflow: hidden;
+      font-family: var(--font-system);
+      background-color: var(--color-bg-canvas);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ==========================================================================
+       THE OUTER GRID LAYOUT MODEL (Tier 1)
+       ========================================================================== */
+    .app-shell {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      width: 100vw;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      transition: grid-template-columns var(--transition-speed) var(--transition-curve);
+    }
+
+    /* Sidebar collapsed "Rail" mode (Desktop toggled or Tablet range) */
+    .app-shell.sidebar-collapsed {
+      grid-template-columns: 72px 1fr;
+    }
+
+    /* ==========================================================================
+       PANE COMPONENT 1: GLOBAL NAVIGATION SIDEBAR
+       ========================================================================== */
+    .app-sidebar {
+      background-color: var(--color-bg-sidebar);
+      border-right: 1px solid #1e293b;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden; /* Prevent sidebar itself from scrollbars */
+      color: var(--color-text-sidebar);
+    }
+
+    /* Sidebar Header Area */
+    .sidebar-header {
+      height: 64px;
+      padding: 0 var(--space-lg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #1e293b;
+      flex-shrink: 0;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-weight: 700;
+      font-size: 1.125rem;
+      color: var(--color-text-sidebar-active);
+      text-decoration: none;
+    }
+
+    /* Navigation Menu Area (Isolated Scroll Container) */
+    .sidebar-menu {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: var(--space-md) var(--space-sm);
+      list-style: none;
+    }
+
+    .menu-item {
+      margin-bottom: var(--space-xs);
+    }
+
+    .menu-link {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-sm) var(--space-md);
+      color: var(--color-text-sidebar);
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: background-color var(--transition-speed) var(--transition-curve),
+                  color var(--transition-speed) var(--transition-curve);
+      outline: none;
+    }
+
+    /* Accessible Focus Ring */
+    .menu-link:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: -2px;
+    }
+
+    .menu-link:hover {
+      background-color: var(--color-bg-sidebar-active);
+      color: var(--color-text-sidebar-active);
+    }
+
+    .menu-link.active {
+      background-color: var(--color-primary);
+      color: var(--color-text-sidebar-active);
+    }
+
+    /* Profile Footer Area */
+    .sidebar-footer {
+      padding: var(--space-md);
+      border-top: 1px solid #1e293b;
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      flex-shrink: 0;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--color-bg-sidebar-active);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: var(--color-text-sidebar-active);
+    }
+
+    /* Hide text elements smoothly when sidebar is collapsed to Rail mode */
+    .app-shell.sidebar-collapsed .sidebar-hide-text {
+      display: none;
+    }
+
+    /* ==========================================================================
+       THE MAIN WORKSPACE GRID & HEADER (Tier 2)
+       ========================================================================== */
+    .app-workspace {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden; /* Scroll belongs strictly to inner main content */
+    }
+
+    /* Fixed Workspace Header */
+    .app-header {
+      height: 64px;
+      background-color: var(--color-bg-card);
+      border-bottom: 1px solid var(--color-border);
+      padding: 0 var(--space-lg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    /* Custom Toggles/Buttons with compliant touch targets */
+    .btn-action {
+      height: 40px;
+      padding: 0 var(--space-md);
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      outline: none;
+      font-size: 0.875rem;
+    }
+
+    .btn-action:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+
+    .btn-action:hover {
+      background-color: var(--color-bg-canvas);
+    }
+
+    /* ==========================================================================
+       PANE COMPONENT 2: THE SCROLLING CONTENT WORKSPACE & PROPERTIES PANE
+       ========================================================================== */
+    .app-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden; /* Isolate outer canvas scroll */
+    }
+
+    /* Center Content Container */
+    .app-content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: var(--space-lg);
+      -webkit-overflow-scrolling: touch; /* Inertia scrolling on iOS */
+    }
+
+    /* Collapsible Right Properties Panel */
+    .properties-panel {
+      width: 320px;
+      background-color: var(--color-bg-card);
+      border-left: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+      transition: transform var(--transition-speed) var(--transition-curve),
+                  width var(--transition-speed) var(--transition-curve);
+    }
+
+    /* Collapsed State (Hardware-accelerated sliding transform) */
+    .properties-panel.collapsed {
+      width: 0;
+      transform: translateX(100%);
+      border-left: none;
+    }
+
+    .panel-header {
+      height: 56px;
+      padding: 0 var(--space-md);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .panel-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-md);
+    }
+
+    /* ==========================================================================
+       LAYOUT ELEMENTS GRID FOR WORKSPACE
+       ========================================================================== */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-lg);
+      margin-bottom: var(--space-lg);
+    }
+
+    .dashboard-card {
+      background-color: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: var(--space-lg);
+      min-height: 140px;
+    }
+
+    /* ==========================================================================
+       RESPONSIVE ADAPTATIONS & BREKPOINTS
+       ========================================================================== */
+    @media (max-width: 1024px) {
+      /* Force properties drawer to overlay sheet on tablet screens */
+      .properties-panel {
+        position: absolute;
+        right: 0;
+        top: 64px;
+        height: calc(100% - 64px);
+        z-index: 30;
+        box-shadow: -4px 0 15px rgba(0, 0, 0, 0.05);
+      }
+    }
+
+    @media (max-width: 768px) {
+      /* Pivot Sidebar to mobile drawer off-canvas */
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .app-sidebar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 280px;
+        z-index: 50;
+        transform: translateX(-100%);
+        transition: transform var(--transition-speed) var(--transition-curve);
+      }
+
+      .app-shell.mobile-sidebar-open .app-sidebar {
+        transform: translateX(0);
+      }
+
+      /* Background Dim Backdrop */
+      .backdrop {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        z-index: 40;
+        display: none;
+      }
+
+      .app-shell.mobile-sidebar-open .backdrop {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Backdrop for mobile sidebar drawer overlay -->
+  <div class="backdrop" id="mobileBackdrop" onclick="toggleMobileSidebar()"></div>
+
+  <!-- The App Shell Grid -->
+  <div class="app-shell" id="appShell">
+
+    <!-- PANE 1: GLOBAL NAVIGATION SIDEBAR LANDMARK -->
+    <nav class="app-sidebar" aria-label="Main Navigation" id="appSidebar">
+
+      <!-- Brand Header -->
+      <div class="sidebar-header">
+        <a href="#" class="brand-logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>
+          <span class="sidebar-hide-text">CoastAI</span>
+        </a>
+      </div>
+
+      <!-- Scrollable Sidebar Menu Items -->
+      <ul class="sidebar-menu">
+        <li class="menu-item">
+          <a href="#" class="menu-link active" aria-current="page">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+            <span class="sidebar-hide-text">Workspace</span>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+            <span class="sidebar-hide-text">Analytics</span>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span class="sidebar-hide-text">Security Logs</span>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            <span class="sidebar-hide-text">System Settings</span>
+          </a>
+        </li>
+      </ul>
+
+      <!-- Sticky Sidebar Profile Footer -->
+      <div class="sidebar-footer">
+        <div class="user-avatar" aria-hidden="true">JD</div>
+        <div class="sidebar-hide-text" style="font-size: 0.875rem; font-weight: 600; color: var(--color-text-sidebar-active);">
+          John Doe
+        </div>
+      </div>
+    </nav>
+
+    <!-- THE WORKSPACE DIVISION -->
+    <div class="app-workspace">
+
+      <!-- PANE 2: FIXED HEADER LANDMARK -->
+      <header class="app-header">
+
+        <!-- Left Breadcrumbs / Toggle Controls -->
+        <div style="display: flex; align-items: center; gap: var(--space-md);">
+          <!-- Collapse Trigger (Compliant touch target & aria annotations) -->
+          <button class="btn-action" onclick="toggleSidebar()" aria-label="Toggle Navigation Sidebar" id="sidebarTrigger">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" x1="21" y1="6" y2="6"/><line x1="3" x1="21" y1="12" y2="12"/><line x1="3" x1="21" y1="18" y2="18"/></svg>
+          </button>
+
+          <span style="font-weight: 600; font-size: 1.125rem;">Analytics Dashboard</span>
+        </div>
+
+        <!-- Right Header Utility Actions -->
+        <div class="header-actions">
+          <button class="btn-action" onclick="toggleProperties()" aria-label="Toggle Context Sidebar" aria-expanded="true" id="propertiesTrigger">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            <span class="sidebar-hide-text">Details</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- PANE 3: APPBODY CONTAINER -->
+      <div class="app-body">
+
+        <!-- CENTER CONTENT WORKSPACE LANDMARK -->
+        <main class="app-content" id="mainContent">
+
+          <!-- Dashboard Content Cards Grid -->
+          <section class="dashboard-grid" aria-label="Key Performance Indicators">
+            <div class="dashboard-card">
+              <h3 style="font-size: 0.875rem; color: #64748b; margin-bottom: var(--space-sm);">Active Sessions</h3>
+              <p style="font-size: 1.875rem; font-weight: 700; color: #0f172a;">2,841</p>
+            </div>
+            <div class="dashboard-card">
+              <h3 style="font-size: 0.875rem; color: #64748b; margin-bottom: var(--space-sm);">Conversion Rate</h3>
+              <p style="font-size: 1.875rem; font-weight: 700; color: #0f172a;">3.24%</p>
+            </div>
+            <div class="dashboard-card">
+              <h3 style="font-size: 0.875rem; color: #64748b; margin-bottom: var(--space-sm);">Hourly Requests</h3>
+              <p style="font-size: 1.875rem; font-weight: 700; color: #0f172a;">12,904</p>
+            </div>
+          </section>
+
+          <!-- Core Data Visualizer Area -->
+          <div class="dashboard-card" style="min-height: 320px; display: flex; align-items: center; justify-content: center; border-style: dashed; margin-bottom: var(--space-lg);">
+            <div style="text-align: center; color: #64748b;">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: var(--space-md); opacity: 0.7;"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
+              <p style="font-weight: 600;">Main Analytics Data Visualization Canvas</p>
+              <p style="font-size: 0.875rem;">Independent scrolling content pane keeps this region fluidly resizeable.</p>
+            </div>
+          </div>
+
+        </main>
+
+        <!-- PANE 4: CONTEXT PROPERTIES PANEL LANDMARK -->
+        <aside class="properties-panel" aria-label="Properties and Context Details" id="propertiesPanel">
+          <div class="panel-header">
+            <h2 style="font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Context Details</h2>
+            <button class="btn-action" style="height: 32px; padding: 0 var(--space-sm);" onclick="toggleProperties()" aria-label="Close Properties Panel">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="panel-body">
+            <div style="margin-bottom: var(--space-lg);">
+              <h4 style="font-size: 0.75rem; color: #64748b; margin-bottom: var(--space-xs);">LOG ORIGIN</h4>
+              <p style="font-weight: 600; font-size: 0.875rem;">us-east-primary-elastic</p>
+            </div>
+            <div style="margin-bottom: var(--space-lg);">
+              <h4 style="font-size: 0.75rem; color: #64748b; margin-bottom: var(--space-xs);">IP RESOLUTION</h4>
+              <p style="font-weight: 600; font-size: 0.875rem;">192.168.1.1</p>
+            </div>
+            <div>
+              <h4 style="font-size: 0.75rem; color: #64748b; margin-bottom: var(--space-xs);">RESPONSE CODE</h4>
+              <span style="display: inline-flex; align-items: center; padding: 2px 8px; background-color: #dcfce7; color: #15803d; border-radius: 9999px; font-weight: 600; font-size: 0.75rem;">200 OK</span>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Javascript for state manipulation & focus management -->
+  <script>
+    const appShell = document.getElementById('appShell');
+    const propertiesPanel = document.getElementById('propertiesPanel');
+    const propertiesTrigger = document.getElementById('propertiesTrigger');
+
+    /**
+     * Toggles Left Sidebar collapsing rail layout on Desktop,
+     * or slides drawer in on mobile devices.
+     */
+    function toggleSidebar() {
+      if (window.innerWidth <= 768) {
+        toggleMobileSidebar();
+      } else {
+        appShell.classList.toggle('sidebar-collapsed');
+      }
+    }
+
+    /**
+     * Handles mobile off-canvas nav drawer activation
+     * and toggles backdrop dim masks.
+     */
+    function toggleMobileSidebar() {
+      appShell.classList.toggle('mobile-sidebar-open');
+    }
+
+    /**
+     * Collapses or Expands Right-Hand contextual details sidebar
+     * updating appropriate ARIA states on trigger buttons.
+     */
+    function toggleProperties() {
+      const isCurrentlyCollapsed = propertiesPanel.classList.toggle('collapsed');
+      propertiesTrigger.setAttribute('aria-expanded', !isCurrentlyCollapsed);
+    }
+  </script>
+</body>
+</html>
