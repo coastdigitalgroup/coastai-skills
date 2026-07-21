@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accessible Master-Detail Settings Blueprint</title>
+  <style>
+    /* Design Tokens */
+    :root {
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+      /* Colors */
+      --color-bg-base: #f8fafc;
+      --color-bg-surface: #ffffff;
+      --color-border: #e2e8f0;
+
+      --color-text-primary: #0f172a;
+      --color-text-secondary: #475569;
+      --color-text-muted: #64748b;
+
+      --color-primary-base: #2563eb;
+      --color-primary-hover: #1d4ed8;
+      --color-primary-light: #eff6ff;
+
+      --color-error-base: #dc2626;
+      --color-error-hover: #b91c1c;
+      --color-error-light: #fef2f2;
+      --color-error-text: #991b1b;
+
+      --color-success-base: #16a34a;
+      --color-success-light: #f0fdf4;
+      --color-success-text: #166534;
+
+      /* Spacing & Layout */
+      --space-xs: 0.25rem;
+      --space-s: 0.5rem;
+      --space-m: 1rem;
+      --space-l: 1.5rem;
+      --space-xl: 2rem;
+      --radius-s: 0.375rem;
+      --radius-m: 0.5rem;
+      --radius-l: 0.75rem;
+
+      --shadow-s: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-m: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-l: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+      /* Transitions */
+      --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Reset & Base Styles */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--color-bg-base);
+      color: var(--color-text-primary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      padding-bottom: 80px; /* Space for sticky unsaved changes banner */
+    }
+
+    /* Layout Containers */
+    .settings-container {
+      max-width: 1200px;
+      margin: var(--space-xl) auto;
+      padding: 0 var(--space-m);
+    }
+
+    .settings-header {
+      margin-bottom: var(--space-xl);
+    }
+
+    .settings-title {
+      font-size: clamp(1.5rem, 3vw, 2.25rem);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: var(--color-text-primary);
+    }
+
+    .settings-subtitle {
+      font-size: 1rem;
+      color: var(--color-text-secondary);
+      margin-top: var(--space-xs);
+    }
+
+    /* Split Pane Layout (Master-Detail) */
+    .settings-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: var(--space-xl);
+      align-items: start;
+    }
+
+    @media (max-width: 768px) {
+      .settings-layout {
+        grid-template-columns: 1fr;
+        gap: var(--space-l);
+      }
+    }
+
+    /* Master Sidebar Navigation */
+    .settings-sidebar {
+      background-color: var(--color-bg-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-l);
+      padding: var(--space-m);
+      box-shadow: var(--shadow-s);
+    }
+
+    .sidebar-group {
+      margin-bottom: var(--space-l);
+    }
+
+    .sidebar-group-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-s);
+      padding-left: var(--space-s);
+    }
+
+    .sidebar-menu {
+      list-style: none;
+    }
+
+    .sidebar-menu-item {
+      margin-bottom: var(--space-xs);
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      padding: var(--space-s) var(--space-m);
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      border-radius: var(--radius-m);
+      transition: var(--transition-fast);
+      position: relative;
+    }
+
+    .sidebar-link:hover {
+      background-color: var(--color-bg-base);
+      color: var(--color-text-primary);
+    }
+
+    .sidebar-link:focus-visible {
+      outline: 2px solid var(--color-primary-base);
+      outline-offset: -2px;
+    }
+
+    .sidebar-link.is-active {
+      background-color: var(--color-primary-light);
+      color: var(--color-primary-base);
+      font-weight: 600;
+    }
+
+    .sidebar-link.is-active::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: var(--space-s);
+      bottom: var(--space-s);
+      width: 4px;
+      background-color: var(--color-primary-base);
+      border-radius: 0 var(--radius-s) var(--radius-s) 0;
+    }
+
+    /* Detail Content Area */
+    .settings-content-pane {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-l);
+    }
+
+    /* Settings Card Component */
+    .settings-card {
+      background-color: var(--color-bg-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-l);
+      padding: var(--space-xl);
+      box-shadow: var(--shadow-s);
+    }
+
+    .card-header {
+      margin-bottom: var(--space-l);
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: var(--space-m);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .card-description {
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+      margin-top: var(--space-xs);
+    }
+
+    /* Forms & Form Fields */
+    .fieldset-reset {
+      border: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-l);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--space-m);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-s);
+    }
+
+    .form-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .form-input {
+      font-family: var(--font-sans);
+      font-size: 0.9375rem;
+      padding: var(--space-s) var(--space-m);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-m);
+      background-color: var(--color-bg-surface);
+      color: var(--color-text-primary);
+      transition: var(--transition-fast);
+      width: 100%;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--color-primary-base);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .form-helper {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+    }
+
+    /* Auto-Save Toggle Interface Row */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-m) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .toggle-row:last-of-type {
+      border-bottom: none;
+    }
+
+    .toggle-info {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      max-width: 80%;
+    }
+
+    .toggle-title {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .toggle-description {
+      font-size: 0.8125rem;
+      color: var(--color-text-secondary);
+    }
+
+    /* Custom Toggle Switch (WCAG 44x44px target) */
+    .switch-wrapper {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 44px; /* Enlarged touch target zone */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .switch-input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .switch-slider {
+      position: absolute;
+      cursor: pointer;
+      width: 40px;
+      height: 24px;
+      background-color: var(--color-border);
+      border-radius: 24px;
+      transition: var(--transition-fast);
+    }
+
+    .switch-slider::before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      border-radius: 50%;
+      transition: var(--transition-fast);
+      box-shadow: var(--shadow-s);
+    }
+
+    .switch-input:checked + .switch-slider {
+      background-color: var(--color-success-base);
+    }
+
+    .switch-input:focus-visible + .switch-slider {
+      outline: 2px solid var(--color-primary-base);
+      outline-offset: 4px;
+    }
+
+    .switch-input:checked + .switch-slider::before {
+      transform: translateX(16px);
+    }
+
+    /* Live Saving Status Loader */
+    .save-status-container {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      min-width: 80px;
+      height: 20px;
+    }
+
+    .spinner {
+      width: 12px;
+      height: 12px;
+      border: 2px solid var(--color-border);
+      border-top-color: var(--color-primary-base);
+      border-radius: 50%;
+      animation: spin 600ms linear infinite;
+      display: none;
+    }
+
+    .status-check {
+      color: var(--color-success-base);
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Danger Zone Styling */
+    .settings-card.is-danger {
+      border: 1px solid var(--color-error-base);
+      background-color: var(--color-error-light);
+    }
+
+    .settings-card.is-danger .card-title {
+      color: var(--color-error-text);
+    }
+
+    .settings-card.is-danger .card-description {
+      color: var(--color-error-text);
+      opacity: 0.9;
+    }
+
+    .settings-card.is-danger .card-header {
+      border-bottom: 1px solid rgba(220, 38, 38, 0.15);
+    }
+
+    .btn-danger {
+      font-family: var(--font-sans);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-bg-surface);
+      background-color: var(--color-error-base);
+      border: none;
+      border-radius: var(--radius-m);
+      padding: var(--space-s) var(--space-m);
+      cursor: pointer;
+      transition: var(--transition-fast);
+      box-shadow: var(--shadow-s);
+    }
+
+    .btn-danger:hover {
+      background-color: var(--color-error-hover);
+    }
+
+    .btn-danger:focus-visible {
+      outline: 2px solid var(--color-error-base);
+      outline-offset: 2px;
+    }
+
+    /* Sticky Bottom Manual-Save Banner (Batch Save UX) */
+    .dirty-state-banner {
+      position: fixed;
+      bottom: var(--space-m);
+      left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      width: calc(100% - 2 * var(--space-m));
+      max-width: 800px;
+      background-color: var(--color-text-primary);
+      color: var(--color-bg-surface);
+      padding: var(--space-m) var(--space-l);
+      border-radius: var(--radius-l);
+      box-shadow: var(--shadow-l);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+      opacity: 0;
+      transition: var(--transition-normal);
+    }
+
+    .dirty-state-banner.is-visible {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .banner-text {
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .banner-actions {
+      display: flex;
+      gap: var(--space-s);
+    }
+
+    .btn-text {
+      background: none;
+      border: none;
+      color: var(--color-bg-base);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      padding: var(--space-s) var(--space-m);
+      border-radius: var(--radius-m);
+      transition: var(--transition-fast);
+    }
+
+    .btn-text:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--color-bg-surface);
+    }
+
+    .btn-primary {
+      background-color: var(--color-primary-base);
+      color: white;
+      border: none;
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: var(--space-s) var(--space-l);
+      border-radius: var(--radius-m);
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--color-primary-hover);
+    }
+
+    .btn-primary:focus-visible, .btn-text:focus-visible {
+      outline: 2px solid white;
+      outline-offset: 2px;
+    }
+
+    /* Screen Reader Only Utility */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="settings-container">
+
+    <!-- Primary Page Header -->
+    <header class="settings-header">
+      <h1 class="settings-title">Workspace Settings</h1>
+      <p class="settings-subtitle">Manage your shared workspace team, integrations, billing preferences, and security thresholds.</p>
+    </header>
+
+    <!-- Master-Detail Navigation Grid -->
+    <div class="settings-layout">
+
+      <!-- MASTER Navigation Sidebar -->
+      <nav class="settings-sidebar" aria-label="Settings Categories">
+        <div class="sidebar-group">
+          <h2 class="sidebar-group-title">Account</h2>
+          <ul class="sidebar-menu">
+            <li class="sidebar-menu-item">
+              <a href="#profile" class="sidebar-link is-active" aria-current="page">Profile Details</a>
+            </li>
+            <li class="sidebar-menu-item">
+              <a href="#notifications" class="sidebar-link">Notifications</a>
+            </li>
+          </ul>
+        </div>
+        <div class="sidebar-group">
+          <h2 class="sidebar-group-title">Organization</h2>
+          <ul class="sidebar-menu">
+            <li class="sidebar-menu-item">
+              <a href="#members" class="sidebar-link">Team Members</a>
+            </li>
+            <li class="sidebar-menu-item">
+              <a href="#billing" class="sidebar-link">Billing & Billing Logs</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <!-- DETAIL Content Panel -->
+      <main class="settings-content-pane" id="main-content">
+
+        <!-- Section Card 1: Form-dependent Fields (Requires Batch Save) -->
+        <section class="settings-card" id="profile" aria-labelledby="card-profile-title">
+          <div class="card-header">
+            <h2 class="card-title" id="card-profile-title">Profile Details</h2>
+            <p class="card-description">Update your workspace public handles, naming structures, and contact endpoints.</p>
+          </div>
+
+          <form id="settings-batch-form">
+            <fieldset class="fieldset-reset">
+              <legend class="sr-only">Workspace Identity Fields</legend>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="workspace-name" class="form-label">Workspace Name</label>
+                  <input type="text" id="workspace-name" name="workspaceName" class="form-input" value="TaskForge Core" required>
+                  <p class="form-helper" id="name-helper">This is the visible handle shared across invitation cards and channels.</p>
+                </div>
+                <div class="form-group">
+                  <label for="workspace-email" class="form-label">Billing Notification Endpoint</label>
+                  <input type="email" id="workspace-email" name="workspaceEmail" class="form-input" value="admin@taskforge.io" required>
+                  <p class="form-helper" id="email-helper">The destination address where recurring payment receipts are delivered.</p>
+                </div>
+              </div>
+            </fieldset>
+          </form>
+        </section>
+
+        <!-- Section Card 2: Interactive Preferences (Auto-Saves Instantly) -->
+        <section class="settings-card" id="notifications" aria-labelledby="card-notify-title">
+          <div class="card-header">
+            <h2 class="card-title" id="card-notify-title">Delivery Channels</h2>
+            <p class="card-description">Set up instantaneous background syncing and delivery rules.</p>
+          </div>
+
+          <fieldset class="fieldset-reset">
+            <legend class="sr-only">System Notification Switches</legend>
+
+            <!-- Toggle Row 1 -->
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <h3 class="toggle-title" id="toggle-digest-label">Weekly Activity Summaries</h3>
+                <p class="toggle-description" id="toggle-digest-desc">Receive a unified dashboard performance breakdown every Monday morning.</p>
+              </div>
+              <div class="switch-wrapper">
+                <input type="checkbox" id="toggle-digest" class="switch-input" aria-labelledby="toggle-digest-label" aria-describedby="toggle-digest-desc" checked>
+                <span class="switch-slider"></span>
+              </div>
+            </div>
+
+            <!-- Toggle Row 2 -->
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <h3 class="toggle-title" id="toggle-members-label">Enable Guest Invitation Hooks</h3>
+                <p class="toggle-description" id="toggle-members-desc">Permit general project viewers to trigger workspace join links to external domains.</p>
+              </div>
+              <div class="switch-wrapper">
+                <input type="checkbox" id="toggle-members" class="switch-input" aria-labelledby="toggle-members-label" aria-describedby="toggle-members-desc">
+                <span class="switch-slider"></span>
+              </div>
+            </div>
+
+            <!-- Auto-save Live Status Feedback (Polite Screen Reader Announcements) -->
+            <div class="save-status-container" aria-live="polite" aria-atomic="true">
+              <div class="spinner" id="auto-save-spinner" aria-hidden="true"></div>
+              <span id="auto-save-status-text">Preferences saved</span>
+              <span class="status-check" id="auto-save-check" aria-hidden="true">&#10003;</span>
+            </div>
+          </fieldset>
+        </section>
+
+        <!-- Section Card 3: The Danger Zone (Isolated, Visual Block) -->
+        <section class="settings-card is-danger" id="danger" aria-labelledby="card-danger-title">
+          <div class="card-header">
+            <h2 class="card-title" id="card-danger-title">Danger Zone</h2>
+            <p class="card-description">Irreversible configurations and workspace destruction capabilities.</p>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <h3 class="toggle-title" style="color: var(--color-error-text);" id="deactivate-label">Deactivate this Workspace</h3>
+              <p class="toggle-description" style="color: var(--color-error-text); opacity: 0.85;" id="deactivate-desc">
+                Permanently purge all active lists, comment archives, historical metrics, and active member invitations. This cannot be undone.
+              </p>
+            </div>
+            <button class="btn-danger" id="btn-trigger-deactivate" aria-describedby="deactivate-desc" aria-haspopup="dialog">
+              Deactivate Workspace...
+            </button>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Sticky Batch-Save Banner Overlay (Pushed when form inputs are touched) -->
+  <div class="dirty-state-banner" id="batch-save-banner" role="status" aria-hidden="true">
+    <div class="banner-text">
+      You have unsaved changes in your profile details.
+    </div>
+    <div class="banner-actions">
+      <button class="btn-text" id="btn-discard-changes">Discard</button>
+      <button class="btn-primary" id="btn-save-changes">Save Changes</button>
+    </div>
+  </div>
+
+  <!-- Interactive State Demonstration Scripts -->
+  <script>
+    const form = document.getElementById('settings-batch-form');
+    const formInputs = form.querySelectorAll('.form-input');
+    const saveBanner = document.getElementById('batch-save-banner');
+    const discardBtn = document.getElementById('btn-discard-changes');
+    const saveBtn = document.getElementById('btn-save-changes');
+
+    const autoSaveSwitches = document.querySelectorAll('.switch-input');
+    const autoSpinner = document.getElementById('auto-save-spinner');
+    const autoText = document.getElementById('auto-save-status-text');
+    const autoCheck = document.getElementById('auto-save-check');
+
+    // 1. Batch Save (Dirty State) Event Loop
+    let isFormDirty = false;
+    const originalValues = {};
+
+    formInputs.forEach(input => {
+      originalValues[input.id] = input.value;
+      input.addEventListener('input', checkFormDirty);
+    });
+
+    function checkFormDirty() {
+      let dirty = false;
+      formInputs.forEach(input => {
+        if (input.value !== originalValues[input.id]) {
+          dirty = true;
+        }
+      });
+
+      isFormDirty = dirty;
+      if (dirty) {
+        saveBanner.classList.add('is-visible');
+        saveBanner.setAttribute('aria-hidden', 'false');
+      } else {
+        saveBanner.classList.remove('is-visible');
+        saveBanner.setAttribute('aria-hidden', 'true');
+      }
+    }
+
+    discardBtn.addEventListener('click', () => {
+      formInputs.forEach(input => {
+        input.value = originalValues[input.id];
+      });
+      isFormDirty = false;
+      saveBanner.classList.remove('is-visible');
+      saveBanner.setAttribute('aria-hidden', 'true');
+    });
+
+    saveBtn.addEventListener('click', () => {
+      formInputs.forEach(input => {
+        originalValues[input.id] = input.value;
+      });
+      isFormDirty = false;
+      saveBanner.classList.remove('is-visible');
+      saveBanner.setAttribute('aria-hidden', 'true');
+      alert('Workspace profile updated successfully!');
+    });
+
+    // Block accidental navigation when form is dirty
+    window.addEventListener('beforeunload', (event) => {
+      if (isFormDirty) {
+        event.preventDefault();
+        event.returnValue = "You have unsaved workspace profile settings.";
+      }
+    });
+
+    // 2. Auto-Save Action Triggers
+    autoSaveSwitches.forEach(toggle => {
+      toggle.addEventListener('change', () => {
+        triggerAutoSave();
+      });
+    });
+
+    function triggerAutoSave() {
+      // Show saving spinner
+      autoText.textContent = "Saving preferences...";
+      autoSpinner.style.display = "block";
+      autoCheck.style.display = "none";
+
+      setTimeout(() => {
+        // Resolve save successfully
+        autoSpinner.style.display = "none";
+        autoCheck.style.display = "inline-block";
+        autoText.textContent = "Preferences saved";
+
+        // Clear checkmark after 1.5s
+        setTimeout(() => {
+          autoCheck.style.display = "none";
+        }, 1500);
+      }, 1000);
+    }
+
+    // 3. Simple navigation highlight
+    const sidebarLinks = document.querySelectorAll('.sidebar-link');
+    sidebarLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        sidebarLinks.forEach(l => {
+          l.classList.remove('is-active');
+          l.removeAttribute('aria-current');
+        });
+        link.classList.add('is-active');
+        link.setAttribute('aria-current', 'page');
+
+        const targetId = link.getAttribute('href');
+        document.querySelector(targetId).scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  </script>
+</body>
+</html>
