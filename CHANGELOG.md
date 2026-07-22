@@ -7,6 +7,7 @@ All notable changes to this project will be documented here. The format follows
 
 ### Added
 
+- `command-palette-system` skill to `website-design` category, defining a systematic framework for accessible, keyboard-first Cmd+K menus.
 - `meeting-scheduling-optimization` skill to `website-growth` category, improving calendar booking rates and show-up rates.
 
 ## [0.2.0] — 2026-07-05
