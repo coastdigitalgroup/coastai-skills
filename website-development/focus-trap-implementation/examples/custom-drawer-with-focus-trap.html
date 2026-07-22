@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Focus Trap Implementation Demo — Side Drawer Example</title>
+  <style>
+    :root {
+      --color-primary: #2563eb;
+      --color-primary-hover: #1d4ed8;
+      --color-bg: #f8fafc;
+      --color-card-bg: #ffffff;
+      --color-text: #1e293b;
+      --color-text-muted: #64748b;
+      --color-border: #e2e8f0;
+      --color-error: #ef4444;
+      --color-success: #22c55e;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.5;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 2rem;
+      border-bottom: 2px solid var(--color-border);
+      padding-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: var(--color-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: var(--color-text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .demo-card {
+      background: var(--color-card-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .demo-card h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    .badge.broken {
+      background-color: #fee2e2;
+      color: var(--color-error);
+    }
+
+    .badge.fixed {
+      background-color: #dcfce7;
+      color: var(--color-success);
+    }
+
+    button {
+      background-color: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.625rem 1.25rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: var(--color-primary-hover);
+    }
+
+    button:focus-visible, a:focus-visible, input:focus-visible {
+      outline: 3px solid #60a5fa;
+      outline-offset: 2px;
+    }
+
+    /* Side Drawer CSS */
+    .drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(15, 23, 42, 0.6);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .drawer-overlay.is-active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: -350px;
+      width: 100%;
+      max-width: 350px;
+      height: 100%;
+      background-color: white;
+      box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
+      z-index: 1001;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .drawer-overlay.is-active .drawer {
+      transform: translateX(-350px);
+    }
+
+    .drawer-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .drawer-header h3 {
+      font-size: 1.2rem;
+    }
+
+    .btn-close {
+      background: none;
+      color: var(--color-text-muted);
+      border: 1px solid var(--color-border);
+      padding: 0.25rem 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    .btn-close:hover {
+      background-color: var(--color-bg);
+      color: var(--color-text);
+    }
+
+    .drawer-body {
+      padding: 1.5rem;
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    .drawer-body form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+    }
+
+    input[type="text"], select {
+      padding: 0.5rem;
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    .drawer-footer {
+      padding: 1.5rem;
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .btn-secondary {
+      background-color: #e2e8f0;
+      color: var(--color-text);
+    }
+
+    .btn-secondary:hover {
+      background-color: #cbd5e1;
+    }
+
+    /* Instructional Alert Panel */
+    .info-panel {
+      background-color: #eff6ff;
+      border-left: 4px solid var(--color-primary);
+      padding: 1rem;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 2rem;
+    }
+
+    .info-panel h4 {
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+      color: var(--color-primary-hover);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container" id="main-content">
+    <header>
+      <h1>Keyboard Focus Trap Showcase</h1>
+      <p>Demonstrating the difference between a broken side-drawer (where focus leaks back to the page) and a WCAG-compliant side-drawer utilizing our custom focus trap.</p>
+    </header>
+
+    <div class="info-panel">
+      <h4>💡 Keyboard Navigation Instructions:</h4>
+      <p>Use the <strong>Tab</strong> key to navigate through elements on this page. Open each drawer below to test focus behavior:</p>
+      <ul>
+        <li><strong>In the Broken Drawer:</strong> Open the drawer, then press Tab continuously. Notice focus wanders completely out of the drawer and highlights links/buttons in the main page behind it.</li>
+        <li><strong>In the Focus-Trapped Drawer:</strong> Open the drawer. Notice focus is locked inside. Pressing Tab at the bottom loops focus back to the top. Pressing <strong>Escape</strong> or clicking the backdrop closes the drawer and restores focus perfectly to the opening button.</li>
+      </ul>
+    </div>
+
+    <div class="demo-grid">
+      <!-- Broken Example -->
+      <div class="demo-card">
+        <h2>
+          <span>Broken Side Drawer</span>
+          <span class="badge broken">NO FOCUS TRAP</span>
+        </h2>
+        <p>This drawer visually slides open, but keyboard focus remains unaware. Focus will bleed into the main background page.</p>
+        <button id="btn-open-broken">Open Broken Drawer</button>
+      </div>
+
+      <!-- Trapped Example -->
+      <div class="demo-card">
+        <h2>
+          <span>Accessible Side Drawer</span>
+          <span class="badge fixed">FOCUS TRAPPED</span>
+        </h2>
+        <p>This drawer uses our <code>FocusTrap</code> utility. It traps focus, handles Shift+Tab, closes on Escape, and restores focus.</p>
+        <button id="btn-open-trapped">Open Trapped Drawer</button>
+      </div>
+    </div>
+
+    <!-- Sibling link elements for focus testing -->
+    <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--color-border);">
+      <h3>Main Page Background Interactive Elements:</h3>
+      <p>These elements are physically located behind the drawers. Try to focus them while drawers are active.</p>
+      <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+        <a href="#" class="bg-link">Background Link A</a>
+        <a href="#" class="bg-link">Background Link B</a>
+        <input type="text" placeholder="Background Text Input" class="bg-input" style="padding: 0.5rem; border: 1px solid var(--color-border); border-radius: 4px;">
+      </div>
+    </div>
+  </div>
+
+  <!-- BROKEN DRAWER OVERLAY -->
+  <div class="drawer-overlay" id="overlay-broken">
+    <div class="drawer" id="drawer-broken">
+      <div class="drawer-header">
+        <h3>Broken Drawer (No Trap)</h3>
+        <button class="btn-close" id="btn-close-broken">Close</button>
+      </div>
+      <div class="drawer-body">
+        <p>Try pressing Tab inside this drawer. You'll notice focus leaves the drawer and moves through background elements.</p>
+        <form onsubmit="event.preventDefault();">
+          <div class="form-group">
+            <label for="broken-name">Full Name</label>
+            <input type="text" id="broken-name" placeholder="John Doe">
+          </div>
+          <div class="form-group">
+            <label for="broken-role">Preferred Role</label>
+            <select id="broken-role">
+              <option value="dev">Developer</option>
+              <option value="des">Designer</option>
+              <option value="pm">Product Manager</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="drawer-footer">
+        <button id="btn-submit-broken">Submit Form</button>
+        <button class="btn-secondary" id="btn-cancel-broken">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRAPPED DRAWER OVERLAY -->
+  <div class="drawer-overlay" id="overlay-trapped" aria-hidden="true">
+    <div class="drawer" id="drawer-trapped">
+      <div class="drawer-header">
+        <h3>Accessible Drawer (Trapped)</h3>
+        <button class="btn-close" id="btn-close-trapped" aria-label="Close Drawer">Close</button>
+      </div>
+      <div class="drawer-body">
+        <p>Your focus is locked inside this panel! Pressing Tab from the Cancel button wraps focus back to the Close button.</p>
+        <form onsubmit="event.preventDefault();">
+          <div class="form-group">
+            <label for="trapped-name">Full Name</label>
+            <input type="text" id="trapped-name" placeholder="Jane Doe">
+          </div>
+          <div class="form-group">
+            <label for="trapped-role">Preferred Role</label>
+            <select id="trapped-role">
+              <option value="dev">Developer</option>
+              <option value="des">Designer</option>
+              <option value="pm">Product Manager</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="drawer-footer">
+        <button id="btn-submit-trapped">Submit Form</button>
+        <button class="btn-secondary" id="btn-cancel-trapped">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- EMBEDDED FOCUS TRAP CLASS (from templates/focus-trap-utility.js) ---
+    class FocusTrap {
+      static FOCUSABLE_SELECTOR = [
+        'a[href]',
+        'area[href]',
+        'input:not([disabled]):not([type="hidden"])',
+        'select:not([disabled])',
+        'textarea:not([disabled])',
+        'button:not([disabled])',
+        'iframe',
+        'object',
+        'embed',
+        '[tabindex]:not([tabindex^="-"]):not([disabled])',
+        '[contenteditable]'
+      ].join(',');
+
+      constructor(container, options = {}) {
+        this.container = container;
+        this.options = {
+          closeOnEscape: true,
+          closeOnClickOutside: false,
+          initialFocus: null,
+          onDeactivate: null,
+          ...options
+        };
+        this.isActive = false;
+        this.previouslyFocusedElement = null;
+        this._handleKeyDown = this._handleKeyDown.bind(this);
+        this._handleClickOutside = this._handleClickOutside.bind(this);
+      }
+
+      getFocusableElements() {
+        const rawElements = Array.from(this.container.querySelectorAll(FocusTrap.FOCUSABLE_SELECTOR));
+        return rawElements.filter(el => {
+          const style = window.getComputedStyle(el);
+          if (style.display === 'none' || style.visibility === 'hidden') {
+            return false;
+          }
+          const hasDimensions = el.offsetWidth > 0 || el.offsetHeight > 0 || el.getClientRects().length > 0;
+          if (!hasDimensions && el.tagName !== 'SVG') {
+            return false;
+          }
+          let parent = el.parentElement;
+          while (parent && parent !== this.container) {
+            const parentStyle = window.getComputedStyle(parent);
+            if (parentStyle.display === 'none' || parentStyle.visibility === 'hidden' || parent.getAttribute('aria-hidden') === 'true') {
+              return false;
+            }
+            parent = parent.parentElement;
+          }
+          return true;
+        });
+      }
+
+      activate() {
+        if (this.isActive) return;
+        this.previouslyFocusedElement = document.activeElement;
+        this.isActive = true;
+        document.addEventListener('keydown', this._handleKeyDown, true);
+        if (this.options.closeOnClickOutside) {
+          document.addEventListener('mousedown', this._handleClickOutside, true);
+        }
+        this.focusInitialElement();
+      }
+
+      deactivate() {
+        if (!this.isActive) return;
+        this.isActive = false;
+        document.removeEventListener('keydown', this._handleKeyDown, true);
+        document.removeEventListener('mousedown', this._handleClickOutside, true);
+        if (typeof this.options.onDeactivate === 'function') {
+          this.options.onDeactivate();
+        }
+        if (this.previouslyFocusedElement && typeof this.previouslyFocusedElement.focus === 'function') {
+          this.previouslyFocusedElement.focus();
+        }
+        this.previouslyFocusedElement = null;
+      }
+
+      focusInitialElement() {
+        if (this.options.initialFocus && typeof this.options.initialFocus.focus === 'function') {
+          this.options.initialFocus.focus();
+          return;
+        }
+        const focusable = this.getFocusableElements();
+        if (focusable.length > 0) {
+          focusable[0].focus();
+        } else {
+          if (!this.container.hasAttribute('tabindex')) {
+            this.container.setAttribute('tabindex', '-1');
+          }
+          this.container.focus();
+        }
+      }
+
+      _handleKeyDown(event) {
+        if (!this.isActive) return;
+        if (this.options.closeOnEscape && event.key === 'Escape') {
+          event.preventDefault();
+          this.deactivate();
+          return;
+        }
+        if (event.key === 'Tab') {
+          const focusableElements = this.getFocusableElements();
+          if (focusableElements.length === 0) {
+            event.preventDefault();
+            return;
+          }
+          const firstElement = focusableElements[0];
+          const lastElement = focusableElements[focusableElements.length - 1];
+          const activeElement = document.activeElement;
+
+          if (focusableElements.length === 1) {
+            event.preventDefault();
+            if (activeElement !== firstElement) {
+              firstElement.focus();
+            }
+            return;
+          }
+
+          if (event.shiftKey) {
+            if (activeElement === firstElement || !this.container.contains(activeElement)) {
+              event.preventDefault();
+              lastElement.focus();
+            }
+          } else {
+            if (activeElement === lastElement || !this.container.contains(activeElement)) {
+              event.preventDefault();
+              firstElement.focus();
+            }
+          }
+        }
+      }
+
+      _handleClickOutside(event) {
+        if (!this.isActive) return;
+        if (!this.container.contains(event.target)) {
+          this.deactivate();
+        }
+      }
+    }
+
+    // --- INTERACTIVE PAGE CONTROLLER ---
+
+    // 1. Broken Drawer Logic
+    const overlayBroken = document.getElementById('overlay-broken');
+    const btnOpenBroken = document.getElementById('btn-open-broken');
+    const btnCloseBroken = document.getElementById('btn-close-broken');
+    const btnCancelBroken = document.getElementById('btn-cancel-broken');
+
+    function openBroken() {
+      overlayBroken.classList.add('is-active');
+    }
+
+    function closeBroken() {
+      overlayBroken.classList.remove('is-active');
+    }
+
+    btnOpenBroken.addEventListener('click', openBroken);
+    btnCloseBroken.addEventListener('click', closeBroken);
+    btnCancelBroken.addEventListener('click', closeBroken);
+
+    // 2. Trapped Drawer Logic
+    const overlayTrapped = document.getElementById('overlay-trapped');
+    const btnOpenTrapped = document.getElementById('btn-open-trapped');
+    const btnCloseTrapped = document.getElementById('btn-close-trapped');
+    const btnCancelTrapped = document.getElementById('btn-cancel-trapped');
+    const mainContent = document.getElementById('main-content');
+
+    // Initialize our FocusTrap on the target container
+    const drawerTrap = new FocusTrap(overlayTrapped, {
+      closeOnEscape: true,
+      closeOnClickOutside: true,
+      onDeactivate: () => {
+        // Callback to close the overlay visual state
+        overlayTrapped.classList.remove('is-active');
+        overlayTrapped.setAttribute('aria-hidden', 'true');
+        mainContent.removeAttribute('aria-hidden'); // Restore background access
+      }
+    });
+
+    function openTrapped() {
+      overlayTrapped.classList.add('is-active');
+      overlayTrapped.removeAttribute('aria-hidden');
+      mainContent.setAttribute('aria-hidden', 'true'); // Hide background from assistive tech
+
+      // Activate the trap!
+      drawerTrap.activate();
+    }
+
+    btnOpenTrapped.addEventListener('click', openTrapped);
+    btnCloseTrapped.addEventListener('click', () => drawerTrap.deactivate());
+    btnCancelTrapped.addEventListener('click', () => drawerTrap.deactivate());
+  </script>
+</body>
+</html>
