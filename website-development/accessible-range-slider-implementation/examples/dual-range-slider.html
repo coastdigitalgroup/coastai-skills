@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accessible Dual Range Slider Example</title>
+  <style>
+    /* Reset and Typography Setup */
+    :root {
+      --primary-color: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #dbeafe;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --track-bg: #cbd5e1;
+      --thumb-bg: #ffffff;
+      --bg-card: #ffffff;
+      --border-color: #e2e8f0;
+      --focus-ring: rgba(37, 99, 235, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text-main);
+      background-color: #f8fafc;
+      padding: 2rem 1rem;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.875rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    /* Slider Component Card */
+    .slider-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      margin-bottom: 2rem;
+    }
+
+    /* Legend/Headers inside the form */
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 1.5rem;
+    }
+
+    .slider-title {
+      font-weight: 600;
+      font-size: 1.125rem;
+      color: #0f172a;
+    }
+
+    /* Output Values styling */
+    .slider-outputs {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      font-family: monospace;
+      font-size: 1.125rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    /* Main Slider Container */
+    .dual-range-slider {
+      position: relative;
+      width: 100%;
+      height: 48px; /* Safe touch target */
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    /* Hide default native slider styles while keeping inputs overlayed */
+    .dual-range-slider input[type="range"] {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      pointer-events: none; /* Let pointer clicks pass through to underneath layers */
+      appearance: none;
+      -webkit-appearance: none;
+      margin: 0;
+      outline: none;
+    }
+
+    /* WEBKIT / BLINK THUMBS styling */
+    .dual-range-slider input[type="range"]::-webkit-slider-thumb {
+      pointer-events: auto; /* Re-enable pointer events for the thumb handle itself */
+      appearance: none;
+      -webkit-appearance: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--thumb-bg);
+      border: 2px solid var(--primary-color);
+      cursor: grab;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+      transition: transform 0.1s ease, background-color 0.1s ease, border-color 0.1s ease;
+    }
+
+    .dual-range-slider input[type="range"]::-webkit-slider-thumb:hover {
+      background-color: var(--primary-light);
+      transform: scale(1.1);
+    }
+
+    .dual-range-slider input[type="range"]::-webkit-slider-thumb:active {
+      cursor: grabbing;
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      transform: scale(1.1);
+    }
+
+    /* GECKO / FIREFOX THUMBS styling */
+    .dual-range-slider input[type="range"]::-moz-range-thumb {
+      pointer-events: auto; /* Re-enable pointer events for Firefox */
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--thumb-bg);
+      border: 2px solid var(--primary-color);
+      cursor: grab;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+      transition: transform 0.1s ease, background-color 0.1s ease, border-color 0.1s ease;
+    }
+
+    .dual-range-slider input[type="range"]::-moz-range-thumb:hover {
+      background-color: var(--primary-light);
+      transform: scale(1.1);
+    }
+
+    .dual-range-slider input[type="range"]::-moz-range-thumb:active {
+      cursor: grabbing;
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      transform: scale(1.1);
+    }
+
+    /* Hide browser track styling */
+    .dual-range-slider input[type="range"]::-webkit-slider-runnable-track {
+      background: transparent;
+      border: none;
+    }
+
+    .dual-range-slider input[type="range"]::-moz-range-track {
+      background: transparent;
+      border: none;
+    }
+
+    /* CUSTOM FOCUS INDICATOR - Meets WCAG 2.2 focus criteria */
+    .dual-range-slider input[type="range"]:focus-visible::-webkit-slider-thumb {
+      box-shadow: 0 0 0 2px #ffffff, 0 0 0 5px var(--primary-color), 0 3px 6px rgba(0,0,0,0.2);
+    }
+
+    .dual-range-slider input[type="range"]:focus-visible::-moz-range-thumb {
+      box-shadow: 0 0 0 2px #ffffff, 0 0 0 5px var(--primary-color), 0 3px 6px rgba(0,0,0,0.2);
+    }
+
+    /* Visual slider tracks placed below standard input sliders */
+    .slider-track {
+      position: absolute;
+      width: 100%;
+      height: 8px;
+      background-color: var(--track-bg);
+      border-radius: 4px;
+      z-index: 1;
+    }
+
+    .slider-fill {
+      position: absolute;
+      height: 8px;
+      background-color: var(--primary-color);
+      border-radius: 4px;
+      z-index: 2;
+    }
+
+    /* Instructions/Labels underneath */
+    .slider-footer {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    /* Informational Notes Card */
+    .notes-card {
+      background-color: #f1f5f9;
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid #cbd5e1;
+    }
+
+    .notes-card h2 {
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      color: #0f172a;
+    }
+
+    .notes-card ul {
+      padding-left: 1.25rem;
+    }
+
+    .notes-card li {
+      margin-bottom: 0.5rem;
+      font-size: 0.925rem;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Accessible Dual-Thumb Slider</h1>
+      <p class="subtitle">Demonstrating native overlap range-inputs with fully synchronized ARIA support</p>
+    </header>
+
+    <main>
+      <form id="filterForm">
+        <div class="slider-card">
+          <div class="slider-header">
+            <span class="slider-title" id="priceRangeLabel">Filter by Price Range</span>
+            <!-- Live Announcement Output Container -->
+            <div class="slider-outputs" aria-live="polite" id="liveOutput">
+              <span id="minValueLabel">$200</span>
+              <span>&mdash;</span>
+              <span id="maxValueLabel">$800</span>
+            </div>
+          </div>
+
+          <div class="dual-range-slider" id="sliderGroup" role="group" aria-labelledby="priceRangeLabel">
+            <!-- Behind-the-scenes visual styling track and fill -->
+            <div class="slider-track"></div>
+            <div class="slider-fill" id="sliderFill"></div>
+
+            <!-- Minimum Value native slider -->
+            <input
+              type="range"
+              id="sliderMin"
+              name="priceMin"
+              min="0"
+              max="1000"
+              step="10"
+              value="200"
+              aria-label="Minimum budget price"
+            >
+
+            <!-- Maximum Value native slider -->
+            <input
+              type="range"
+              id="sliderMax"
+              name="priceMax"
+              min="0"
+              max="1000"
+              step="10"
+              value="800"
+              aria-label="Maximum budget price"
+            >
+          </div>
+
+          <div class="slider-footer">
+            <span>Min: $0</span>
+            <span>Max: $1,000</span>
+          </div>
+        </div>
+      </form>
+
+      <div class="notes-card">
+        <h2>Accessibility & Performance Highlights</h2>
+        <ul>
+          <li><strong>Overlapping Native Inputs:</strong> Uses two overlapping native HTML5 <code>&lt;input type="range"&gt;</code> controls. This preserves native platform touch gestures and full, bulletproof keyboard support.</li>
+          <li><strong>Keyboard Support out-of-the-box:</strong> Press <kbd>Tab</kbd> to focus on the min or max handles. Adjust with <kbd>&larr;</kbd> / <kbd>&rarr;</kbd> or <kbd>&uarr;</kbd> / <kbd>&darr;</kbd>. Jump using <kbd>Home</kbd>, <kbd>End</kbd>, <kbd>PageUp</kbd>, or <kbd>PageDown</kbd>.</li>
+          <li><strong>Dynamic Stacking (Z-Index Swap):</strong> High-precision JavaScript swaps the <code>z-index</code> priority when a thumb is focused, hovered, or active. This ensures thumbs never become trapped or unselectable.</li>
+          <li><strong>Screen Reader friendly mapping:</strong> Programmatically maps dynamic text labels using the <code>aria-valuetext</code> attribute so screen readers announce "$200" or "$800" instead of plain numbers.</li>
+          <li><strong>Target Sizing:</strong> Thumbs are sized at 28x28px and the active track wrapper is 48px deep, creating generous interactive targets complying with WCAG 2.2 standards.</li>
+        </ul>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const sliderMin = document.getElementById('sliderMin');
+      const sliderMax = document.getElementById('sliderMax');
+      const sliderFill = document.getElementById('sliderFill');
+      const minValueLabel = document.getElementById('minValueLabel');
+      const maxValueLabel = document.getElementById('maxValueLabel');
+
+      // Configuration
+      const minGap = 50; // Keep a mandatory gap of $50 between min and max handles
+
+      /**
+       * Updates the visual highlight bar matching the active selection.
+       */
+      function updateVisualTrack() {
+        const minVal = parseInt(sliderMin.value);
+        const maxVal = parseInt(sliderMax.value);
+
+        const rangeMin = parseInt(sliderMin.min);
+        const rangeMax = parseInt(sliderMin.max);
+        const totalRange = rangeMax - rangeMin;
+
+        const leftPercent = ((minVal - rangeMin) / totalRange) * 100;
+        const rightPercent = 100 - (((maxVal - rangeMin) / totalRange) * 100);
+
+        sliderFill.style.left = `${leftPercent}%`;
+        sliderFill.style.right = `${rightPercent}%`;
+      }
+
+      /**
+       * Synchronizes outputs, updates ARIA value descriptions, and handles collisions.
+       */
+      function syncSliders(e) {
+        let minVal = parseInt(sliderMin.value);
+        let maxVal = parseInt(sliderMax.value);
+
+        // Check if values have collided within the minGap range
+        if (maxVal - minVal < minGap) {
+          if (e && e.target === sliderMin) {
+            sliderMin.value = maxVal - minGap;
+            minVal = maxVal - minGap;
+          } else if (e && e.target === sliderMax) {
+            sliderMax.value = minVal + minGap;
+            maxVal = minVal + minGap;
+          }
+        }
+
+        // Update visual labels
+        minValueLabel.textContent = `$${minVal}`;
+        maxValueLabel.textContent = `$${maxVal}`;
+
+        // Standard screen reader value description text mapping
+        sliderMin.setAttribute('aria-valuetext', `$${minVal}`);
+        sliderMax.setAttribute('aria-valuetext', `$${maxVal}`);
+
+        updateVisualTrack();
+      }
+
+      /**
+       * Swaps stacking order so the active/hovered/focused thumb is always draggable.
+       */
+      function swapStackingOrder(activeInput) {
+        if (activeInput === sliderMin) {
+          sliderMin.style.zIndex = '10';
+          sliderMax.style.zIndex = '9';
+        } else {
+          sliderMin.style.zIndex = '9';
+          sliderMax.style.zIndex = '10';
+        }
+      }
+
+      // Event Listeners for State changes
+      sliderMin.addEventListener('input', syncSliders);
+      sliderMax.addEventListener('input', syncSliders);
+
+      // Event Listeners for Z-Index stacking
+      sliderMin.addEventListener('input', () => swapStackingOrder(sliderMin));
+      sliderMax.addEventListener('input', () => swapStackingOrder(sliderMax));
+
+      sliderMin.addEventListener('mouseover', () => swapStackingOrder(sliderMin));
+      sliderMax.addEventListener('mouseover', () => swapStackingOrder(sliderMax));
+
+      sliderMin.addEventListener('focus', () => swapStackingOrder(sliderMin));
+      sliderMax.addEventListener('focus', () => swapStackingOrder(sliderMax));
+
+      // Initial execution to align styles upon loading
+      syncSliders();
+    });
+  </script>
+</body>
+</html>
