@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toolbar and Action Dock Specification Template</title>
+  <style>
+    :root {
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #f9fafb;
+      --bg-dark: #111827;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+      --text-inverse: #ffffff;
+      --border-subtle: #e5e7eb;
+      --border-focus: #2563eb;
+
+      --brand-primary: #2563eb;
+      --brand-subtle: #eff6ff;
+      --brand-hover: #1d4ed8;
+
+      --status-danger: #dc2626;
+      --status-danger-hover: #b91c1c;
+
+      --radius-md: 6px;
+      --radius-lg: 10px;
+      --radius-full: 9999px;
+
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-dock: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+      --toolbar-height: 44px;
+      --control-size: 34px;
+      --touch-target-min: 44px;
+    }
+
+    /* Base Reset & Typography */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f3f4f6;
+      color: var(--text-main);
+      padding: 32px 16px 120px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    p.description {
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      font-size: 0.95rem;
+    }
+
+    .demo-section {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      margin-bottom: 40px;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .demo-header {
+      padding: 16px 20px;
+      background: var(--bg-surface-elevated);
+      border-bottom: 1px solid var(--border-subtle);
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ==========================================================================
+       PATTERN 1: Sticky Editor Formatting Toolbar
+       ========================================================================== */
+
+    .editor-wrapper {
+      position: relative;
+      min-height: 240px;
+    }
+
+    /* Toolbar Container */
+    .app-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      flex-wrap: wrap;
+    }
+
+    /* Logical Groupings */
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    /* Vertical Separator */
+    .toolbar-separator {
+      width: 1px;
+      height: 20px;
+      background-color: var(--border-subtle);
+      margin: 0 4px;
+    }
+
+    /* Generic Toolbar Button */
+    .toolbar-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--control-size);
+      height: var(--control-size);
+      border: 1px solid transparent;
+      background: transparent;
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 600;
+      position: relative;
+      transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .toolbar-btn:hover {
+      background-color: var(--bg-surface-elevated);
+      color: var(--brand-primary);
+    }
+
+    /* Focus Visible State */
+    .toolbar-btn:focus-visible,
+    .toolbar-select:focus-visible {
+      outline: 2px solid var(--border-focus);
+      outline-offset: 1px;
+      z-index: 2;
+    }
+
+    /* Pressed / Active Toggle State (aria-pressed="true") */
+    .toolbar-btn[aria-pressed="true"],
+    .toolbar-btn[aria-checked="true"] {
+      background-color: var(--brand-subtle);
+      color: var(--brand-primary);
+      border-color: rgba(37, 99, 235, 0.2);
+    }
+
+    /* Disabled State */
+    .toolbar-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* Select Dropdown in Toolbar */
+    .toolbar-select {
+      height: var(--control-size);
+      padding: 0 8px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* SVG Icon Sizing */
+    .toolbar-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .editor-content {
+      padding: 20px;
+      min-height: 180px;
+      outline: none;
+    }
+
+    /* ==========================================================================
+       PATTERN 2: Floating Bulk Action Dock
+       ========================================================================== */
+
+    .floating-action-dock {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 12px 6px 16px;
+
+      background: var(--bg-dark);
+      color: var(--text-inverse);
+      border-radius: var(--radius-full);
+      box-shadow: var(--shadow-dock);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+
+      max-width: calc(100vw - 32px);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+    }
+
+    .dock-selection-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      white-space: nowrap;
+      padding-right: 8px;
+      border-right: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .dock-badge-count {
+      background: var(--brand-primary);
+      color: #ffffff;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+    }
+
+    .dock-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dock-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 36px;
+      padding: 0 12px;
+      border-radius: var(--radius-full);
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-inverse);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .dock-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .dock-btn:focus-visible {
+      outline: 2px solid #ffffff;
+      outline-offset: 2px;
+    }
+
+    .dock-btn--danger {
+      background: var(--status-danger);
+    }
+
+    .dock-btn--danger:hover {
+      background: var(--status-danger-hover);
+    }
+
+    .dock-btn-close {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border-radius: var(--radius-full);
+      justify-content: center;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .dock-btn-close:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .dock-btn svg, .dock-btn-close svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    /* Screen Reader Only Utility Class */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Touch device target optimization */
+    @media (pointer: coarse) {
+      .toolbar-btn {
+        min-width: var(--touch-target-min);
+        min-height: var(--touch-target-min);
+      }
+      .dock-btn {
+        min-height: var(--touch-target-min);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Toolbar and Action Dock Specification Template</h1>
+    <p class="description">
+      Demonstrating accessibility-compliant ARIA toolbar keyboard navigation (Roving tabindex) and a floating multi-selection action dock.
+    </p>
+
+    <!-- DEMO 1: Sticky Rich Text Editor Toolbar -->
+    <div class="demo-section">
+      <div class="demo-header">Pattern 1: Sticky Editor Formatting Toolbar (role="toolbar")</div>
+      <div class="editor-wrapper">
+
+        <!-- ARIA Toolbar Container -->
+        <div class="app-toolbar" role="toolbar" aria-label="Text formatting options" id="editor-toolbar">
+
+          <!-- Group 1: Text Style Dropdown -->
+          <div class="toolbar-group">
+            <label for="format-select" class="sr-only">Text format</label>
+            <select id="format-select" class="toolbar-select" tabindex="0">
+              <option value="p">Paragraph</option>
+              <option value="h1">Heading 1</option>
+              <option value="h2">Heading 2</option>
+              <option value="h3">Heading 3</option>
+              <option value="blockquote">Quote</option>
+            </select>
+          </div>
+
+          <div class="toolbar-separator" role="separator" aria-orientation="vertical"></div>
+
+          <!-- Group 2: Inline Toggles (Bold, Italic, Underline) -->
+          <div class="toolbar-group">
+            <button type="button" class="toolbar-btn" aria-pressed="true" aria-label="Bold (Ctrl+B)" title="Bold (Ctrl+B)" tabindex="-1">
+              <svg viewBox="0 0 24 24"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path></svg>
+            </button>
+            <button type="button" class="toolbar-btn" aria-pressed="false" aria-label="Italic (Ctrl+I)" title="Italic (Ctrl+I)" tabindex="-1">
+              <svg viewBox="0 0 24 24"><line x1="19" y1="4" x2="10" y2="4"></line><line x1="14" y1="20" x2="5" y2="20"></line><line x1="15" y1="4" x2="9" y2="20"></line></svg>
+            </button>
+            <button type="button" class="toolbar-btn" aria-pressed="false" aria-label="Underline (Ctrl+U)" title="Underline (Ctrl+U)" tabindex="-1">
+              <svg viewBox="0 0 24 24"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"></path><line x1="4" y1="21" x2="20" y2="21"></line></svg>
+            </button>
+          </div>
+
+          <div class="toolbar-separator" role="separator" aria-orientation="vertical"></div>
+
+          <!-- Group 3: Text Alignment Radio Group -->
+          <div class="toolbar-group" role="group" aria-label="Text alignment">
+            <button type="button" class="toolbar-btn" role="radio" aria-checked="true" aria-label="Align left" title="Align left" tabindex="-1">
+              <svg viewBox="0 0 24 24"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="15" y1="18" x2="3" y2="18"></line></svg>
+            </button>
+            <button type="button" class="toolbar-btn" role="radio" aria-checked="false" aria-label="Align center" title="Align center" tabindex="-1">
+              <svg viewBox="0 0 24 24"><line x1="18" y1="10" x2="6" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="18" y1="18" x2="6" y2="18"></line></svg>
+            </button>
+            <button type="button" class="toolbar-btn" role="radio" aria-checked="false" aria-label="Align right" title="Align right" tabindex="-1">
+              <svg viewBox="0 0 24 24"><line x1="21" y1="10" x2="7" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="9" y2="18"></line></svg>
+            </button>
+          </div>
+
+          <div class="toolbar-separator" role="separator" aria-orientation="vertical"></div>
+
+          <!-- Group 4: History Controls -->
+          <div class="toolbar-group">
+            <button type="button" class="toolbar-btn" aria-label="Undo (Ctrl+Z)" title="Undo (Ctrl+Z)" tabindex="-1">
+              <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+            </button>
+            <button type="button" class="toolbar-btn" disabled aria-label="Redo (Ctrl+Y)" title="Redo (Ctrl+Y)" tabindex="-1">
+              <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"></path></svg>
+            </button>
+          </div>
+
+        </div>
+
+        <div class="editor-content" contenteditable="true">
+          <p>This is an editable content area. Focus the toolbar above and use <strong>Left/Right Arrow keys</strong> to move focus across toolbar controls via Roving Tabindex.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- DEMO 2: Floating Bulk Action Dock -->
+  <div class="floating-action-dock" role="toolbar" aria-label="Bulk actions for selected rows">
+    <div class="dock-selection-badge">
+      <span class="dock-badge-count" aria-live="polite">12</span>
+      <span>Items Selected</span>
+    </div>
+
+    <div class="dock-actions">
+      <button type="button" class="dock-btn">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        <span>Mark Complete</span>
+      </button>
+
+      <button type="button" class="dock-btn">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+        <span>Export</span>
+      </button>
+
+      <button type="button" class="dock-btn dock-btn--danger">
+        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        <span>Delete</span>
+      </button>
+
+      <button type="button" class="dock-btn-close" aria-label="Deselect all items" title="Deselect all items">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Roving Tabindex Keyboard Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const toolbar = document.getElementById('editor-toolbar');
+      if (!toolbar) return;
+
+      const items = Array.from(toolbar.querySelectorAll('.toolbar-btn:not([disabled]), .toolbar-select'));
+
+      toolbar.addEventListener('keydown', (e) => {
+        const activeElement = document.activeElement;
+        const currentIndex = items.indexOf(activeElement);
+
+        if (currentIndex === -1) return;
+
+        let nextIndex = currentIndex;
+
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          nextIndex = (currentIndex + 1) % items.length;
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          nextIndex = (currentIndex - 1 + items.length) % items.length;
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          nextIndex = 0;
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          nextIndex = items.length - 1;
+        }
+
+        if (nextIndex !== currentIndex) {
+          items[currentIndex].setAttribute('tabindex', '-1');
+          items[nextIndex].setAttribute('tabindex', '0');
+          items[nextIndex].focus();
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
