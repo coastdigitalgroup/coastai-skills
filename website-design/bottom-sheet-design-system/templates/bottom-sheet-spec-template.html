@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bottom Sheet Design System Template</title>
+  <style>
+    /* CSS Custom Properties & Design Tokens */
+    :root {
+      --sheet-bg: #ffffff;
+      --sheet-text: #0f172a;
+      --sheet-muted: #64748b;
+      --sheet-border: #e2e8f0;
+      --sheet-overlay: rgba(15, 23, 42, 0.6);
+      --sheet-handle: #cbd5e1;
+      --sheet-radius-mobile: 16px 16px 0 0;
+      --sheet-radius-desktop: 12px;
+      --sheet-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.1), 0 -8px 10px -6px rgba(0, 0, 0, 0.1);
+      --primary-cta-bg: #0f172a;
+      --primary-cta-text: #ffffff;
+      --focus-ring: #2563eb;
+      --ease-out-cubic: cubic-bezier(0.32, 0.72, 0, 1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --sheet-bg: #1e293b;
+        --sheet-text: #f8fafc;
+        --sheet-muted: #94a3b8;
+        --sheet-border: #334155;
+        --sheet-overlay: rgba(0, 0, 0, 0.75);
+        --sheet-handle: #475569;
+        --primary-cta-bg: #38bdf8;
+        --primary-cta-text: #0f172a;
+      }
+    }
+
+    /* Page Layout Base */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f1f5f9;
+      color: var(--sheet-text);
+      line-height: 1.5;
+      padding: 2rem;
+    }
+
+    /* Backdrop Overlay */
+    .sheet-backdrop {
+      position: fixed;
+      inset: 0;
+      background-color: var(--sheet-overlay);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 250ms var(--ease-out-cubic), visibility 250ms var(--ease-out-cubic);
+      z-index: 1000;
+    }
+
+    .sheet-backdrop.is-visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Bottom Sheet Container (Mobile Viewport Default) */
+    .sheet-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      max-height: 85vh;
+      background-color: var(--sheet-bg);
+      color: var(--sheet-text);
+      border-radius: var(--sheet-radius-mobile);
+      box-shadow: var(--sheet-shadow);
+      display: flex;
+      flex-direction: column;
+      transform: translateY(100%);
+      transition: transform 300ms var(--ease-out-cubic), visibility 300ms var(--ease-out-cubic);
+      visibility: hidden;
+      z-index: 1001;
+      overflow: hidden;
+    }
+
+    .sheet-container.is-open {
+      transform: translateY(0);
+      visibility: visible;
+    }
+
+    /* Drag Affordance Header */
+    .sheet-drag-area {
+      width: 100%;
+      padding: 12px 0 4px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: grab;
+      touch-action: pan-y;
+    }
+
+    .sheet-drag-handle {
+      width: 36px;
+      height: 4px;
+      background-color: var(--sheet-handle);
+      border-radius: 9999px;
+    }
+
+    /* Sticky Header Bar */
+    .sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 20px 16px 20px;
+      border-bottom: 1px solid var(--sheet-border);
+    }
+
+    .sheet-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--sheet-text);
+    }
+
+    .sheet-close-btn {
+      background: transparent;
+      border: none;
+      color: var(--sheet-muted);
+      font-size: 1.25rem;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .sheet-close-btn:focus-visible,
+    .trigger-btn:focus-visible,
+    .sheet-btn:focus-visible {
+      outline: 2px solid var(--focus-ring);
+      outline-offset: 2px;
+    }
+
+    /* Scrollable Body Content */
+    .sheet-body {
+      padding: 20px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      flex: 1 1 auto;
+    }
+
+    /* Sticky Footer Action Bar with Safe-Area Inset */
+    .sheet-footer {
+      padding: 16px 20px calc(16px + env(safe-area-inset-bottom, 16px)) 20px;
+      border-top: 1px solid var(--sheet-border);
+      display: flex;
+      gap: 12px;
+      background-color: var(--sheet-bg);
+    }
+
+    .sheet-btn {
+      min-height: 44px;
+      padding: 0 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9375rem;
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+    }
+
+    .sheet-btn-secondary {
+      background-color: transparent;
+      border-color: var(--sheet-border);
+      color: var(--sheet-text);
+    }
+
+    .sheet-btn-primary {
+      background-color: var(--primary-cta-bg);
+      color: var(--primary-cta-text);
+    }
+
+    /* Responsive Desktop Modal Adaptation (≥768px) */
+    @media (min-width: 768px) {
+      .sheet-container {
+        top: 50%;
+        left: 50%;
+        bottom: auto;
+        right: auto;
+        width: 100%;
+        max-width: 540px;
+        max-height: 80vh;
+        border-radius: var(--sheet-radius-desktop);
+        transform: translate(-50%, -45%) scale(0.96);
+        transition: transform 250ms var(--ease-out-cubic), opacity 250ms var(--ease-out-cubic), visibility 250ms var(--ease-out-cubic);
+        opacity: 0;
+      }
+
+      .sheet-container.is-open {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+
+      .sheet-drag-area {
+        display: none; /* Hide drag handle pill on desktop modal */
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Bottom Sheet Design System Pattern</h1>
+  <p>Click below to test the mobile bottom sheet and desktop modal dialog adaptation.</p>
+  <br>
+
+  <button type="button" class="sheet-btn sheet-btn-primary trigger-btn" id="openSheetBtn" aria-haspopup="dialog" aria-expanded="false" style="max-width: 240px;">
+    Open Filter Sheet
+  </button>
+
+  <!-- Backdrop Overlay -->
+  <div class="sheet-backdrop" id="sheetBackdrop" tabindex="-1"></div>
+
+  <!-- Bottom Sheet / Modal Dialog Container -->
+  <div class="sheet-container" id="sheetContainer" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" aria-describedby="sheetDesc">
+
+    <!-- Drag Handle Area (Mobile Touch Affordance) -->
+    <div class="sheet-drag-area" id="sheetDragArea" aria-hidden="true">
+      <div class="sheet-drag-handle"></div>
+    </div>
+
+    <!-- Sticky Header -->
+    <header class="sheet-header">
+      <h2 class="sheet-title" id="sheetTitle">Filter & Sort Options</h2>
+      <button type="button" class="sheet-close-btn" id="sheetCloseBtn" aria-label="Close sheet">&times;</button>
+    </header>
+
+    <!-- Scrollable Sheet Body -->
+    <div class="sheet-body" id="sheetBody">
+      <p id="sheetDesc" style="color: var(--sheet-muted); margin-bottom: 1rem;">Refine your search results using the filter criteria below.</p>
+
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <div>
+          <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Sort Order</label>
+          <select style="width: 100%; min-height: 44px; padding: 0 12px; border-radius: 6px; border: 1px solid var(--sheet-border); background: var(--sheet-bg); color: var(--sheet-text);">
+            <option>Featured Items</option>
+            <option>Price: Low to High</option>
+            <option>Price: High to Low</option>
+            <option>Customer Rating</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Categories</label>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <label style="display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" checked style="width: 20px; height: 20px;"> Outerwear & Jackets
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" style="width: 20px; height: 20px;"> Footwear & Boots
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" style="width: 20px; height: 20px;"> Travel Accessories
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sticky Footer Actions -->
+    <footer class="sheet-footer">
+      <button type="button" class="sheet-btn sheet-btn-secondary" id="resetFiltersBtn">Reset</button>
+      <button type="button" class="sheet-btn sheet-btn-primary" id="applyFiltersBtn">Apply Filters (18)</button>
+    </footer>
+  </div>
+
+  <script>
+    // Bottom Sheet Controller
+    (function () {
+      const openBtn = document.getElementById('openSheetBtn');
+      const closeBtn = document.getElementById('sheetCloseBtn');
+      const backdrop = document.getElementById('sheetBackdrop');
+      const container = document.getElementById('sheetContainer');
+      let previousActiveElement = null;
+
+      function openSheet() {
+        previousActiveElement = document.activeElement;
+        backdrop.classList.add('is-visible');
+        container.classList.add('is-open');
+        openBtn.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+
+        // Focus close button on open
+        setTimeout(() => closeBtn.focus(), 50);
+      }
+
+      function closeSheet() {
+        backdrop.classList.remove('is-visible');
+        container.classList.remove('is-open');
+        openBtn.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+
+        if (previousActiveElement) {
+          previousActiveElement.focus();
+        }
+      }
+
+      // Event Listeners
+      openBtn.addEventListener('click', openSheet);
+      closeBtn.addEventListener('click', closeSheet);
+      backdrop.addEventListener('click', closeSheet);
+
+      // Keyboard Trap & Escape Key Handler
+      document.addEventListener('keydown', (e) => {
+        if (!container.classList.contains('is-open')) return;
+
+        if (e.key === 'Escape') {
+          closeSheet();
+        }
+
+        if (e.key === 'Tab') {
+          const focusables = container.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+          const firstFocusable = focusables[0];
+          const lastFocusable = focusables[focusables.length - 1];
+
+          if (e.shiftKey && document.activeElement === firstFocusable) {
+            e.preventDefault();
+            lastFocusable.focus();
+          } else if (!e.shiftKey && document.activeElement === lastFocusable) {
+            e.preventDefault();
+            firstFocusable.focus();
+          }
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
