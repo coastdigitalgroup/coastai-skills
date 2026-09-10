@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cross-Tab State Synchronization Demo</title>
+  <style>
+    :root {
+      --color-bg: #0f172a;
+      --color-card: #1e293b;
+      --color-border: #334155;
+      --color-text: #f8fafc;
+      --color-muted: #94a3b8;
+      --color-primary: #38bdf8;
+      --color-success: #22c55e;
+      --color-danger: #ef4444;
+      --color-warning: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      padding: 2rem;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .tab-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: var(--color-card);
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      border: 1px solid var(--color-border);
+      font-size: 0.875rem;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: var(--color-muted);
+    }
+
+    .status-dot.leader {
+      background-color: var(--color-success);
+      box-shadow: 0 0 8px var(--color-success);
+    }
+
+    .status-dot.follower {
+      background-color: var(--color-primary);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background-color: var(--color-card);
+      border: 1px solid var(--color-border);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .card h2 {
+      font-size: 1.25rem;
+      color: var(--color-primary);
+    }
+
+    .btn {
+      background-color: var(--color-primary);
+      color: #0f172a;
+      border: none;
+      padding: 0.625rem 1.25rem;
+      border-radius: 0.375rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    .btn-danger {
+      background-color: var(--color-danger);
+      color: #ffffff;
+    }
+
+    .btn-secondary {
+      background-color: var(--color-border);
+      color: var(--color-text);
+    }
+
+    .cart-counter {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--color-bg);
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+    }
+
+    .cart-count-val {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-success);
+    }
+
+    .log-box {
+      background-color: #090d16;
+      border: 1px solid var(--color-border);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.8125rem;
+      max-height: 200px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .log-entry {
+      display: flex;
+      gap: 0.5rem;
+      color: var(--color-muted);
+    }
+
+    .log-entry .time {
+      color: var(--color-primary);
+    }
+
+    .log-entry .event {
+      color: var(--color-warning);
+    }
+
+    .alert-banner {
+      display: none;
+      background-color: rgba(239, 68, 68, 0.15);
+      border: 1px solid var(--color-danger);
+      color: #fca5a5;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      font-weight: 500;
+    }
+
+    .alert-banner.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div>
+        <h1>Cross-Tab State Sync</h1>
+        <p style="color: var(--color-muted); font-size: 0.875rem;">
+          Open this page in multiple tabs or windows to test real-time state synchronization.
+        </p>
+      </div>
+      <div class="tab-badge">
+        <span id="roleDot" class="status-dot"></span>
+        <span id="tabIdDisplay">Tab ID: initializing...</span>
+        <span id="roleText" style="color: var(--color-muted); font-weight: 600;">(Follower)</span>
+      </div>
+    </header>
+
+    <div id="logoutBanner" class="alert-banner">
+      🚨 <strong>Session Terminated:</strong> You were logged out in another tab. Please log in again.
+    </div>
+
+    <div class="grid">
+      <!-- Auth Module -->
+      <div class="card">
+        <h2>Authentication State</h2>
+        <p id="authState">Current Status: <strong style="color: var(--color-success);">Logged In (John Doe)</strong></p>
+        <div style="display: flex; gap: 0.5rem;">
+          <button id="logoutBtn" class="btn btn-danger">Log Out (Broadcasts All Tabs)</button>
+          <button id="loginBtn" class="btn btn-secondary" style="display: none;">Log In Again</button>
+        </div>
+      </div>
+
+      <!-- Shopping Cart Module -->
+      <div class="card">
+        <h2>Shopping Cart Sync</h2>
+        <div class="cart-counter">
+          <span>Items in Cart:</span>
+          <span id="cartCount" class="cart-count-val">0</span>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button id="addItemBtn" class="btn">+ Add Item</button>
+          <button id="clearCartBtn" class="btn btn-secondary">Clear Cart</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cross-Tab Activity Log -->
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2>Cross-Tab Event Activity Log</h2>
+        <button id="clearLogBtn" class="btn btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.75rem;">Clear Log</button>
+      </div>
+      <div id="logBox" class="log-box">
+        <div class="log-entry">
+          <span class="time">[System]</span> Listening for cross-tab events...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { CrossTabStateManager } from '../templates/cross-tab-state-manager.js';
+
+    // Initialize CrossTabStateManager
+    const xtab = new CrossTabStateManager({
+      channelName: 'demo_app_sync',
+      enableLeaderElection: true,
+      debug: true
+    });
+
+    // DOM Elements
+    const tabIdDisplay = document.getElementById('tabIdDisplay');
+    const roleDot = document.getElementById('roleDot');
+    const roleText = document.getElementById('roleText');
+    const authState = document.getElementById('authState');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBanner = document.getElementById('logoutBanner');
+    const cartCount = document.getElementById('cartCount');
+    const addItemBtn = document.getElementById('addItemBtn');
+    const clearCartBtn = document.getElementById('clearCartBtn');
+    const logBox = document.getElementById('logBox');
+    const clearLogBtn = document.getElementById('clearLogBtn');
+
+    let currentCartCount = parseInt(localStorage.getItem('demo_cart_count') || '0', 10);
+    cartCount.textContent = currentCartCount;
+
+    tabIdDisplay.textContent = `Tab: ${xtab.tabId.substring(0, 12)}...`;
+
+    // 1. Leader Election Callback
+    xtab.onLeaderChange((isLeader) => {
+      if (isLeader) {
+        roleDot.className = 'status-dot leader';
+        roleText.textContent = '(Leader Tab)';
+        roleText.style.color = 'var(--color-success)';
+        appendLog('SYSTEM', 'This tab was elected LEADER (handling primary background tasks).');
+      } else {
+        roleDot.className = 'status-dot follower';
+        roleText.textContent = '(Follower Tab)';
+        roleText.style.color = 'var(--color-primary)';
+        appendLog('SYSTEM', 'This tab is a FOLLOWER.');
+      }
+    });
+
+    // 2. Auth Logout Broadcast & Listen
+    logoutBtn.addEventListener('click', () => {
+      // Perform local logout action
+      handleLocalLogout();
+      // Broadcast to other tabs
+      xtab.postMessage('AUTH_LOGOUT', { reason: 'User clicked logout' });
+      appendLog('EMIT: AUTH_LOGOUT', 'Broadcasted logout to all other open tabs.');
+    });
+
+    loginBtn.addEventListener('click', () => {
+      authState.innerHTML = 'Current Status: <strong style="color: var(--color-success);">Logged In (John Doe)</strong>';
+      logoutBanner.classList.remove('visible');
+      logoutBtn.style.display = 'inline-block';
+      loginBtn.style.display = 'none';
+      xtab.postMessage('AUTH_LOGIN', { user: 'John Doe' });
+      appendLog('EMIT: AUTH_LOGIN', 'Broadcasted login state restored.');
+    });
+
+    xtab.on('AUTH_LOGOUT', (payload, meta) => {
+      handleLocalLogout();
+      logoutBanner.classList.add('visible');
+      appendLog(`RECV: AUTH_LOGOUT`, `From ${meta.senderId}: ${payload.reason}`);
+    });
+
+    xtab.on('AUTH_LOGIN', (payload, meta) => {
+      authState.innerHTML = `Current Status: <strong style="color: var(--color-success);">Logged In (${payload.user})</strong>`;
+      logoutBanner.classList.remove('visible');
+      logoutBtn.style.display = 'inline-block';
+      loginBtn.style.display = 'none';
+      appendLog(`RECV: AUTH_LOGIN`, `From ${meta.senderId}: User ${payload.user} logged in.`);
+    });
+
+    function handleLocalLogout() {
+      authState.innerHTML = 'Current Status: <strong style="color: var(--color-danger);">Logged Out</strong>';
+      logoutBtn.style.display = 'none';
+      loginBtn.style.display = 'inline-block';
+    }
+
+    // 3. Cart State Broadcast & Reconciliation
+    addItemBtn.addEventListener('click', () => {
+      currentCartCount++;
+      cartCount.textContent = currentCartCount;
+      localStorage.setItem('demo_cart_count', currentCartCount.toString());
+
+      xtab.postMessage('CART_UPDATED', { count: currentCartCount, action: 'add' });
+      appendLog('EMIT: CART_UPDATED', `Cart count set to ${currentCartCount}`);
+    });
+
+    clearCartBtn.addEventListener('click', () => {
+      currentCartCount = 0;
+      cartCount.textContent = '0';
+      localStorage.removeItem('demo_cart_count');
+
+      xtab.postMessage('CART_UPDATED', { count: 0, action: 'clear' });
+      appendLog('EMIT: CART_UPDATED', 'Cart cleared.');
+    });
+
+    xtab.on('CART_UPDATED', (payload, meta) => {
+      currentCartCount = payload.count;
+      cartCount.textContent = currentCartCount;
+      appendLog('RECV: CART_UPDATED', `From ${meta.senderId}: Cart updated to ${payload.count} items.`);
+    });
+
+    // Helper: Logging to UI
+    function appendLog(eventTag, message) {
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      const timeStr = new Date().toLocaleTimeString();
+      entry.innerHTML = `<span class="time">[${timeStr}]</span> <span class="event">[${eventTag}]</span> ${escapeHtml(message)}`;
+      logBox.appendChild(entry);
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    clearLogBtn.addEventListener('click', () => {
+      logBox.innerHTML = '<div class="log-entry"><span class="time">[System]</span> Log cleared.</div>';
+    });
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+  </script>
+</body>
+</html>
