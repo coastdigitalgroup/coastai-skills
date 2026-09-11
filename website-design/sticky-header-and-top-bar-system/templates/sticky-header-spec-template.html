@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi-Tier Sticky Header Spec Template</title>
+  <style>
+    :root {
+      /* Header Design Tokens */
+      --header-bg: #ffffff;
+      --header-bg-scrolled: rgba(255, 255, 255, 0.92);
+      --header-border: #e5e7eb;
+      --text-primary: #111827;
+      --text-secondary: #4b5563;
+      --brand-accent: #2563eb;
+
+      /* Tier Heights */
+      --tier-0-height: 36px;
+      --tier-1-height: 32px;
+      --tier-2-height-initial: 72px;
+      --tier-2-height-scrolled: 56px;
+
+      /* Active Sticky Header Height Variable (Used for A11y Scroll Offsets) */
+      --sticky-header-height: var(--tier-2-height-scrolled);
+
+      /* Elevation Tokens */
+      --shadow-scrolled: 0 4px 20px -2px rgba(0, 0, 0, 0.08);
+
+      /* Z-Index Scale */
+      --z-header: 1000;
+      --z-dropdown: 1100;
+      --z-skip-link: 2000;
+      --z-modal: 3000;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--text-primary);
+      line-height: 1.5;
+      background-color: #f9fafb;
+    }
+
+    /* WCAG SC 2.4.11 Focus Not Obscured Scroll Margin Offset */
+    :target,
+    [id],
+    main a,
+    main button,
+    main input,
+    main select,
+    main textarea {
+      scroll-margin-top: calc(var(--sticky-header-height) + 24px);
+    }
+
+    /* Accessibility Skip Navigation Link */
+    .skip-to-content {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: var(--z-skip-link);
+      padding: 10px 16px;
+      background: var(--brand-accent);
+      color: #ffffff;
+      font-weight: 600;
+      border-radius: 6px;
+      text-decoration: none;
+      transform: translateY(-150%);
+      transition: transform 0.2s ease;
+    }
+
+    .skip-to-content:focus {
+      transform: translateY(0);
+      outline: 3px solid #93c5fd;
+    }
+
+    /* HEADER STRUCTURE & STICKY MECHANICS */
+    .header-assembly {
+      position: sticky;
+      top: calc(-1 * (var(--tier-0-height) + var(--tier-1-height)));
+      z-index: var(--z-header);
+      width: 100%;
+      background: var(--header-bg);
+      border-bottom: 1px solid var(--header-border);
+      transition: background-color 0.25s ease, box-shadow 0.25s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Scrolled Visual State */
+    .header-assembly.is-scrolled {
+      background: var(--header-bg-scrolled);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-scrolled);
+    }
+
+    /* Dynamic Auto-Hide State */
+    .header-assembly.is-hidden {
+      transform: translateY(-100%);
+    }
+
+    /* TIER 0: Announcement Banner */
+    .tier-announcement {
+      height: var(--tier-0-height);
+      background: #1e293b;
+      color: #f8fafc;
+      font-size: 0.8125rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      position: relative;
+    }
+
+    .tier-announcement a {
+      color: #38bdf8;
+      margin-left: 6px;
+      text-decoration: underline;
+    }
+
+    .banner-close-btn {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.125rem;
+      cursor: pointer;
+      min-width: 28px;
+      min-height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* TIER 1: Utility Navigation Bar */
+    .tier-utility {
+      height: var(--tier-1-height);
+      background: #f1f5f9;
+      border-bottom: 1px solid var(--header-border);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+
+    .utility-group {
+      display: flex;
+      gap: 16px;
+      list-style: none;
+    }
+
+    .utility-group a {
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+
+    .utility-group a:hover {
+      color: var(--text-primary);
+    }
+
+    /* TIER 2: Primary Navigation Header */
+    .tier-primary {
+      height: var(--tier-2-height-initial);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      transition: height 0.25s ease;
+    }
+
+    .is-scrolled .tier-primary {
+      height: var(--tier-2-height-scrolled);
+    }
+
+    .brand-logo {
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: var(--text-primary);
+      text-decoration: none;
+      letter-spacing: -0.025em;
+      transition: font-size 0.25s ease;
+    }
+
+    .is-scrolled .brand-logo {
+      font-size: 1.125rem;
+    }
+
+    .main-nav {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .main-nav-link {
+      font-weight: 500;
+      font-size: 0.9375rem;
+      color: var(--text-primary);
+      text-decoration: none;
+      padding: 8px 4px;
+    }
+
+    .main-nav-link:hover {
+      color: var(--brand-accent);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .cta-button {
+      padding: 8px 16px;
+      background: var(--brand-accent);
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.875rem;
+      border-radius: 6px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+    }
+
+    /* Mobile Menu Toggle Button */
+    .mobile-menu-toggle {
+      display: none;
+      background: none;
+      border: 1px solid var(--header-border);
+      border-radius: 6px;
+      padding: 8px;
+      cursor: pointer;
+      min-width: 44px;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* RESPONSIVE ADAPTATION */
+    @media (max-width: 768px) {
+      .tier-utility {
+        display: none; /* Hide tier 1 on mobile */
+      }
+
+      .main-nav {
+        display: none; /* Collapsed into mobile drawer */
+      }
+
+      .mobile-menu-toggle {
+        display: flex;
+      }
+
+      .tier-primary {
+        height: 56px;
+        padding: 0 16px;
+      }
+
+      :root {
+        --sticky-header-height: 56px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Skip Navigation Link -->
+  <a href="#main-content" class="skip-to-content">Skip to main content</a>
+
+  <!-- Multi-Tier Header Assembly -->
+  <header class="header-assembly" id="site-header">
+
+    <!-- Tier 0: Announcement Banner -->
+    <div class="tier-announcement" id="announcement-banner">
+      <span>🎉 Spring Release: Platform 2.0 is live! <a href="#">Learn more</a></span>
+      <button class="banner-close-btn" aria-label="Dismiss announcement" onclick="dismissBanner()">×</button>
+    </div>
+
+    <!-- Tier 1: Utility Bar -->
+    <div class="tier-utility">
+      <ul class="utility-group">
+        <li><a href="#">USD ($)</a></li>
+        <li><a href="#">Global (English)</a></li>
+      </ul>
+      <ul class="utility-group">
+        <li><a href="#">Store Locator</a></li>
+        <li><a href="#">Support</a></li>
+        <li><a href="#">Account Log In</a></li>
+      </ul>
+    </div>
+
+    <!-- Tier 2: Primary Navigation Header -->
+    <div class="tier-primary">
+      <button class="mobile-menu-toggle" aria-expanded="false" aria-label="Toggle navigation menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+
+      <a href="#" class="brand-logo">COASTAL</a>
+
+      <nav aria-label="Primary Navigation">
+        <ul class="main-nav">
+          <li><a href="#products" class="main-nav-link">Products</a></li>
+          <li><a href="#solutions" class="main-nav-link">Solutions</a></li>
+          <li><a href="#pricing" class="main-nav-link">Pricing</a></li>
+          <li><a href="#docs" class="main-nav-link">Documentation</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <a href="#trial" class="cta-button">Start Free Trial</a>
+      </div>
+    </div>
+
+  </header>
+
+  <!-- Page Body Content Target -->
+  <main id="main-content" style="padding: 40px 24px; max-width: 1000px; margin: 0 auto;">
+    <section id="products" style="margin-bottom: 600px;">
+      <h2>Products Section</h2>
+      <p>Scroll down to test the shrink-on-scroll state transition and WCAG SC 2.4.11 focus margin offset.</p>
+    </section>
+
+    <section id="solutions" style="margin-bottom: 600px;">
+      <h2>Solutions Section</h2>
+      <p>Targeted heading offset test.</p>
+    </section>
+  </main>
+
+  <script>
+    // Header Scroll State Controller
+    const header = document.getElementById('site-header');
+    let lastScrollY = window.scrollY;
+
+    function dismissBanner() {
+      const banner = document.getElementById('announcement-banner');
+      if (banner) {
+        banner.style.display = 'none';
+      }
+    }
+
+    window.addEventListener('scroll', () => {
+      const currentScrollY = window.scrollY;
+
+      // Toggle Scrolled Class
+      if (currentScrollY > 60) {
+        header.classList.add('is-scrolled');
+      } else {
+        header.classList.remove('is-scrolled');
+      }
+
+      // Dynamic Auto-Hide Logic (Optional for Smart Headers)
+      if (currentScrollY > 200 && currentScrollY > lastScrollY + 10) {
+        header.classList.add('is-hidden');
+      } else if (currentScrollY < lastScrollY - 15) {
+        header.classList.remove('is-hidden');
+      }
+
+      lastScrollY = currentScrollY;
+    }, { passive: true });
+  </script>
+</body>
+</html>
