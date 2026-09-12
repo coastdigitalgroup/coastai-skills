@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inert Attribute Management - Modal, Drawer & Wizard Example</title>
+  <style>
+    :root {
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-border: #e2e8f0;
+      --color-text: #0f172a;
+      --color-muted: #64748b;
+      --color-primary: #2563eb;
+      --color-primary-hover: #1d4ed8;
+      --color-danger: #dc2626;
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.5;
+      padding: 2rem;
+    }
+
+    header, main, footer {
+      max-width: 900px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    h1, h2, h3 {
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      margin-bottom: 1rem;
+      color: var(--color-muted);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #fff;
+      background-color: var(--color-primary);
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+
+    .btn:hover {
+      background-color: var(--color-primary-hover);
+    }
+
+    .btn-secondary {
+      background-color: #e2e8f0;
+      color: var(--color-text);
+    }
+
+    .btn-secondary:hover {
+      background-color: #cbd5e1;
+    }
+
+    .btn-danger {
+      background-color: var(--color-danger);
+    }
+
+    /* Native :inert styling enhancement */
+    :inert,
+    [inert] {
+      opacity: 0.4;
+      pointer-events: none !important;
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      transition: opacity 0.25s ease;
+    }
+
+    /* Off-canvas Drawer */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      z-index: 100;
+    }
+
+    .drawer-backdrop.is-open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 380px;
+      max-width: 90vw;
+      background: var(--color-surface);
+      padding: 2rem;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 101;
+      box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .drawer.is-open {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Multi-step Form Wizard */
+    .wizard-steps {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid var(--color-border);
+      padding-bottom: 0.75rem;
+    }
+
+    .wizard-step-indicator {
+      font-weight: 600;
+      color: var(--color-muted);
+    }
+
+    .wizard-step-indicator.active {
+      color: var(--color-primary);
+    }
+
+    .wizard-panel {
+      display: none;
+    }
+
+    .wizard-panel.active {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.35rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      font-size: 1rem;
+    }
+
+    .bad-practice-badge {
+      display: inline-block;
+      background: #fee2e2;
+      color: #991b1b;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .good-practice-badge {
+      display: inline-block;
+      background: #dcfce7;
+      color: #166534;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PRIMARY PAGE WRAPPER (Can be marked inert when overlays are active) -->
+  <div id="page-wrapper">
+    <header class="card">
+      <h1>Inert Attribute Management Demo</h1>
+      <p>Demonstrating robust DOM subtree isolation using native <code>inert</code> vs. naive <code>tabindex</code>/<code>aria-hidden</code> loops.</p>
+    </header>
+
+    <main>
+      <!-- BEFORE: Naive Approach Explanation -->
+      <section class="card">
+        <span class="bad-practice-badge">Naive Approach (Before)</span>
+        <h2>Why Manual <code>tabindex="-1"</code> and <code>aria-hidden</code> Fails</h2>
+        <p>In traditional setups, developers try to disable background content when a drawer opens by looping through interactive elements and applying <code>tabindex="-1"</code> and <code>aria-hidden="true"</code>:</p>
+        <pre><code>// NAIVE APPROACH - DO NOT USE IN PRODUCTION
+function disableBackgroundNaive() {
+  document.querySelectorAll('a, button, input').forEach(el => {
+    el.dataset.origTab = el.getAttribute('tabindex') || '';
+    el.setAttribute('tabindex', '-1');
+  });
+  document.getElementById('page-wrapper').setAttribute('aria-hidden', 'true');
+}</code></pre>
+        <p><strong>Failures of this approach:</strong></p>
+        <ul>
+          <li>Does NOT stop browser text search (<code>Ctrl+F</code>) from finding and scrolling to off-screen elements.</li>
+          <li>Breaks when dynamic elements are rendered into the page while the overlay is open.</li>
+          <li>Does NOT block mouse click or touch events on exposed background regions.</li>
+          <li>Mismatches screen reader state if any descendant overrides <code>aria-hidden</code>.</li>
+        </ul>
+      </section>
+
+      <!-- AFTER: Native Inert Solutions -->
+      <section class="card">
+        <span class="good-practice-badge">Robust Approach (After)</span>
+        <h2>1. Slide-Out Drawer with Page Inertia</h2>
+        <p>Clicking the button below activates <code>pageWrapper.inert = true</code>, completely isolating the page content from keyboard, touch, screen readers, and text search.</p>
+        <button id="open-drawer-btn" class="btn">Open Cart Drawer</button>
+      </section>
+
+      <section class="card">
+        <span class="good-practice-badge">Robust Approach (After)</span>
+        <h2>2. Multi-Step Form Wizard with Panel Inertia</h2>
+        <p>Inactive step panels use the <code>inert</code> attribute declaratively, keeping off-screen step inputs out of the tab order and browser autofill.</p>
+
+        <div class="wizard-steps">
+          <span class="wizard-step-indicator active" id="indicator-1">Step 1: Account</span>
+          <span class="wizard-step-indicator" id="indicator-2">Step 2: Shipping</span>
+          <span class="wizard-step-indicator" id="indicator-3">Step 3: Payment</span>
+        </div>
+
+        <form id="wizard-form" onsubmit="event.preventDefault();">
+          <!-- Step 1 (Active) -->
+          <div class="wizard-panel active" id="wizard-panel-1">
+            <h3>Step 1: Account Details</h3>
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" required placeholder="user@example.com">
+            </div>
+            <button type="button" class="btn" onclick="goToStep(2)">Next: Shipping &rarr;</button>
+          </div>
+
+          <!-- Step 2 (Inert when inactive) -->
+          <div class="wizard-panel" id="wizard-panel-2" inert>
+            <h3>Step 2: Shipping Address</h3>
+            <div class="form-group">
+              <label for="address">Street Address</label>
+              <input type="text" id="address" placeholder="123 Main St">
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="goToStep(1)">&larr; Back</button>
+            <button type="button" class="btn" onclick="goToStep(3)">Next: Payment &rarr;</button>
+          </div>
+
+          <!-- Step 3 (Inert when inactive) -->
+          <div class="wizard-panel" id="wizard-panel-3" inert>
+            <h3>Step 3: Payment Details</h3>
+            <div class="form-group">
+              <label for="card">Credit Card Number</label>
+              <input type="text" id="card" placeholder="4532 •••• •••• 8892">
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="goToStep(2)">&larr; Back</button>
+            <button type="submit" class="btn">Complete Purchase</button>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <!-- OFF-CANVAS DRAWER (Outside page-wrapper so it escapes main page inertia) -->
+  <div id="drawer-backdrop" class="drawer-backdrop" onclick="closeDrawer()"></div>
+  <aside id="drawer" class="drawer" inert aria-label="Shopping Cart">
+    <div class="drawer-header">
+      <h2>Your Cart</h2>
+      <button id="close-drawer-btn" class="btn btn-secondary" onclick="closeDrawer()">&times; Close</button>
+    </div>
+    <p>This drawer is currently active. Notice that pressing <kbd>Tab</kbd> will never jump to the background page, and <kbd>Ctrl+F</kbd> won't find text behind this panel while open.</p>
+    <div style="margin-top: auto;">
+      <button class="btn btn-danger" onclick="alert('Checkout clicked!')">Proceed to Checkout</button>
+    </div>
+  </aside>
+
+  <script>
+    const pageWrapper = document.getElementById('page-wrapper');
+    const drawer = document.getElementById('drawer');
+    const drawerBackdrop = document.getElementById('drawer-backdrop');
+    const openDrawerBtn = document.getElementById('open-drawer-btn');
+    const closeDrawerBtn = document.getElementById('close-drawer-btn');
+    let previousFocus = null;
+
+    // Open Cart Drawer
+    openDrawerBtn.addEventListener('click', () => {
+      previousFocus = document.activeElement;
+
+      // Mark page wrapper as inert
+      pageWrapper.inert = true;
+
+      // Make drawer interactive and show it
+      drawer.inert = false;
+      drawer.classList.add('is-open');
+      drawerBackdrop.classList.add('is-open');
+
+      // Focus close button inside drawer
+      closeDrawerBtn.focus();
+    });
+
+    // Close Cart Drawer
+    function closeDrawer() {
+      // Restore page wrapper interactivity
+      pageWrapper.inert = false;
+
+      // Mark drawer as inert and hide it
+      drawer.inert = true;
+      drawer.classList.remove('is-open');
+      drawerBackdrop.classList.remove('is-open');
+
+      // Restore focus to button that opened drawer
+      if (previousFocus && typeof previousFocus.focus === 'function') {
+        previousFocus.focus();
+      }
+    }
+
+    // Handle Escape key to close drawer
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !drawer.inert) {
+        closeDrawer();
+      }
+    });
+
+    // Multi-Step Form Wizard Step Logic
+    function goToStep(stepNumber) {
+      for (let i = 1; i <= 3; i++) {
+        const panel = document.getElementById(`wizard-panel-${i}`);
+        const indicator = document.getElementById(`indicator-${i}`);
+
+        if (i === stepNumber) {
+          panel.classList.add('active');
+          panel.inert = false;
+          indicator.classList.add('active');
+
+          // Focus first input in newly active step
+          const firstInput = panel.querySelector('input, button');
+          if (firstInput) firstInput.focus();
+        } else {
+          panel.classList.remove('active');
+          panel.inert = true; // Declarative inertia on inactive step
+          indicator.classList.remove('active');
+        }
+      }
+    }
+  </script>
+</body>
+</html>
