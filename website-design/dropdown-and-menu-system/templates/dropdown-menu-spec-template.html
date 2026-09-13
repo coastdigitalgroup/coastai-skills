@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accessible Dropdown & Action Menu Spec Template</title>
+  <style>
+    :root {
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, monospace;
+
+      --color-bg-page: #f8fafc;
+      --color-surface: #ffffff;
+      --color-text-primary: #0f172a;
+      --color-text-secondary: #475569;
+      --color-text-tertiary: #94a3b8;
+      --color-text-danger: #dc2626;
+      --color-bg-hover: #f1f5f9;
+      --color-bg-danger-hover: #fef2f2;
+      --color-border-subtle: #e2e8f0;
+      --color-focus-ring: #2563eb;
+
+      --shadow-dropdown: 0 10px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
+      --radius-menu: 10px;
+      --radius-item: 6px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--color-bg-page);
+      color: var(--color-text-primary);
+      padding: 40px 24px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .header {
+      margin-bottom: 32px;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      color: var(--color-text-secondary);
+      font-size: 14px;
+    }
+
+    /* Card Table Demo Component */
+    .demo-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+
+    .row:last-child {
+      border-bottom: none;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+      color: #334155;
+    }
+
+    /* Menu Trigger Button */
+    .menu-trigger {
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--color-text-secondary);
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .menu-trigger:hover,
+    .menu-trigger[aria-expanded="true"] {
+      background: var(--color-bg-hover);
+      color: var(--color-text-primary);
+      border-color: var(--color-border-subtle);
+    }
+
+    .menu-trigger:focus-visible {
+      outline: 2px solid var(--color-focus-ring);
+      outline-offset: 2px;
+    }
+
+    /* Dropdown Overlay Container */
+    .dropdown-menu {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      min-width: 230px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-menu);
+      box-shadow: var(--shadow-dropdown);
+      padding: 6px;
+    }
+
+    .dropdown-menu.is-open {
+      display: block;
+      animation: menuFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes menuFadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Menu Section Header & Divider */
+    .menu-header {
+      padding: 6px 10px 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-tertiary);
+    }
+
+    .menu-divider {
+      height: 1px;
+      background: var(--color-border-subtle);
+      margin: 4px 0;
+    }
+
+    /* Menu Item Item Mechanics */
+    .menu-item {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-item);
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      cursor: pointer;
+      text-align: left;
+      user-select: none;
+    }
+
+    .menu-item-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .menu-item-icon {
+      width: 16px;
+      height: 16px;
+      color: var(--color-text-secondary);
+      flex-shrink: 0;
+    }
+
+    .shortcut {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+    }
+
+    .menu-item:hover,
+    .menu-item:focus {
+      background: var(--color-bg-hover);
+      color: var(--color-text-primary);
+      outline: none;
+    }
+
+    .menu-item:focus-visible {
+      outline: 2px solid var(--color-focus-ring);
+      outline-offset: -2px;
+    }
+
+    .menu-item.danger {
+      color: var(--color-text-danger);
+    }
+
+    .menu-item.danger .menu-item-icon {
+      color: var(--color-text-danger);
+    }
+
+    .menu-item.danger:hover,
+    .menu-item.danger:focus {
+      background: var(--color-bg-danger-hover);
+    }
+
+    /* Backdrop for dismiss / Mobile Bottom Sheet Overlay */
+    .menu-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .menu-backdrop.is-active {
+      display: block;
+    }
+
+    /* Mobile Adaptations (<768px) */
+    @media (max-width: 767px) {
+      .dropdown-menu.is-open {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: auto !important;
+        min-width: 100%;
+        border-radius: 16px 16px 0 0;
+        padding: 12px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+        box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
+        animation: sheetSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      @keyframes sheetSlideUp {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+      }
+
+      .mobile-drag-handle {
+        width: 36px;
+        height: 4px;
+        background: var(--color-border-subtle);
+        border-radius: 999px;
+        margin: 0 auto 12px;
+      }
+
+      .menu-item {
+        padding: 12px 12px;
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <h1>Accessible Dropdown & Action Menu Spec</h1>
+      <p>Demonstrates WAI-ARIA <code>role="menu"</code>, roving focus keyboard traversal, boundary collision auto-flipping, and responsive mobile adaptation.</p>
+    </div>
+
+    <div class="demo-card">
+      <div class="row">
+        <div class="user-info">
+          <div class="avatar">AC</div>
+          <div>
+            <strong>Acme Corporation</strong>
+            <p style="font-size: 12px; color: var(--color-text-secondary)">Enterprise • Active</p>
+          </div>
+        </div>
+
+        <!-- Menu Trigger Button -->
+        <button
+          id="menu-trigger-1"
+          class="menu-trigger"
+          aria-haspopup="menu"
+          aria-expanded="false"
+          aria-controls="dropdown-menu-1"
+          aria-label="Actions for Acme Corporation"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="1"/>
+            <circle cx="12" cy="5" r="1"/>
+            <circle cx="12" cy="19" r="1"/>
+          </svg>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div
+          id="dropdown-menu-1"
+          class="dropdown-menu"
+          role="menu"
+          aria-labelledby="menu-trigger-1"
+          tabindex="-1"
+        >
+          <div class="mobile-drag-handle"></div>
+
+          <div class="menu-header">Manage Subscription</div>
+
+          <button role="menuitem" class="menu-item" tabindex="-1">
+            <span class="menu-item-content">
+              <svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Edit Details
+            </span>
+            <span class="shortcut">⌘E</span>
+          </button>
+
+          <button role="menuitem" class="menu-item" tabindex="-1">
+            <span class="menu-item-content">
+              <svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Duplicate Plan
+            </span>
+            <span class="shortcut">⌘D</span>
+          </button>
+
+          <div class="menu-divider" role="separator"></div>
+
+          <button role="menuitemcheckbox" class="menu-item" aria-checked="true" tabindex="-1">
+            <span class="menu-item-content">
+              <svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Auto-Renew Active
+            </span>
+          </button>
+
+          <div class="menu-divider" role="separator"></div>
+
+          <button role="menuitem" class="menu-item danger" tabindex="-1">
+            <span class="menu-item-content">
+              <svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              Cancel Account
+            </span>
+            <span class="shortcut">⌘⌫</span>
+          </button>
+        </div>
+
+        <div id="menu-backdrop" class="menu-backdrop"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const trigger = document.getElementById('menu-trigger-1');
+      const menu = document.getElementById('dropdown-menu-1');
+      const backdrop = document.getElementById('menu-backdrop');
+      const items = Array.from(menu.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"]'));
+
+      let isOpen = false;
+
+      function openMenu() {
+        isOpen = true;
+        trigger.setAttribute('aria-expanded', 'true');
+        menu.classList.add('is-open');
+        backdrop.classList.add('is-active');
+        positionMenu();
+
+        // Focus first menu item
+        if (items.length > 0) {
+          items[0].focus();
+        }
+      }
+
+      function closeMenu() {
+        isOpen = false;
+        trigger.setAttribute('aria-expanded', 'false');
+        menu.classList.remove('is-open');
+        backdrop.classList.remove('is-active');
+        trigger.focus();
+      }
+
+      function positionMenu() {
+        if (window.innerWidth < 768) return; // Mobile bottom sheet layout
+
+        const triggerRect = trigger.getBoundingClientRect();
+        const menuRect = menu.getBoundingClientRect();
+
+        let top = triggerRect.bottom + 6;
+        let left = triggerRect.right - menuRect.width;
+
+        // Collision Flip Check
+        if (top + menuRect.height > window.innerHeight - 16) {
+          top = triggerRect.top - menuRect.height - 6;
+        }
+
+        menu.style.top = `${top}px`;
+        menu.style.left = `${left}px`;
+      }
+
+      // Event Listeners
+      trigger.addEventListener('click', () => {
+        isOpen ? closeMenu() : openMenu();
+      });
+
+      backdrop.addEventListener('click', closeMenu);
+
+      // Keyboard Roving Focus Handling
+      menu.addEventListener('keydown', (e) => {
+        const currentIndex = items.indexOf(document.activeElement);
+
+        switch (e.key) {
+          case 'ArrowDown':
+            e.preventDefault();
+            const nextIndex = (currentIndex + 1) % items.length;
+            items[nextIndex].focus();
+            break;
+
+          case 'ArrowUp':
+            e.preventDefault();
+            const prevIndex = (currentIndex - 1 + items.length) % items.length;
+            items[prevIndex].focus();
+            break;
+
+          case 'Home':
+            e.preventDefault();
+            items[0].focus();
+            break;
+
+          case 'End':
+            e.preventDefault();
+            items[items.length - 1].focus();
+            break;
+
+          case 'Escape':
+            e.preventDefault();
+            closeMenu();
+            break;
+
+          case 'Tab':
+            closeMenu();
+            break;
+        }
+      });
+
+      // Item Execution Handler
+      items.forEach((item) => {
+        item.addEventListener('click', () => {
+          if (item.getAttribute('role') === 'menuitemcheckbox') {
+            const isChecked = item.getAttribute('aria-checked') === 'true';
+            item.setAttribute('aria-checked', (!isChecked).toString());
+          } else {
+            closeMenu();
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
