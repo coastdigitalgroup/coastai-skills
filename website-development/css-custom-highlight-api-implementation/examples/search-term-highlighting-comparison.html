@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Custom Highlight API vs Legacy DOM Wrapping Comparison</title>
+  <style>
+    :root {
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --color-bg: #f8fafc;
+      --color-card: #ffffff;
+      --color-border: #e2e8f0;
+      --color-text: #1e293b;
+      --color-text-muted: #64748b;
+      --color-primary: #2563eb;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.6;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-size: 1.875rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: var(--color-text-muted);
+      font-size: 1rem;
+    }
+
+    /* CSS Custom Highlight API Pseudo-elements */
+    ::highlight(search-match) {
+      background-color: #fef08a;
+      color: #854d0e;
+      text-decoration: underline;
+      text-decoration-color: #eab308;
+    }
+
+    ::highlight(search-active) {
+      background-color: #f97316;
+      color: #ffffff;
+      font-weight: bold;
+    }
+
+    /* Legacy DOM fallback styling */
+    mark.legacy-highlight {
+      background-color: #fef08a;
+      color: #854d0e;
+      padding: 0;
+      border-radius: 2px;
+    }
+
+    mark.legacy-active {
+      background-color: #f97316;
+      color: #ffffff;
+      font-weight: bold;
+    }
+
+    .controls {
+      background-color: var(--color-card);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 280px;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 0.625rem 0.875rem;
+      font-size: 1rem;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    button {
+      padding: 0.625rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      background-color: #f1f5f9;
+      color: #334155;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+
+    button:hover {
+      background-color: #e2e8f0;
+    }
+
+    .status-bar {
+      width: 100%;
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.5rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background-color: var(--color-card);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.625rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge-modern {
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+
+    .badge-legacy {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+
+    .editor-area {
+      min-height: 250px;
+      padding: 1rem;
+      border: 1px dashed var(--color-border);
+      border-radius: 6px;
+      background-color: #fafafa;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .editor-area:focus {
+      border-color: var(--color-primary);
+      background-color: #ffffff;
+    }
+
+    .metrics {
+      margin-top: 1rem;
+      font-family: monospace;
+      font-size: 0.8rem;
+      background-color: #0f172a;
+      color: #38bdf8;
+      padding: 0.75rem;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>CSS Custom Highlight API vs. Legacy DOM Wrapping</h1>
+      <p class="subtitle">
+        Compare non-destructive, zero-reflow paint highlighting (W3C CSS Custom Highlight API) against legacy destructive DOM node splitting (<mark>marks</mark> / spans).
+      </p>
+    </header>
+
+    <div class="controls">
+      <div class="search-box">
+        <label for="search-input" class="visually-hidden">Search term</label>
+        <input type="text" id="search-input" placeholder="Type to search (e.g., 'highlight', 'performance', 'DOM')..." value="highlight">
+        <button id="btn-prev" type="button" aria-label="Previous Match">&uarr; Prev</button>
+        <button id="btn-next" type="button" aria-label="Next Match">&darr; Next</button>
+        <button id="btn-clear" type="button">Clear</button>
+      </div>
+
+      <!-- ARIA Live Region for Screen Reader Announcements -->
+      <div id="sr-announcement" class="visually-hidden" aria-live="polite"></div>
+
+      <div class="status-bar">
+        <span id="match-count">Matches: 0</span>
+        <span id="api-support">Checking API support...</span>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- Modern CSS Custom Highlight API Panel -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Modern: CSS Custom Highlight API</h2>
+          <span class="badge badge-modern">Zero Reflows</span>
+        </div>
+        <p><em>Try selecting text or editing inside this box while searching. Caret and selection are preserved perfectly!</em></p>
+        <div id="modern-target" class="editor-area" contenteditable="true">
+          The W3C CSS Custom Highlight API provides a mechanism for styling arbitrary text ranges by associating Range objects with a custom highlight name. By registering these ranges in the global CSS.highlights map, the rendering engine styles the text directly during the paint pipeline via ::highlight() pseudo-elements. This approach eliminates DOM node mutation, prevents layout thrashing, preserves contenteditable caret positions, and reduces memory overhead significantly compared to inserting DOM wrapper spans.
+        </div>
+        <div id="modern-metrics" class="metrics">
+          Execution Time: 0.00 ms | DOM Mutated: NO | Reflows: 0
+        </div>
+      </div>
+
+      <!-- Legacy Destructive DOM Wrapping Panel -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Legacy: Destructive DOM Wrapping</h2>
+          <span class="badge badge-legacy">Causes Reflows</span>
+        </div>
+        <p><em>Try typing or selecting text inside this box. Notice how innerHTML re-renders collapse text selection and reset caret positions!</em></p>
+        <div id="legacy-target" class="editor-area" contenteditable="true">
+          The W3C CSS Custom Highlight API provides a mechanism for styling arbitrary text ranges by associating Range objects with a custom highlight name. By registering these ranges in the global CSS.highlights map, the rendering engine styles the text directly during the paint pipeline via ::highlight() pseudo-elements. This approach eliminates DOM node mutation, prevents layout thrashing, preserves contenteditable caret positions, and reduces memory overhead significantly compared to inserting DOM wrapper spans.
+        </div>
+        <div id="legacy-metrics" class="metrics">
+          Execution Time: 0.00 ms | DOM Mutated: YES | Reflows: Forced
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State management
+    let activeMatchIndex = -1;
+    let modernRanges = [];
+    let legacyMatches = [];
+
+    // DOM Elements
+    const searchInput = document.getElementById('search-input');
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    const btnClear = document.getElementById('btn-clear');
+    const matchCountEl = document.getElementById('match-count');
+    const apiSupportEl = document.getElementById('api-support');
+    const srAnnouncement = document.getElementById('sr-announcement');
+
+    const modernTarget = document.getElementById('modern-target');
+    const legacyTarget = document.getElementById('legacy-target');
+    const modernMetrics = document.getElementById('modern-metrics');
+    const legacyMetrics = document.getElementById('legacy-metrics');
+
+    // Store raw text for legacy target reset
+    const originalLegacyText = legacyTarget.innerText;
+
+    // Feature Detection
+    const isCustomHighlightSupported = 'highlights' in CSS;
+    if (isCustomHighlightSupported) {
+      apiSupportEl.textContent = 'API Status: Native CSS Custom Highlight API Supported';
+      apiSupportEl.style.color = '#15803d';
+    } else {
+      apiSupportEl.textContent = 'API Status: Not Supported (Falling back to DOM wrapping)';
+      apiSupportEl.style.color = '#b91c1c';
+    }
+
+    // Helper: Find all text node ranges matching query
+    function findRangesInContainer(container, query) {
+      if (!query || query.trim() === '') return [];
+
+      const ranges = [];
+      const normalizedQuery = query.toLowerCase();
+      const treeWalker = document.createTreeWalker(
+        container,
+        NodeFilter.SHOW_TEXT,
+        {
+          acceptNode(node) {
+            const parent = node.parentElement;
+            if (!parent) return NodeFilter.FILTER_REJECT;
+            const tag = parent.tagName;
+            if (tag === 'SCRIPT' || tag === 'STYLE') return NodeFilter.FILTER_REJECT;
+            return node.textContent.trim().length > 0 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+          }
+        }
+      );
+
+      let currentNode = treeWalker.nextNode();
+      while (currentNode) {
+        const text = currentNode.textContent;
+        const lowerText = text.toLowerCase();
+        let startIndex = 0;
+
+        while ((startIndex = lowerText.indexOf(normalizedQuery, startIndex)) !== -1) {
+          const range = new Range();
+          range.setStart(currentNode, startIndex);
+          range.setEnd(currentNode, startIndex + query.length);
+          ranges.push(range);
+          startIndex += query.length;
+        }
+
+        currentNode = treeWalker.nextNode();
+      }
+
+      return ranges;
+    }
+
+    // METHOD 1: Modern CSS Custom Highlight API
+    function executeModernHighlight(query) {
+      const t0 = performance.now();
+
+      if (!isCustomHighlightSupported) {
+        modernMetrics.textContent = 'API Not Supported in this browser engine.';
+        return [];
+      }
+
+      modernRanges = findRangesInContainer(modernTarget, query);
+
+      if (modernRanges.length > 0) {
+        const searchHighlight = new Highlight(...modernRanges);
+        CSS.highlights.set('search-match', searchHighlight);
+      } else {
+        CSS.highlights.delete('search-match');
+        CSS.highlights.delete('search-active');
+      }
+
+      const t1 = performance.now();
+      modernMetrics.textContent = `Execution Time: ${(t1 - t0).toFixed(2)} ms | DOM Mutated: NO | Reflows: 0 | Ranges: ${modernRanges.length}`;
+      return modernRanges;
+    }
+
+    // METHOD 2: Legacy Destructive DOM Node Splitting
+    function executeLegacyHighlight(query) {
+      const t0 = performance.now();
+
+      // Reset HTML content (destroys active input/caret focus state)
+      legacyTarget.innerText = originalLegacyText;
+      legacyMatches = [];
+
+      if (!query || query.trim() === '') {
+        const t1 = performance.now();
+        legacyMetrics.textContent = `Execution Time: ${(t1 - t0).toFixed(2)} ms | DOM Mutated: NO | Reflows: 0`;
+        return [];
+      }
+
+      const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`(${escapedQuery})`, 'gi');
+
+      // Mutate innerHTML directly (forces full DOM parsing & reflow)
+      legacyTarget.innerHTML = legacyTarget.innerHTML.replace(
+        regex,
+        '<mark class="legacy-highlight">$1</mark>'
+      );
+
+      legacyMatches = Array.from(legacyTarget.querySelectorAll('mark.legacy-highlight'));
+
+      const t1 = performance.now();
+      legacyMetrics.textContent = `Execution Time: ${(t1 - t0).toFixed(2)} ms | DOM Mutated: YES (Nodes split) | Forced Reflow | Matches: ${legacyMatches.length}`;
+      return legacyMatches;
+    }
+
+    // Navigation & Focus Management
+    function updateActiveMatch(index) {
+      if (modernRanges.length === 0) {
+        activeMatchIndex = -1;
+        matchCountEl.textContent = 'Matches: 0';
+        srAnnouncement.textContent = 'No search matches found.';
+        return;
+      }
+
+      activeMatchIndex = (index + modernRanges.length) % modernRanges.length;
+      matchCountEl.textContent = `Match ${activeMatchIndex + 1} of ${modernRanges.length}`;
+      srAnnouncement.textContent = `Focused match ${activeMatchIndex + 1} of ${modernRanges.length}`;
+
+      // Update Modern Active Highlight
+      if (isCustomHighlightSupported) {
+        const activeRange = modernRanges[activeMatchIndex];
+        const activeHighlight = new Highlight(activeRange);
+        CSS.highlights.set('search-active', activeHighlight);
+      }
+
+      // Update Legacy Active Highlight
+      legacyMatches.forEach((el, i) => {
+        if (i === activeMatchIndex) {
+          el.classList.add('legacy-active');
+        } else {
+          el.classList.remove('legacy-active');
+        }
+      });
+    }
+
+    // Event Handlers
+    function performSearch() {
+      const query = searchInput.value.trim();
+      const ranges = executeModernHighlight(query);
+      executeLegacyHighlight(query);
+
+      if (ranges.length > 0) {
+        updateActiveMatch(0);
+      } else {
+        updateActiveMatch(-1);
+      }
+    }
+
+    searchInput.addEventListener('input', performSearch);
+
+    btnNext.addEventListener('click', () => {
+      if (modernRanges.length > 0) {
+        updateActiveMatch(activeMatchIndex + 1);
+      }
+    });
+
+    btnPrev.addEventListener('click', () => {
+      if (modernRanges.length > 0) {
+        updateActiveMatch(activeMatchIndex - 1);
+      }
+    });
+
+    btnClear.addEventListener('click', () => {
+      searchInput.value = '';
+      performSearch();
+      searchInput.focus();
+    });
+
+    // Re-run search if user edits text inside modern container
+    modernTarget.addEventListener('input', () => {
+      if (searchInput.value.trim() !== '') {
+        performSearch();
+      }
+    });
+
+    // Initial run
+    performSearch();
+  </script>
+</body>
+</html>
