@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Numeric Input and Stepper System - Specification Template</title>
+  <style>
+    :root {
+      --bg-canvas: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-disabled: #f1f5f9;
+      --bg-hover: #f1f5f9;
+      --bg-active: #e2e8f0;
+
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-disabled: #94a3b8;
+      --text-brand: #2563eb;
+      --text-danger: #dc2626;
+
+      --border-default: #cbd5e1;
+      --border-focus: #2563eb;
+      --border-disabled: #e2e8f0;
+
+      --ring-focus: rgba(37, 99, 235, 0.35);
+
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-pill: 9999px;
+
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      line-height: 1.5;
+      padding: 2rem 1rem;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-top: 0;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-disabled);
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+
+    /* CSS Reset for spin buttons */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+
+    /* Component Pattern 1: Standard Inline Stepper */
+    .stepper-inline {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      overflow: hidden;
+    }
+
+    .stepper-inline:focus-within {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--ring-focus);
+    }
+
+    .stepper-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background-color 0.15s ease, color 0.15s ease;
+      touch-action: manipulation;
+    }
+
+    .stepper-btn:hover:not(:disabled) {
+      background-color: var(--bg-hover);
+    }
+
+    .stepper-btn:active:not(:disabled) {
+      background-color: var(--bg-active);
+    }
+
+    .stepper-btn:focus-visible {
+      outline: 2px solid var(--border-focus);
+      outline-offset: -2px;
+      z-index: 1;
+    }
+
+    .stepper-btn:disabled {
+      color: var(--text-disabled);
+      background-color: var(--bg-disabled);
+      cursor: not-allowed;
+    }
+
+    .stepper-input {
+      width: 56px;
+      height: 44px;
+      border: none;
+      border-left: 1px solid var(--border-default);
+      border-right: 1px solid var(--border-default);
+      background: transparent;
+      text-align: center;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      padding: 0 4px;
+    }
+
+    .stepper-input:focus {
+      outline: none;
+    }
+
+    /* Component Pattern 2: Unit Stepper with Prefix/Suffix */
+    .stepper-unit-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+      max-width: 280px;
+    }
+
+    .label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .stepper-unit {
+      position: relative;
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+    }
+
+    .stepper-unit:focus-within {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--ring-focus);
+    }
+
+    .unit-prefix {
+      padding-left: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .stepper-unit-input {
+      flex: 1;
+      height: 40px;
+      border: none;
+      padding: 0 0.5rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      background: transparent;
+    }
+
+    .stepper-unit-input:focus {
+      outline: none;
+    }
+
+    .stacked-stepper-controls {
+      display: flex;
+      flex-direction: column;
+      width: 36px;
+      height: 40px;
+      border-left: 1px solid var(--border-default);
+    }
+
+    .stacked-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      cursor: pointer;
+      padding: 0;
+      touch-action: manipulation;
+    }
+
+    .stacked-btn:first-child {
+      border-bottom: 1px solid var(--border-default);
+    }
+
+    .stacked-btn:hover:not(:disabled) {
+      background-color: var(--bg-hover);
+    }
+
+    .stacked-btn:disabled {
+      color: var(--text-disabled);
+      background-color: var(--bg-disabled);
+      cursor: not-allowed;
+    }
+
+    .hint-text {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+
+<main class="container">
+  <h1>Numeric Input & Stepper System Specification</h1>
+  <p class="subtitle">Interactive accessible implementation template for discrete numerical entry controls.</p>
+
+  <!-- Section 1: E-Commerce Inline Stepper -->
+  <section class="card">
+    <h2>1. Inline Stepper (E-Commerce Quantity)</h2>
+    <p class="hint-text" style="margin-bottom: 1rem;">
+      Includes minimum (1) and maximum (10) boundary enforcement, touch-ready 44px tap targets, and ARIA spinbutton integration.
+    </p>
+
+    <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+      <div>
+        <label for="cart-qty-input" class="label" style="display: block; margin-bottom: 0.5rem;">Quantity</label>
+        <div class="stepper-inline" role="group" aria-label="Quantity selector">
+          <button type="button" class="stepper-btn" id="cart-qty-dec" aria-label="Decrease quantity" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+
+          <input
+            type="text"
+            id="cart-qty-input"
+            class="stepper-input"
+            value="1"
+            role="spinbutton"
+            aria-valuenow="1"
+            aria-valuemin="1"
+            aria-valuemax="10"
+            aria-label="Item quantity"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            autocomplete="off"
+          >
+
+          <button type="button" class="stepper-btn" id="cart-qty-inc" aria-label="Increase quantity">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div style="font-size: 0.875rem; color: var(--text-secondary);">
+        <div>Status: <strong id="cart-status-text" style="color: var(--text-primary);">Minimum boundary reached (1)</strong></div>
+        <div id="cart-live-region" class="sr-only" aria-live="polite">Quantity updated to 1</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: Financial Stacked Unit Stepper -->
+  <section class="card">
+    <h2>2. Financial Unit Input with Stacked Micro-Steppers</h2>
+    <p class="hint-text" style="margin-bottom: 1rem;">
+      Currency input with step increments ($10.00), bounds ($0 - $5,000), and support for ArrowUp/ArrowDown keys.
+    </p>
+
+    <div class="stepper-unit-container">
+      <label for="budget-input" class="label">Monthly Budget Allowance</label>
+      <div class="stepper-unit">
+        <span class="unit-prefix" aria-hidden="true">$</span>
+        <input
+          type="text"
+          id="budget-input"
+          class="stepper-unit-input"
+          value="250.00"
+          role="spinbutton"
+          aria-valuenow="250.00"
+          aria-valuemin="0.00"
+          aria-valuemax="5000.00"
+          aria-label="Monthly budget allowance in USD"
+          inputmode="decimal"
+          autocomplete="off"
+        >
+        <div class="stacked-stepper-controls">
+          <button type="button" class="stacked-btn" id="budget-inc" aria-label="Increase budget by $10">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="18 15 12 9 6 15"></polyline>
+            </svg>
+          </button>
+          <button type="button" class="stacked-btn" id="budget-dec" aria-label="Decrease budget by $10">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <span class="hint-text">Step: $10.00 | Min: $0.00 | Max: $5,000.00</span>
+    </div>
+  </section>
+</main>
+
+<script>
+  // --- Inline Stepper Controller ---
+  (function initCartStepper() {
+    const input = document.getElementById('cart-qty-input');
+    const decBtn = document.getElementById('cart-qty-dec');
+    const incBtn = document.getElementById('cart-qty-inc');
+    const statusText = document.getElementById('cart-status-text');
+    const liveRegion = document.getElementById('cart-live-region');
+
+    const MIN = 1;
+    const MAX = 10;
+
+    function updateState(val) {
+      let numericVal = parseInt(val, 10);
+      if (isNaN(numericVal)) numericVal = MIN;
+
+      // Clamp values
+      if (numericVal <= MIN) {
+        numericVal = MIN;
+        decBtn.disabled = true;
+        incBtn.disabled = false;
+        statusText.textContent = 'Minimum boundary reached (1)';
+      } else if (numericVal >= MAX) {
+        numericVal = MAX;
+        incBtn.disabled = true;
+        decBtn.disabled = false;
+        statusText.textContent = 'Maximum boundary reached (10)';
+      } else {
+        decBtn.disabled = false;
+        incBtn.disabled = false;
+        statusText.textContent = `Active count: ${numericVal}`;
+      }
+
+      input.value = numericVal;
+      input.setAttribute('aria-valuenow', numericVal.toString());
+      liveRegion.textContent = `Quantity updated to ${numericVal}`;
+    }
+
+    decBtn.addEventListener('click', () => {
+      let current = parseInt(input.value, 10) || MIN;
+      updateState(current - 1);
+    });
+
+    incBtn.addEventListener('click', () => {
+      let current = parseInt(input.value, 10) || MIN;
+      updateState(current + 1);
+    });
+
+    input.addEventListener('change', () => {
+      updateState(input.value);
+    });
+
+    input.addEventListener('keydown', (e) => {
+      let current = parseInt(input.value, 10) || MIN;
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        updateState(current + 1);
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        updateState(current - 1);
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        updateState(MIN);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        updateState(MAX);
+      }
+    });
+  })();
+
+  // --- Stacked Currency Stepper Controller ---
+  (function initBudgetStepper() {
+    const input = document.getElementById('budget-input');
+    const incBtn = document.getElementById('budget-inc');
+    const decBtn = document.getElementById('budget-dec');
+
+    const STEP = 10;
+    const MIN = 0;
+    const MAX = 5000;
+
+    function formatValue(val) {
+      return val.toFixed(2);
+    }
+
+    function updateValue(newVal) {
+      let clamped = Math.max(MIN, Math.min(MAX, newVal));
+      input.value = formatValue(clamped);
+      input.setAttribute('aria-valuenow', clamped.toFixed(2));
+
+      decBtn.disabled = clamped <= MIN;
+      incBtn.disabled = clamped >= MAX;
+    }
+
+    incBtn.addEventListener('click', () => {
+      let current = parseFloat(input.value) || 0;
+      updateValue(current + STEP);
+    });
+
+    decBtn.addEventListener('click', () => {
+      let current = parseFloat(input.value) || 0;
+      updateValue(current - STEP);
+    });
+
+    input.addEventListener('blur', () => {
+      let current = parseFloat(input.value);
+      if (isNaN(current)) current = MIN;
+      updateValue(current);
+    });
+
+    input.addEventListener('keydown', (e) => {
+      let current = parseFloat(input.value) || 0;
+      let multiplier = e.shiftKey ? 10 : 1;
+
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        updateValue(current + (STEP * multiplier));
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        updateValue(current - (STEP * multiplier));
+      }
+    });
+  })();
+</script>
+
+</body>
+</html>
