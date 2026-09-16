@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dropdown and Menu System Specification Template</title>
+  <style>
+    :root {
+      /* Color System Tokens */
+      --color-surface-bg: #ffffff;
+      --color-surface-elevated: #ffffff;
+      --color-surface-hover: #f3f4f6;
+      --color-surface-active: #e5e7eb;
+      --color-border: #e5e7eb;
+      --color-border-subtle: #f0f0f0;
+
+      --color-text-primary: #111827;
+      --color-text-secondary: #4b5563;
+      --color-text-muted: #9ca3af;
+      --color-text-danger: #dc2626;
+      --color-surface-danger-hover: #fef2f2;
+
+      --color-primary: #2563eb;
+      --color-focus-ring: #3b82f6;
+
+      /* Spatial & Radius Tokens */
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+
+      --shadow-dropdown: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --z-dropdown: 1000;
+      --z-backdrop: 999;
+
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-surface-bg: #0f172a;
+        --color-surface-elevated: #1e293b;
+        --color-surface-hover: #334155;
+        --color-surface-active: #475569;
+        --color-border: #334155;
+        --color-border-subtle: #1e293b;
+
+        --color-text-primary: #f8fafc;
+        --color-text-secondary: #cbd5e1;
+        --color-text-muted: #64748b;
+        --color-text-danger: #f87171;
+        --color-surface-danger-hover: #450a0a;
+
+        --color-primary: #3b82f6;
+        --color-focus-ring: #60a5fa;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--color-surface-bg);
+      color: var(--color-text-primary);
+      padding: 40px 24px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 32px;
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: 16px;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    p.description {
+      color: var(--color-text-secondary);
+      font-size: 14px;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 32px;
+      margin-top: 32px;
+    }
+
+    .card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      background: var(--color-surface-elevated);
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--color-text-primary);
+    }
+
+    /* Trigger Button Styling */
+    .btn-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      background-color: var(--color-surface-elevated);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+      position: relative;
+    }
+
+    .btn-trigger:hover {
+      background-color: var(--color-surface-hover);
+    }
+
+    .btn-trigger:focus-visible {
+      outline: 2px solid var(--color-focus-ring);
+      outline-offset: 2px;
+    }
+
+    .btn-trigger[aria-expanded="true"] {
+      background-color: var(--color-surface-active);
+      border-color: var(--color-primary);
+    }
+
+    /* Icon Button Variant */
+    .btn-icon-trigger {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      background: var(--color-surface-elevated);
+      color: var(--color-text-secondary);
+      cursor: pointer;
+    }
+
+    .btn-icon-trigger:hover {
+      background-color: var(--color-surface-hover);
+      color: var(--color-text-primary);
+    }
+
+    /* Dropdown Container */
+    .dropdown-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      min-width: 220px;
+      padding: 6px;
+      background-color: var(--color-surface-elevated);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-dropdown);
+      z-index: var(--z-dropdown);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+    }
+
+    .dropdown-menu.is-open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    /* Positioning Modifier Variants */
+    .dropdown-menu-end {
+      left: auto;
+      right: 0;
+    }
+
+    .dropdown-menu-top {
+      top: auto;
+      bottom: calc(100% + 4px);
+      transform: translateY(8px);
+    }
+
+    .dropdown-menu-top.is-open {
+      transform: translateY(0);
+    }
+
+    /* Section Groups & Headers */
+    .dropdown-header {
+      padding: 8px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+    }
+
+    .dropdown-divider {
+      height: 1px;
+      background-color: var(--color-border-subtle);
+      margin: 6px -6px;
+      border: none;
+    }
+
+    /* Menu Item Row Anatomy */
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 14px;
+      color: var(--color-text-primary);
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      text-align: left;
+      text-decoration: none;
+      user-select: none;
+      gap: 10px;
+      transition: background-color 0.1s ease, color 0.1s ease;
+    }
+
+    .dropdown-item:hover,
+    .dropdown-item:focus,
+    .dropdown-item.is-focused {
+      background-color: var(--color-surface-hover);
+      outline: none;
+    }
+
+    .dropdown-item:active {
+      background-color: var(--color-surface-active);
+    }
+
+    /* Slots inside Item */
+    .item-icon {
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      color: var(--color-text-secondary);
+    }
+
+    .dropdown-item:hover .item-icon,
+    .dropdown-item:focus .item-icon {
+      color: var(--color-text-primary);
+    }
+
+    .item-label {
+      flex-grow: 1;
+      white-space: nowrap;
+    }
+
+    .item-shortcut {
+      font-size: 11px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: var(--color-text-muted);
+      background: var(--color-surface-hover);
+      padding: 2px 5px;
+      border-radius: 4px;
+      border: 1px solid var(--color-border);
+    }
+
+    /* Destructive Item State */
+    .dropdown-item-danger {
+      color: var(--color-text-danger);
+    }
+
+    .dropdown-item-danger .item-icon {
+      color: var(--color-text-danger);
+    }
+
+    .dropdown-item-danger:hover,
+    .dropdown-item-danger:focus,
+    .dropdown-item-danger.is-focused {
+      background-color: var(--color-surface-danger-hover);
+      color: var(--color-text-danger);
+    }
+
+    /* Mobile Backdrop Scrim */
+    .dropdown-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.4);
+      z-index: var(--z-backdrop);
+    }
+
+    /* Responsive Mobile Bottom Sheet Transformation (<768px) */
+    @media (max-width: 767px) {
+      .dropdown-backdrop.is-active {
+        display: block;
+      }
+
+      .dropdown-menu.mobile-bottom-sheet {
+        position: fixed;
+        top: auto !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        padding: 16px 12px calc(16px + env(safe-area-inset-bottom, 0px));
+        transform: translateY(100%);
+        box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.15);
+      }
+
+      .dropdown-menu.mobile-bottom-sheet.is-open {
+        transform: translateY(0);
+      }
+
+      .dropdown-menu.mobile-bottom-sheet .dropdown-item {
+        padding: 14px 12px; /* Touch target enlarged to 48px */
+        font-size: 16px;
+      }
+
+      .dropdown-sheet-handle {
+        width: 36px;
+        height: 4px;
+        background: var(--color-border);
+        border-radius: 99px;
+        margin: 0 auto 12px auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Dropdown & Menu System Specification</h1>
+      <p class="description">
+        Standardized, accessible command menus with roving tabindex keyboard navigation,
+        viewport collision detection, and mobile bottom sheet adaptation.
+      </p>
+    </header>
+
+    <div class="demo-grid">
+
+      <!-- Demo 1: Table Row Overflow Action Menu -->
+      <div class="card">
+        <h2 class="card-title">1. Table Row Actions Menu</h2>
+        <div class="dropdown-wrapper">
+          <button
+            type="button"
+            id="demo-trigger-1"
+            class="btn-icon-trigger"
+            aria-label="Actions menu"
+            aria-haspopup="menu"
+            aria-expanded="false"
+            aria-controls="demo-menu-1"
+          >
+            <svg class="item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+            </svg>
+          </button>
+
+          <div
+            id="demo-menu-1"
+            class="dropdown-menu mobile-bottom-sheet"
+            role="menu"
+            aria-labelledby="demo-trigger-1"
+          >
+            <div class="dropdown-sheet-handle" aria-hidden="true"></div>
+
+            <div role="group" aria-label="Main Operations">
+              <button type="button" role="menuitem" class="dropdown-item" tabindex="-1">
+                <svg class="item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+                <span class="item-label">View Record</span>
+                <kbd class="item-shortcut">⌘V</kbd>
+              </button>
+
+              <button type="button" role="menuitem" class="dropdown-item" tabindex="-1">
+                <svg class="item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+                <span class="item-label">Edit Details</span>
+                <kbd class="item-shortcut">⌘E</kbd>
+              </button>
+            </div>
+
+            <hr role="separator" class="dropdown-divider">
+
+            <div role="group" aria-label="Destructive Operations">
+              <button type="button" role="menuitem" class="dropdown-item dropdown-item-danger" tabindex="-1">
+                <svg class="item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                <span class="item-label">Delete Entry</span>
+                <kbd class="item-shortcut">⌫</kbd>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Demo 2: User Account Dropdown Menu -->
+      <div class="card">
+        <h2 class="card-title">2. Account & Preference Menu</h2>
+        <div class="dropdown-wrapper">
+          <button
+            type="button"
+            id="demo-trigger-2"
+            class="btn-trigger"
+            aria-haspopup="menu"
+            aria-expanded="false"
+            aria-controls="demo-menu-2"
+          >
+            <span>Options</span>
+            <svg class="item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+
+          <div
+            id="demo-menu-2"
+            class="dropdown-menu mobile-bottom-sheet"
+            role="menu"
+            aria-labelledby="demo-trigger-2"
+          >
+            <div class="dropdown-sheet-handle" aria-hidden="true"></div>
+            <div class="dropdown-header">Preferences</div>
+
+            <button type="button" role="menuitemcheckbox" aria-checked="true" class="dropdown-item" tabindex="-1">
+              <svg class="item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+              <span class="item-label">Dark Mode</span>
+            </button>
+
+            <button type="button" role="menuitemcheckbox" aria-checked="false" class="dropdown-item" tabindex="-1">
+              <span class="item-icon"></span>
+              <span class="item-label">Compact Density</span>
+            </button>
+
+            <hr role="separator" class="dropdown-divider">
+
+            <button type="button" role="menuitem" class="dropdown-item" tabindex="-1">
+              <svg class="item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+              </svg>
+              <span class="item-label">Log Out</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="dropdown-backdrop" class="dropdown-backdrop"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const backdrop = document.getElementById('dropdown-backdrop');
+
+      function initDropdown(triggerId, menuId) {
+        const trigger = document.getElementById(triggerId);
+        const menu = document.getElementById(menuId);
+        if (!trigger || !menu) return;
+
+        const items = Array.from(menu.querySelectorAll('[role^="menuitem"]'));
+        let focusedIndex = -1;
+
+        function openMenu() {
+          // Close other open menus
+          document.querySelectorAll('.dropdown-menu.is-open').forEach(m => {
+            if (m !== menu) m.classList.remove('is-open');
+          });
+          document.querySelectorAll('[aria-haspopup="menu"]').forEach(t => {
+            if (t !== trigger) t.setAttribute('aria-expanded', 'false');
+          });
+
+          menu.classList.add('is-open');
+          trigger.setAttribute('aria-expanded', 'true');
+          backdrop.classList.add('is-active');
+
+          // Spatial collision check
+          const rect = menu.getBoundingClientRect();
+          if (rect.bottom > window.innerHeight && rect.top > menu.offsetHeight) {
+            menu.classList.add('dropdown-menu-top');
+          } else {
+            menu.classList.remove('dropdown-menu-top');
+          }
+
+          // Focus first item
+          focusedIndex = 0;
+          updateFocus();
+        }
+
+        function closeMenu() {
+          menu.classList.remove('is-open');
+          trigger.setAttribute('aria-expanded', 'false');
+          backdrop.classList.remove('is-active');
+          focusedIndex = -1;
+          items.forEach(item => item.setAttribute('tabindex', '-1'));
+          trigger.focus();
+        }
+
+        function updateFocus() {
+          items.forEach((item, index) => {
+            if (index === focusedIndex) {
+              item.setAttribute('tabindex', '0');
+              item.focus();
+            } else {
+              item.setAttribute('tabindex', '-1');
+            }
+          });
+        }
+
+        trigger.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isOpen = trigger.getAttribute('aria-expanded') === 'true';
+          if (isOpen) closeMenu(); else openMenu();
+        });
+
+        trigger.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openMenu();
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            openMenu();
+            focusedIndex = items.length - 1;
+            updateFocus();
+          }
+        });
+
+        menu.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            closeMenu();
+          } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            focusedIndex = (focusedIndex + 1) % items.length;
+            updateFocus();
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            focusedIndex = (focusedIndex - 1 + items.length) % items.length;
+            updateFocus();
+          } else if (e.key === 'Home') {
+            e.preventDefault();
+            focusedIndex = 0;
+            updateFocus();
+          } else if (e.key === 'End') {
+            e.preventDefault();
+            focusedIndex = items.length - 1;
+            updateFocus();
+          }
+        });
+
+        items.forEach((item) => {
+          item.addEventListener('click', () => {
+            if (item.getAttribute('role') === 'menuitemcheckbox') {
+              const checked = item.getAttribute('aria-checked') === 'true';
+              item.setAttribute('aria-checked', (!checked).toString());
+            }
+            closeMenu();
+          });
+        });
+      }
+
+      initDropdown('demo-trigger-1', 'demo-menu-1');
+      initDropdown('demo-trigger-2', 'demo-menu-2');
+
+      backdrop.addEventListener('click', () => {
+        document.querySelectorAll('.dropdown-menu.is-open').forEach(menu => {
+          menu.classList.remove('is-open');
+        });
+        document.querySelectorAll('[aria-haspopup="menu"]').forEach(trigger => {
+          trigger.setAttribute('aria-expanded', 'false');
+        });
+        backdrop.classList.remove('is-active');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.dropdown-wrapper')) {
+          document.querySelectorAll('.dropdown-menu.is-open').forEach(menu => {
+            menu.classList.remove('is-open');
+          });
+          document.querySelectorAll('[aria-haspopup="menu"]').forEach(trigger => {
+            trigger.setAttribute('aria-expanded', 'false');
+          });
+          backdrop.classList.remove('is-active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
