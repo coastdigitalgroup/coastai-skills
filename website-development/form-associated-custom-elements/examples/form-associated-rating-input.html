@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form-Associated Custom Elements (FACE) Example</title>
+  <style>
+    :root {
+      --color-bg: #f8fafc;
+      --color-card: #ffffff;
+      --color-border: #cbd5e1;
+      --color-text: #0f172a;
+      --color-muted: #64748b;
+      --color-primary: #2563eb;
+      --color-danger: #dc2626;
+      --color-star-active: #f59e0b;
+      --color-star-inactive: #d1d5db;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      line-height: 1.5;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p.subtitle {
+      color: var(--color-muted);
+      margin-top: 0;
+      margin-bottom: 2rem;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--color-card);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .card.broken {
+      border-top: 4px solid var(--color-danger);
+    }
+
+    .card.compliant {
+      border-top: 4px solid var(--color-primary);
+    }
+
+    .card h2 {
+      font-size: 1.25rem;
+      margin-top: 0;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button[type="reset"] {
+      background-color: transparent;
+      color: var(--color-muted);
+      border: 1px solid var(--color-border);
+      margin-left: 0.5rem;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .output-box {
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 1rem;
+      border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+      min-height: 80px;
+    }
+
+    fieldset {
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    legend {
+      font-weight: 600;
+      padding: 0 0.4rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Form-Associated Custom Elements (FACE) Demonstration</h1>
+  <p class="subtitle">Comparing a naive non-form-associated component with a compliant FACE implementation using ElementInternals.</p>
+
+  <div class="comparison-grid">
+
+    <!-- NAIVE BROKEN CUSTOM ELEMENT -->
+    <div class="card broken">
+      <h2>❌ Non-Form-Associated Component</h2>
+      <p style="font-size:0.85rem; color: var(--color-muted);">
+        Fails form submission, ignores <code>new FormData()</code>, ignores <code>form.reset()</code>, ignores required validation, and ignores fieldset disabling.
+      </p>
+
+      <form id="form-broken">
+        <div class="form-group">
+          <label for="user-name-1">Customer Name:</label>
+          <input type="text" id="user-name-1" name="customerName" value="Alice Smith" required>
+        </div>
+
+        <div class="form-group">
+          <label>Product Rating (Required):</label>
+          <!-- Broken component without form submission or validation hooks -->
+          <broken-rating id="broken-rating" name="rating" required></broken-rating>
+        </div>
+
+        <div class="form-group">
+          <button type="submit">Submit Form</button>
+          <button type="reset">Reset Form</button>
+        </div>
+      </form>
+
+      <h4>Form Submission Data:</h4>
+      <div id="output-broken" class="output-box">Click "Submit Form" to test...</div>
+    </div>
+
+    <!-- FULLY COMPLIANT FACE CUSTOM ELEMENT -->
+    <div class="card compliant">
+      <h2>✅ Form-Associated Custom Element</h2>
+      <p style="font-size:0.85rem; color: var(--color-muted);">
+        Integrates with <code>FormData</code>, triggers native HTML5 constraint validation popups, resets correctly on <code>form.reset()</code>, and respects fieldset state.
+      </p>
+
+      <form id="form-compliant">
+        <fieldset id="compliant-fieldset">
+          <legend>Feedback Form</legend>
+
+          <div class="form-group">
+            <label for="user-name-2">Customer Name:</label>
+            <input type="text" id="user-name-2" name="customerName" value="Bob Jones" required>
+          </div>
+
+          <div class="form-group">
+            <label for="star-rating-control">Product Rating (Required):</label>
+            <!-- Fully compliant FACE custom element -->
+            <star-rating id="star-rating-control" name="rating" required value="0"></star-rating>
+          </div>
+        </fieldset>
+
+        <div class="form-group" style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+          <button type="submit">Submit Form</button>
+          <button type="reset">Reset Form</button>
+          <label style="font-weight:normal; margin:0; display:inline-flex; align-items:center; gap:0.25rem;">
+            <input type="checkbox" id="toggle-fieldset-disable"> Disable Fieldset
+          </label>
+        </div>
+      </form>
+
+      <h4>Form Submission Data:</h4>
+      <div id="output-compliant" class="output-box">Click "Submit Form" to test...</div>
+    </div>
+
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. NAIVE / BROKEN CUSTOM ELEMENT
+    // =========================================================================
+    class BrokenRating extends HTMLElement {
+      constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.value = 0;
+        this.shadowRoot.innerHTML = `
+          <style>
+            :host { display: inline-block; font-size: 1.5rem; cursor: pointer; }
+            .star { color: #d1d5db; transition: color 0.15s; }
+            .star.active { color: #f59e0b; }
+          </style>
+          <div class="rating-container">
+            <span class="star" data-rating="1">★</span>
+            <span class="star" data-rating="2">★</span>
+            <span class="star" data-rating="3">★</span>
+            <span class="star" data-rating="4">★</span>
+            <span class="star" data-rating="5">★</span>
+          </div>
+        `;
+      }
+
+      connectedCallback() {
+        this.shadowRoot.querySelectorAll('.star').forEach(star => {
+          star.addEventListener('click', (e) => {
+            this.value = parseInt(e.target.dataset.rating, 10);
+            this.updateDisplay();
+          });
+        });
+      }
+
+      updateDisplay() {
+        const stars = this.shadowRoot.querySelectorAll('.star');
+        stars.forEach((star, index) => {
+          if (index < this.value) {
+            star.classList.add('active');
+          } else {
+            star.classList.remove('active');
+          }
+        });
+      }
+    }
+    customElements.define('broken-rating', BrokenRating);
+
+
+    // =========================================================================
+    // 2. COMPLIANT FORM-ASSOCIATED CUSTOM ELEMENT (FACE)
+    // =========================================================================
+    class StarRating extends HTMLElement {
+      // Step 1: Declare static formAssociated flag
+      static formAssociated = true;
+
+      // Private instance properties
+      #internals;
+      #value = 0;
+      #defaultValue = 0;
+      #disabled = false;
+
+      static get observedAttributes() {
+        return ['value', 'disabled', 'required', 'name'];
+      }
+
+      constructor() {
+        super();
+        // Step 2: Attach ElementInternals
+        this.#internals = this.attachInternals();
+        this.attachShadow({ mode: 'open' });
+
+        this.shadowRoot.innerHTML = `
+          <style>
+            :host {
+              display: inline-block;
+              outline: none;
+            }
+            :host(:focus-visible) .rating-container {
+              outline: 2px solid #2563eb;
+              outline-offset: 4px;
+              border-radius: 4px;
+            }
+            :host([disabled]) {
+              opacity: 0.5;
+              cursor: not-allowed;
+            }
+            .rating-container {
+              display: inline-flex;
+              gap: 0.25rem;
+              font-size: 1.75rem;
+              cursor: pointer;
+              user-select: none;
+            }
+            .star {
+              color: var(--color-star-inactive, #d1d5db);
+              transition: color 0.15s, transform 0.1s;
+            }
+            .star.active {
+              color: var(--color-star-active, #f59e0b);
+            }
+            :host(:not([disabled])) .star:hover {
+              transform: scale(1.15);
+            }
+          </style>
+          <div class="rating-container"
+               role="slider"
+               aria-label="Star Rating"
+               aria-valuemin="0"
+               aria-valuemax="5"
+               aria-valuenow="0"
+               tabindex="0">
+            <span class="star" data-value="1">★</span>
+            <span class="star" data-value="2">★</span>
+            <span class="star" data-value="3">★</span>
+            <span class="star" data-value="4">★</span>
+            <span class="star" data-value="5">★</span>
+          </div>
+        `;
+      }
+
+      connectedCallback() {
+        // Record initial default value for form reset
+        if (this.hasAttribute('value')) {
+          this.#defaultValue = parseInt(this.getAttribute('value'), 10) || 0;
+          this.#value = this.#defaultValue;
+        }
+
+        const container = this.shadowRoot.querySelector('.rating-container');
+
+        // Click interaction
+        container.addEventListener('click', (e) => {
+          if (this.#disabled) return;
+          const star = e.target.closest('.star');
+          if (star) {
+            this.value = parseInt(star.dataset.value, 10);
+          }
+        });
+
+        // Keyboard interaction (Accessibility)
+        container.addEventListener('keydown', (e) => {
+          if (this.#disabled) return;
+          let handled = false;
+
+          if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+            this.value = Math.min(5, this.#value + 1);
+            handled = true;
+          } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+            this.value = Math.max(0, this.#value - 1);
+            handled = true;
+          } else if (e.key === 'Home') {
+            this.value = 0;
+            handled = true;
+          } else if (e.key === 'End') {
+            this.value = 5;
+            handled = true;
+          } else if (e.key >= '0' && e.key <= '5') {
+            this.value = parseInt(e.key, 10);
+            handled = true;
+          }
+
+          if (handled) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        });
+
+        this.#syncState();
+      }
+
+      attributeChangedCallback(name, oldValue, newValue) {
+        if (oldValue === newValue) return;
+
+        if (name === 'value') {
+          this.#value = parseInt(newValue, 10) || 0;
+          this.#syncState();
+        } else if (name === 'disabled') {
+          this.#disabled = this.hasAttribute('disabled');
+          this.#syncState();
+        } else if (name === 'required') {
+          this.#validate();
+        }
+      }
+
+      // -----------------------------------------------------------------------
+      // Form Properties & Methods Mirroring
+      // -----------------------------------------------------------------------
+      get form() { return this.#internals.form; }
+      get name() { return this.getAttribute('name'); }
+      set name(val) { this.setAttribute('name', val); }
+
+      get type() { return 'star-rating'; }
+
+      get value() { return this.#value; }
+      set value(val) {
+        const numVal = parseInt(val, 10) || 0;
+        this.#value = Math.max(0, Math.min(5, numVal));
+        this.setAttribute('value', String(this.#value));
+        this.#syncState();
+      }
+
+      get disabled() { return this.#disabled; }
+      set disabled(val) {
+        if (val) this.setAttribute('disabled', '');
+        else this.removeAttribute('disabled');
+      }
+
+      get validity() { return this.#internals.validity; }
+      get validationMessage() { return this.#internals.validationMessage; }
+      get willValidate() { return this.#internals.willValidate; }
+
+      checkValidity() { return this.#internals.checkValidity(); }
+      reportValidity() { return this.#internals.reportValidity(); }
+
+      // -----------------------------------------------------------------------
+      // Form Lifecycle Callbacks
+      // -----------------------------------------------------------------------
+      formResetCallback() {
+        // Called when form.reset() is invoked
+        this.value = this.#defaultValue;
+      }
+
+      formDisabledCallback(disabled) {
+        // Called when host or parent fieldset disabled attribute changes
+        this.#disabled = disabled;
+        const container = this.shadowRoot.querySelector('.rating-container');
+        if (container) {
+          container.setAttribute('tabindex', disabled ? '-1' : '0');
+        }
+        this.#syncState();
+      }
+
+      formStateRestoreCallback(state, mode) {
+        // Called on browser session restore or autocomplete fill
+        if (state) {
+          this.value = parseInt(state, 10) || 0;
+        }
+      }
+
+      formAssociatedCallback(form) {
+        // React to parent form connection
+      }
+
+      // -----------------------------------------------------------------------
+      // Internal Helper Functions
+      // -----------------------------------------------------------------------
+      #syncState() {
+        // 1. Sync value with Form via ElementInternals setFormValue
+        if (this.#value > 0) {
+          this.#internals.setFormValue(String(this.#value));
+        } else {
+          // If 0 / unselected, set form value to null or empty
+          this.#internals.setFormValue(null);
+        }
+
+        // 2. Sync Visual UI Stars & ARIA attributes
+        const stars = this.shadowRoot.querySelectorAll('.star');
+        stars.forEach((star, index) => {
+          star.classList.toggle('active', index < this.#value);
+        });
+
+        const container = this.shadowRoot.querySelector('.rating-container');
+        if (container) {
+          container.setAttribute('aria-valuenow', String(this.#value));
+          container.setAttribute('aria-valuetext', `${this.#value} out of 5 stars`);
+        }
+
+        // 3. Trigger Constraint Validation Check
+        this.#validate();
+      }
+
+      #validate() {
+        if (this.hasAttribute('required') && this.#value === 0) {
+          const anchor = this.shadowRoot.querySelector('.rating-container');
+          // Set invalid status with custom error message and focus anchor
+          this.#internals.setValidity(
+            { valueMissing: true },
+            'Please select a star rating before submitting.',
+            anchor
+          );
+        } else {
+          // Clear validity error flags
+          this.#internals.setValidity({});
+        }
+      }
+    }
+    customElements.define('star-rating', StarRating);
+
+
+    // =========================================================================
+    // EVENT LISTENERS & UI HANDLERS FOR TESTING
+    // =========================================================================
+
+    // Broken Form Handlers
+    const formBroken = document.getElementById('form-broken');
+    const outputBroken = document.getElementById('output-broken');
+
+    formBroken.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const formData = new FormData(formBroken);
+      const entries = Object.fromEntries(formData.entries());
+      outputBroken.textContent = `SUBMITTED PAYLOAD:\n${JSON.stringify(entries, null, 2)}\n\nNOTE: "rating" field is missing!`;
+    });
+
+    // Compliant Form Handlers
+    const formCompliant = document.getElementById('form-compliant');
+    const outputCompliant = document.getElementById('output-compliant');
+    const toggleFieldset = document.getElementById('toggle-fieldset-disable');
+    const compliantFieldset = document.getElementById('compliant-fieldset');
+
+    formCompliant.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const formData = new FormData(formCompliant);
+      const entries = Object.fromEntries(formData.entries());
+      outputCompliant.textContent = `SUCCESSFUL SUBMISSION PAYLOAD:\n${JSON.stringify(entries, null, 2)}`;
+    });
+
+    toggleFieldset.addEventListener('change', (e) => {
+      compliantFieldset.disabled = e.target.checked;
+    });
+  </script>
+
+</body>
+</html>
