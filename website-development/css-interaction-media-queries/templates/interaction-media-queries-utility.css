@@ -1,0 +1,103 @@
+/**
+ * CSS Interaction Media Queries Utility Snippets
+ * Production-ready utility classes, custom CSS properties, and input-aware mixins.
+ */
+
+:root {
+  /* Default Target Size Variables (WCAG 2.2 Level AA / AAA) */
+  --target-size-min: 24px;
+  --target-size-recommended: 44px;
+  --touch-padding-inline: 16px;
+  --touch-padding-block: 12px;
+
+  --mouse-padding-inline: 12px;
+  --mouse-padding-block: 8px;
+}
+
+/* ==========================================================================
+   1. TARGET SIZE UTILITIES (@media (pointer: coarse))
+   ========================================================================== */
+
+/* Compact by default (pointer: fine) */
+.ui-interactive-element,
+.ui-button,
+.ui-icon-btn,
+.ui-input {
+  min-height: 32px;
+  padding: var(--mouse-padding-block) var(--mouse-padding-inline);
+}
+
+/* Scale up for finger touch targets when coarse pointer is detected */
+@media (pointer: coarse) {
+  .ui-interactive-element,
+  .ui-button,
+  .ui-input {
+    min-height: var(--target-size-recommended);
+    padding: var(--touch-padding-block) var(--touch-padding-inline);
+    font-size: 1rem; /* Prevent auto-zoom on iOS inputs */
+  }
+
+  .ui-icon-btn {
+    min-width: var(--target-size-recommended);
+    min-height: var(--target-size-recommended);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* ==========================================================================
+   2. STICKY HOVER GUARDS (@media (hover: hover))
+   ========================================================================== */
+
+/* Safe hover class utility */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+@media (hover: hover) {
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
+}
+
+/* Tactile press state for all input modalities */
+.hover-lift:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ==========================================================================
+   3. ADAPTIVE DISCLOSURE UTILITIES (@media (hover: none))
+   ========================================================================== */
+
+/* Controls that reveal on hover on desktop, but stay permanently visible on touch */
+.disclosure-overlay-action {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (hover: hover) {
+  .disclosure-overlay-action {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+  }
+
+  .disclosure-container:hover .disclosure-overlay-action,
+  .disclosure-container:focus-within .disclosure-overlay-action {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+/* ==========================================================================
+   4. HYBRID & FINE-POINTER DENSITY MODIFIERS (@media (any-pointer: fine))
+   ========================================================================== */
+
+/* Expose precision handles if ANY connected device has fine precision */
+@media (any-pointer: fine) {
+  .has-precision-pointer {
+    --show-dense-tooltips: 1;
+  }
+}
