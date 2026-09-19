@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toggle and Switch System Specification Template</title>
+  <style>
+    /* ==========================================================================
+       TOGGLE AND SWITCH SYSTEM DESIGN TOKENS
+       ========================================================================== */
+    :root {
+      /* Sizing tokens */
+      --switch-track-width: 44px;
+      --switch-track-height: 24px;
+      --switch-track-padding: 2px;
+      --switch-thumb-size: 20px;
+      --switch-thumb-travel: 20px; /* track-width - track-padding*2 - thumb-size */
+      --switch-radius: 9999px;
+      --switch-touch-min-height: 44px;
+
+      /* Color tokens - Light Theme */
+      --switch-off-track-bg: #6B7280; /* Gray 500 (3.5:1 WCAG contrast on white) */
+      --switch-off-track-hover: #4B5563;
+      --switch-on-track-bg: #2563EB; /* Blue 600 (4.5:1 WCAG contrast) */
+      --switch-on-track-hover: #1D4ED8;
+      --switch-thumb-bg: #FFFFFF;
+      --switch-thumb-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      --switch-focus-ring: #2563EB;
+      --switch-disabled-track: #E5E7EB;
+      --switch-disabled-thumb: #9CA3AF;
+
+      /* Transitions */
+      --switch-transition-speed: 0.2s;
+      --switch-transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+
+      /* Typography & Layout */
+      --color-text-primary: #111827;
+      --color-text-secondary: #4B5563;
+      --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --switch-off-track-bg: #4B5563;
+        --switch-off-track-hover: #6B7280;
+        --switch-on-track-bg: #3B82F6;
+        --switch-on-track-hover: #60A5FA;
+        --switch-thumb-bg: #FFFFFF;
+        --switch-disabled-track: #374151;
+        --switch-disabled-thumb: #6B7280;
+        --color-text-primary: #F9FAFB;
+        --color-text-secondary: #9CA3AF;
+      }
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: #F9FAFB;
+      color: var(--color-text-primary);
+      padding: 2rem;
+      margin: 0;
+    }
+
+    /* ==========================================================================
+       SWITCH LIST CONTAINER
+       ========================================================================== */
+    .switch-group {
+      max-width: 560px;
+      margin: 0 auto;
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+
+    /* ==========================================================================
+       SWITCH ITEM COMPONENT (FULL ROW TOUCH TARGET)
+       ========================================================================== */
+    .switch-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: var(--switch-touch-min-height);
+      padding: 16px 20px;
+      border-bottom: 1px solid #F3F4F6;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.15s ease;
+    }
+
+    .switch-item:last-child {
+      border-bottom: none;
+    }
+
+    .switch-item:hover {
+      background-color: #F9FAFB;
+    }
+
+    .switch-item.is-disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .switch-label-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding-right: 16px;
+    }
+
+    .switch-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .switch-description {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      line-height: 1.4;
+    }
+
+    /* ==========================================================================
+       PHYSICAL SWITCH CONTROL (ACCESSIBLE INPUT WRAPPER)
+       ========================================================================== */
+    .switch-control {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      flex-shrink: 0;
+      width: var(--switch-track-width);
+      height: var(--switch-track-height);
+    }
+
+    /* Hide native checkbox visually while maintaining screen reader & keyboard accessibility */
+    .switch-input {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      margin: 0;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .switch-input:disabled {
+      cursor: not-allowed;
+    }
+
+    /* Switch Track */
+    .switch-track {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--switch-off-track-bg);
+      border-radius: var(--switch-radius);
+      transition: background-color var(--switch-transition-speed) var(--switch-transition-timing);
+    }
+
+    .switch-input:hover + .switch-track {
+      background-color: var(--switch-off-track-hover);
+    }
+
+    .switch-input:checked + .switch-track {
+      background-color: var(--switch-on-track-bg);
+    }
+
+    .switch-input:checked:hover + .switch-track {
+      background-color: var(--switch-on-track-hover);
+    }
+
+    .switch-input:disabled + .switch-track {
+      background-color: var(--switch-disabled-track);
+    }
+
+    /* Switch Thumb */
+    .switch-thumb {
+      position: absolute;
+      top: var(--switch-track-padding);
+      left: var(--switch-track-padding);
+      width: var(--switch-thumb-size);
+      height: var(--switch-thumb-size);
+      background-color: var(--switch-thumb-bg);
+      border-radius: 50%;
+      box-shadow: var(--switch-thumb-shadow);
+      transition: transform var(--switch-transition-speed) var(--switch-transition-timing);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .switch-input:checked ~ .switch-track .switch-thumb {
+      transform: translateX(var(--switch-thumb-travel));
+    }
+
+    .switch-input:disabled ~ .switch-track .switch-thumb {
+      background-color: var(--switch-disabled-thumb);
+      box-shadow: none;
+    }
+
+    /* FOCUS VISIBLE INDICATOR (WCAG 2.2 COMPLIANT) */
+    .switch-input:focus-visible + .switch-track {
+      outline: 2px solid var(--switch-focus-ring);
+      outline-offset: 3px;
+    }
+
+    /* ==========================================================================
+       REDUCED MOTION ACCESSIBILITY (PREFERS-REDUCED-MOTION)
+       ========================================================================== */
+    @media (prefers-reduced-motion: reduce) {
+      .switch-track,
+      .switch-thumb {
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main>
+    <div class="switch-group" role="group" aria-label="Notification Preferences">
+
+      <!-- ITEM 1: DEFAULT OFF SWITCH -->
+      <label class="switch-item" for="switch-email">
+        <div class="switch-label-group">
+          <span class="switch-title" id="title-email">Email Digest Notifications</span>
+          <span class="switch-description" id="desc-email">Receive a weekly summary of workspace activities and statistics.</span>
+        </div>
+        <div class="switch-control">
+          <input
+            type="checkbox"
+            id="switch-email"
+            class="switch-input"
+            role="switch"
+            aria-checked="false"
+            aria-labelledby="title-email"
+            aria-describedby="desc-email"
+          >
+          <div class="switch-track" aria-hidden="true">
+            <div class="switch-thumb"></div>
+          </div>
+        </div>
+      </label>
+
+      <!-- ITEM 2: DEFAULT ON SWITCH -->
+      <label class="switch-item" for="switch-push">
+        <div class="switch-label-group">
+          <span class="switch-title" id="title-push">Push Alerts for Direct Messages</span>
+          <span class="switch-description" id="desc-push">Get real-time browser notifications when mentioned in comments.</span>
+        </div>
+        <div class="switch-control">
+          <input
+            type="checkbox"
+            id="switch-push"
+            class="switch-input"
+            role="switch"
+            aria-checked="true"
+            checked
+            aria-labelledby="title-push"
+            aria-describedby="desc-push"
+          >
+          <div class="switch-track" aria-hidden="true">
+            <div class="switch-thumb"></div>
+          </div>
+        </div>
+      </label>
+
+      <!-- ITEM 3: DISABLED SWITCH -->
+      <label class="switch-item is-disabled" for="switch-sms">
+        <div class="switch-label-group">
+          <span class="switch-title" id="title-sms">SMS Security Alerts (Upgrade Required)</span>
+          <span class="switch-description" id="desc-sms">SMS alerts require an active Enterprise subscription plan.</span>
+        </div>
+        <div class="switch-control">
+          <input
+            type="checkbox"
+            id="switch-sms"
+            class="switch-input"
+            role="switch"
+            aria-checked="false"
+            disabled
+            aria-labelledby="title-sms"
+            aria-describedby="desc-sms"
+          >
+          <div class="switch-track" aria-hidden="true">
+            <div class="switch-thumb"></div>
+          </div>
+        </div>
+      </label>
+
+    </div>
+  </main>
+
+  <script>
+    // Keep aria-checked attribute in sync with input state for accessibility trees
+    document.querySelectorAll('.switch-input').forEach(input => {
+      input.addEventListener('change', (e) => {
+        e.target.setAttribute('aria-checked', e.target.checked ? 'true' : 'false');
+      });
+    });
+  </script>
+</body>
+</html>
