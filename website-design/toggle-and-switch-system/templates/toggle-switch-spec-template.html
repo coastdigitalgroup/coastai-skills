@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toggle and Switch System Specification Template</title>
+  <style>
+    /* ==========================================================================
+       DESIGN TOKENS & BASE RESET
+       ========================================================================== */
+    :root {
+      --color-bg-app: #f8fafc;
+      --color-surface-card: #ffffff;
+      --color-border-card: #e2e8f0;
+      --color-border-divider: #f1f5f9;
+
+      --color-text-primary: #0f172a;
+      --color-text-secondary: #475569;
+      --color-text-disabled: #94a3b8;
+
+      /* Switch Specific Tokens */
+      --switch-track-off-bg: #64748b;        /* 3.6:1 contrast against white */
+      --switch-track-off-border: #475569;
+      --switch-track-on-bg: #2563eb;         /* High-contrast active primary */
+      --switch-track-disabled-bg: #cbd5e1;
+      --switch-thumb-bg: #ffffff;
+      --switch-focus-ring: #2563eb;
+
+      --color-status-success: #16a34a;
+      --color-status-error: #dc2626;
+
+      --radius-full: 9999px;
+      --radius-card: 16px;
+
+      --space-xs: 4px;
+      --space-s: 8px;
+      --space-m: 16px;
+      --space-l: 24px;
+
+      --transition-standard: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Dark Mode Design Token Overrides */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-bg-app: #0f172a;
+        --color-surface-card: #1e293b;
+        --color-border-card: #334155;
+        --color-border-divider: #334155;
+
+        --color-text-primary: #f8fafc;
+        --color-text-secondary: #94a3b8;
+        --color-text-disabled: #64748b;
+
+        --switch-track-off-bg: #475569;
+        --switch-track-off-border: #64748b;
+        --switch-track-on-bg: #3b82f6;
+        --switch-track-disabled-bg: #334155;
+        --switch-focus-ring: #60a5fa;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--color-bg-app);
+      color: var(--color-text-primary);
+      line-height: 1.5;
+      padding: var(--space-l);
+      display: flex;
+      justify-content: center;
+    }
+
+    .settings-container {
+      width: 100%;
+      max-width: 680px;
+    }
+
+    .settings-header {
+      margin-bottom: var(--space-l);
+    }
+
+    .settings-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--color-text-primary);
+    }
+
+    .settings-subtitle {
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+      margin-top: var(--space-xs);
+    }
+
+    /* ==========================================================================
+       SETTINGS CARD & SWITCH LIST LAYOUT
+       ========================================================================== */
+    .settings-card {
+      background-color: var(--color-surface-card);
+      border: 1px solid var(--color-border-card);
+      border-radius: var(--radius-card);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+
+    .switch-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-m) var(--space-l);
+      border-bottom: 1px solid var(--color-border-divider);
+      gap: var(--space-m);
+      transition: background-color var(--transition-standard);
+    }
+
+    .switch-row:last-child {
+      border-bottom: none;
+    }
+
+    .switch-row:hover:not(.is-disabled) {
+      background-color: rgba(0, 0, 0, 0.015);
+    }
+
+    /* Text Column Stack */
+    .switch-label-stack {
+      flex: 1 1 auto;
+      max-width: calc(100% - 100px);
+    }
+
+    .switch-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      display: flex;
+      align-items: center;
+      gap: var(--space-s);
+    }
+
+    .switch-description {
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+      margin-top: 2px;
+    }
+
+    .badge-pro {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background-color: rgba(37, 99, 235, 0.1);
+      color: var(--switch-track-on-bg);
+    }
+
+    /* Right Control Container */
+    .switch-control-wrapper {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: var(--space-s);
+    }
+
+    .status-badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      min-width: 60px;
+      text-align: right;
+      color: var(--color-text-secondary);
+      transition: opacity var(--transition-standard);
+    }
+
+    .status-badge.is-saved {
+      color: var(--color-status-success);
+    }
+
+    .status-badge.is-error {
+      color: var(--color-status-error);
+    }
+
+    /* ==========================================================================
+       TOGGLE SWITCH COMPONENT ANATOMY & STATES
+       ========================================================================== */
+    .switch {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+      width: 48px;                     /* Visual Track Width */
+      height: 26px;                    /* Visual Track Height */
+      padding: 2px;                    /* Thumb Inset Margin */
+      background-color: var(--switch-track-off-bg);
+      border: 1px solid var(--switch-track-off-border);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      outline: none;
+      transition: background-color var(--transition-standard), border-color var(--transition-standard);
+    }
+
+    /* Extended Touch Target Layer (WCAG 2.2 SC 2.5.8 Compliant: Minimum 44x44px) */
+    .switch::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 48px;
+      height: 44px;                    /* Ensures 44px vertical hit target */
+    }
+
+    /* Switch Thumb Assembly */
+    .switch-thumb {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      background-color: var(--switch-thumb-bg);
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+      transition: transform var(--transition-standard);
+      pointer-events: none;
+    }
+
+    /* ACTIVE / ON STATE */
+    .switch[aria-checked="true"] {
+      background-color: var(--switch-track-on-bg);
+      border-color: var(--switch-track-on-bg);
+    }
+
+    .switch[aria-checked="true"] .switch-thumb {
+      transform: translateX(22px);     /* Track width (48) - thumb (20) - padding (4) - border (2) = 22px */
+    }
+
+    /* KEYBOARD FOCUS-VISIBLE STATE */
+    .switch:focus-visible {
+      outline: 3px solid var(--switch-focus-ring);
+      outline-offset: 3px;
+    }
+
+    /* DISABLED STATE */
+    .switch:disabled,
+    .switch[aria-disabled="true"] {
+      background-color: var(--switch-track-disabled-bg);
+      border-color: transparent;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .switch-row.is-disabled .switch-title,
+    .switch-row.is-disabled .switch-description {
+      color: var(--color-text-disabled);
+    }
+
+    /* ASYNCHRONOUS LOADING / PENDING STATE */
+    .switch.is-loading {
+      cursor: wait;
+      opacity: 0.8;
+    }
+
+    .switch-spinner {
+      display: none;
+      width: 12px;
+      height: 12px;
+      border: 2px solid rgba(0, 0, 0, 0.2);
+      border-top-color: var(--switch-track-on-bg);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    .switch.is-loading .switch-spinner {
+      display: block;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ==========================================================================
+       REDUCED MOTION PREFERENCE OVERRIDE (WCAG 2.3.3)
+       ========================================================================== */
+    @media (prefers-reduced-motion: reduce) {
+      .switch,
+      .switch-thumb,
+      .switch-row {
+        transition: none !important;
+      }
+    }
+
+    /* Mobile Responsive Adaptation */
+    @media (max-width: 480px) {
+      .switch-row {
+        padding: var(--space-m);
+      }
+      .switch-label-stack {
+        max-width: calc(100% - 80px);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="settings-container">
+    <header class="settings-header">
+      <h1 class="settings-title">Security & Notification Preferences</h1>
+      <p class="settings-subtitle">Manage automated protections and alerts. Changes take effect instantly.</p>
+    </header>
+
+    <div class="settings-card" role="group" aria-label="Security and Notification Settings">
+
+      <!-- ROW 1: Standard Active Switch -->
+      <div class="switch-row">
+        <div class="switch-label-stack">
+          <label id="label-2fa" for="switch-2fa" class="switch-title">
+            Two-Factor Authentication (2FA)
+          </label>
+          <p id="desc-2fa" class="switch-description">
+            Require a one-time verification code from an authenticator app when signing in.
+          </p>
+        </div>
+        <div class="switch-control-wrapper">
+          <button type="button"
+                  id="switch-2fa"
+                  class="switch"
+                  role="switch"
+                  aria-checked="true"
+                  aria-labelledby="label-2fa"
+                  aria-describedby="desc-2fa">
+            <span class="switch-thumb"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ROW 2: Standard Inactive Switch -->
+      <div class="switch-row">
+        <div class="switch-label-stack">
+          <label id="label-desktop-push" for="switch-desktop-push" class="switch-title">
+            Desktop Push Notifications
+          </label>
+          <p id="desc-desktop-push" class="switch-description">
+            Receive real-time alerts on suspicious login attempts directly in your browser.
+          </p>
+        </div>
+        <div class="switch-control-wrapper">
+          <button type="button"
+                  id="switch-desktop-push"
+                  class="switch"
+                  role="switch"
+                  aria-checked="false"
+                  aria-labelledby="label-desktop-push"
+                  aria-describedby="desc-desktop-push">
+            <span class="switch-thumb"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ROW 3: Asynchronous Saving State Switch -->
+      <div class="switch-row">
+        <div class="switch-label-stack">
+          <label id="label-threat-blocking" for="switch-threat-blocking" class="switch-title">
+            Automated Threat Blocking <span class="badge-pro">PRO</span>
+          </label>
+          <p id="desc-threat-blocking" class="switch-description">
+            Instantly drop requests from IP ranges flagged by our global threat intelligence network.
+          </p>
+        </div>
+        <div class="switch-control-wrapper">
+          <span id="status-threat-blocking" class="status-badge" aria-live="polite"></span>
+          <button type="button"
+                  id="switch-threat-blocking"
+                  class="switch"
+                  role="switch"
+                  aria-checked="true"
+                  aria-labelledby="label-threat-blocking"
+                  aria-describedby="desc-threat-blocking">
+            <span class="switch-thumb">
+              <span class="switch-spinner" aria-hidden="true"></span>
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ROW 4: Disabled Switch -->
+      <div class="switch-row is-disabled">
+        <div class="switch-label-stack">
+          <span id="label-audit-logs" class="switch-title">
+            SIEM Audit Log Streaming
+          </span>
+          <p id="desc-audit-logs" class="switch-description">
+            Export real-time authentication logs to Splunk or Datadog. Requires Enterprise plan.
+          </p>
+        </div>
+        <div class="switch-control-wrapper">
+          <button type="button"
+                  id="switch-audit-logs"
+                  class="switch"
+                  role="switch"
+                  aria-checked="false"
+                  disabled
+                  aria-disabled="true"
+                  aria-labelledby="label-audit-logs"
+                  aria-describedby="desc-audit-logs">
+            <span class="switch-thumb"></span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    /* ==========================================================================
+       ACCESSIBLE TOGGLE SWITCH CONTROLLER & ASYNC DEMO
+       ========================================================================== */
+    document.addEventListener('DOMContentLoaded', () => {
+      const switches = document.querySelectorAll('.switch:not(:disabled)');
+
+      switches.forEach(switchEl => {
+        switchEl.addEventListener('click', () => {
+          toggleSwitch(switchEl);
+        });
+
+        /* Ensure Space and Enter keys trigger toggle behavior naturally */
+        switchEl.addEventListener('keydown', (e) => {
+          if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            toggleSwitch(switchEl);
+          }
+        });
+      });
+
+      function toggleSwitch(switchEl) {
+        if (switchEl.classList.contains('is-loading')) return;
+
+        const isChecked = switchEl.getAttribute('aria-checked') === 'true';
+        const newState = !isChecked;
+
+        /* Special demo behavior for Asynchronous Loading Switch */
+        if (switchEl.id === 'switch-threat-blocking') {
+          handleAsyncToggle(switchEl, newState);
+        } else {
+          /* Instant State Update */
+          switchEl.setAttribute('aria-checked', newState ? 'true' : 'false');
+        }
+      }
+
+      function handleAsyncToggle(switchEl, newState) {
+        const statusBadge = document.getElementById('status-threat-blocking');
+
+        // Enter Loading / Pending State
+        switchEl.classList.add('is-loading');
+        switchEl.setAttribute('aria-busy', 'true');
+        statusBadge.textContent = 'Saving...';
+        statusBadge.className = 'status-badge';
+
+        // Optimistically move thumb
+        switchEl.setAttribute('aria-checked', newState ? 'true' : 'false');
+
+        // Simulate 1.2s Network API Request
+        setTimeout(() => {
+          switchEl.classList.remove('is-loading');
+          switchEl.removeAttribute('aria-busy');
+
+          statusBadge.textContent = 'Saved ✓';
+          statusBadge.classList.add('is-saved');
+
+          // Clear success badge after 2 seconds
+          setTimeout(() => {
+            statusBadge.style.opacity = '0';
+            setTimeout(() => {
+              statusBadge.textContent = '';
+              statusBadge.style.opacity = '1';
+              statusBadge.classList.remove('is-saved');
+            }, 200);
+          }, 2000);
+
+        }, 1200);
+      }
+    });
+  </script>
+</body>
+</html>
