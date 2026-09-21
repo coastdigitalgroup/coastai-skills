@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inert Attribute Management - Example</title>
+  <style>
+    :root {
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-text: #0f172a;
+      --color-text-muted: #64748b;
+      --color-primary: #2563eb;
+      --color-primary-hover: #1d4ed8;
+      --color-border: #e2e8f0;
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.5;
+      padding: 2rem;
+    }
+
+    header, main, footer {
+      max-width: 800px;
+      margin: 0 auto 1.5rem auto;
+      background: var(--color-surface);
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--color-border);
+    }
+
+    /* Native :inert visual feedback styling */
+    header:inert,
+    main:inert,
+    footer:inert,
+    .wizard-step:inert {
+      opacity: 0.4;
+      pointer-events: none;
+      user-select: none;
+      filter: grayscale(50%);
+      transition: opacity 0.25s ease, filter 0.25s ease;
+    }
+
+    h1, h2, h3 {
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      color: var(--color-text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #fff;
+      background-color: var(--color-primary);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+
+    .btn:hover {
+      background-color: var(--color-primary-hover);
+    }
+
+    .btn-secondary {
+      background-color: #475569;
+    }
+
+    .btn-secondary:hover {
+      background-color: #334155;
+    }
+
+    .btn-danger {
+      background-color: #dc2626;
+    }
+
+    .btn-danger:hover {
+      background-color: #b91c1c;
+    }
+
+    /* Drawer / Modal Overlay CSS */
+    .overlay-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+
+    .overlay-backdrop.is-open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .drawer-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 360px;
+      background: var(--color-surface);
+      box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+      z-index: 101;
+      padding: 2rem;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .drawer-panel.is-open {
+      transform: translateX(0);
+    }
+
+    .modal-box {
+      background: var(--color-surface);
+      padding: 2rem;
+      border-radius: var(--radius);
+      width: 90%;
+      max-width: 480px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Form & Wizard Styles */
+    .wizard-card {
+      border: 1px solid var(--color-border);
+      padding: 1.25rem;
+      border-radius: var(--radius);
+      margin-top: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.375rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      font-size: 0.875rem;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      background: #e0f2fe;
+      color: #0369a1;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Root Page Header -->
+  <header id="page-header">
+    <h1>Inert Attribute Management Demo</h1>
+    <p>Demonstrates using HTML <code>inert</code> to cleanly suppress focus, pointer interaction, and screen reader virtual navigation on background subtrees.</p>
+    <button id="open-drawer-btn" class="btn">Open Cart Drawer</button>
+  </header>
+
+  <!-- Root Main Content -->
+  <main id="main-content">
+    <section>
+      <h2>Multi-Step Wizard Example</h2>
+      <p>Step 2 is currently active. Step 1 and Step 3 have the <code>inert</code> attribute declared, preventing tabbing or pointer interaction into inactive steps.</p>
+
+      <!-- Step 1 (Inert) -->
+      <div id="step-1" class="wizard-card wizard-step" inert>
+        <span class="status-badge">Step 1 (Inert)</span>
+        <h3>1. Account Setup</h3>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" value="user@example.com" readonly>
+        </div>
+      </div>
+
+      <!-- Step 2 (Active) -->
+      <div id="step-2" class="wizard-card wizard-step">
+        <span class="status-badge" style="background: #dcfce7; color: #15803d;">Step 2 (Active)</span>
+        <h3>2. Shipping Information</h3>
+        <div class="form-group">
+          <label for="street">Street Address</label>
+          <input type="text" id="street" placeholder="123 Main St">
+        </div>
+        <div class="form-group">
+          <label for="city">City</label>
+          <input type="text" id="city" placeholder="San Francisco">
+        </div>
+        <div class="nav-buttons">
+          <button id="prev-step" class="btn btn-secondary">Back to Step 1</button>
+          <button id="next-step" class="btn">Proceed to Step 3</button>
+        </div>
+      </div>
+
+      <!-- Step 3 (Inert) -->
+      <div id="step-3" class="wizard-card wizard-step" inert>
+        <span class="status-badge">Step 3 (Inert)</span>
+        <h3>3. Payment Details</h3>
+        <div class="form-group">
+          <label for="card">Card Number</label>
+          <input type="text" id="card" placeholder="•••• •••• •••• ••••">
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Root Footer -->
+  <footer id="page-footer">
+    <p>&copy; 2025 Frontend Engineering Skill Library. Accessible &amp; Inert Compliant.</p>
+  </footer>
+
+  <!-- Slide-Out Drawer (Sibling to Header, Main, Footer) -->
+  <aside id="cart-drawer" class="drawer-panel" aria-label="Shopping Cart Drawer" inert>
+    <h2>Your Cart</h2>
+    <p>Background regions (Header, Main, Footer) are marked <code>inert</code> while this drawer is open.</p>
+    <div style="margin: 1.5rem 0;">
+      <button id="checkout-modal-btn" class="btn">Open Confirmation Modal</button>
+    </div>
+    <button id="close-drawer-btn" class="btn btn-secondary">Close Drawer</button>
+  </aside>
+
+  <!-- Sub-Modal Dialog Backdrop & Container (Sibling to Header, Main, Footer, Drawer) -->
+  <div id="modal-backdrop" class="overlay-backdrop" inert>
+    <div id="confirm-modal" class="modal-box" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+      <h2 id="modal-title">Confirm Checkout</h2>
+      <p>This modal sits on top of the drawer. Reference-counted inert management keeps the main page inert while handling multi-layered overlays.</p>
+      <div class="nav-buttons">
+        <button id="confirm-btn" class="btn btn-danger">Confirm &amp; Pay</button>
+        <button id="close-modal-btn" class="btn btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * Inert Subtree Manager - Production Reference Implementation
+     */
+    class InertSubtreeManager {
+      constructor() {
+        // Track how many active overlays have rendered each root element inert
+        this.inertCounts = new Map();
+        this.focusHistory = [];
+      }
+
+      /**
+       * Render target elements inert and isolate an active overlay element
+       * @param {HTMLElement[]} targetRoots - Sibling elements to render inert
+       * @param {HTMLElement} activeContainer - The container receiving interactive focus
+       */
+      isolate(targetRoots, activeContainer) {
+        // Save focus location for restoration
+        if (document.activeElement && document.activeElement !== document.body) {
+          this.focusHistory.push(document.activeElement);
+        }
+
+        // Apply inert to targets with reference counting
+        targetRoots.forEach(el => {
+          if (!el) return;
+          const currentCount = this.inertCounts.get(el) || 0;
+          this.inertCounts.set(el, currentCount + 1);
+          el.inert = true;
+        });
+
+        // Ensure active container is NOT inert
+        if (activeContainer) {
+          activeContainer.inert = false;
+          // Set focus into active container
+          const focusable = activeContainer.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+          if (focusable) {
+            focusable.focus();
+          } else {
+            activeContainer.setAttribute('tabindex', '-1');
+            activeContainer.focus();
+          }
+        }
+      }
+
+      /**
+       * Restore previous inert state and return focus
+       * @param {HTMLElement[]} targetRoots - Sibling elements to release from inert
+       */
+      restore(targetRoots) {
+        targetRoots.forEach(el => {
+          if (!el) return;
+          const currentCount = this.inertCounts.get(el) || 0;
+          const newCount = Math.max(0, currentCount - 1);
+          this.inertCounts.set(el, newCount);
+
+          if (newCount === 0) {
+            el.inert = false;
+          }
+        });
+
+        // Restore focus to previous trigger
+        const previousFocus = this.focusHistory.pop();
+        if (previousFocus && typeof previousFocus.focus === 'function') {
+          previousFocus.focus();
+        }
+      }
+    }
+
+    const inertManager = new InertSubtreeManager();
+
+    // DOM Elements
+    const pageHeader = document.getElementById('page-header');
+    const mainContent = document.getElementById('main-content');
+    const pageFooter = document.getElementById('page-footer');
+    const cartDrawer = document.getElementById('cart-drawer');
+    const modalBackdrop = document.getElementById('modal-backdrop');
+
+    const openDrawerBtn = document.getElementById('open-drawer-btn');
+    const closeDrawerBtn = document.getElementById('close-drawer-btn');
+    const checkoutModalBtn = document.getElementById('checkout-modal-btn');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const confirmBtn = document.getElementById('confirm-btn');
+
+    const backgroundRoots = [pageHeader, mainContent, pageFooter];
+
+    // Open Cart Drawer
+    openDrawerBtn.addEventListener('click', () => {
+      cartDrawer.classList.add('is-open');
+      inertManager.isolate(backgroundRoots, cartDrawer);
+    });
+
+    // Close Cart Drawer
+    closeDrawerBtn.addEventListener('click', () => {
+      cartDrawer.classList.remove('is-open');
+      cartDrawer.inert = true;
+      inertManager.restore(backgroundRoots);
+    });
+
+    // Open Sub-Modal (Cascading Overlay over Drawer)
+    checkoutModalBtn.addEventListener('click', () => {
+      modalBackdrop.classList.add('is-open');
+      // When modal opens, also isolate the drawer underneath it
+      inertManager.isolate([...backgroundRoots, cartDrawer], modalBackdrop);
+    });
+
+    // Close Sub-Modal
+    closeModalBtn.addEventListener('click', () => {
+      modalBackdrop.classList.remove('is-open');
+      modalBackdrop.inert = true;
+      // Restores drawer to active state, main roots remain inert until drawer closes
+      inertManager.restore([...backgroundRoots, cartDrawer]);
+    });
+
+    confirmBtn.addEventListener('click', () => {
+      alert('Order placed successfully!');
+      modalBackdrop.classList.remove('is-open');
+      modalBackdrop.inert = true;
+      cartDrawer.classList.remove('is-open');
+      cartDrawer.inert = true;
+      // Reset all inert states
+      inertManager.restore([...backgroundRoots, cartDrawer]);
+      inertManager.restore(backgroundRoots);
+    });
+
+    // Multi-step form step toggling using inert
+    const step1 = document.getElementById('step-1');
+    const step2 = document.getElementById('step-2');
+    const step3 = document.getElementById('step-3');
+    const prevStepBtn = document.getElementById('prev-step');
+    const nextStepBtn = document.getElementById('next-step');
+
+    prevStepBtn.addEventListener('click', () => {
+      step2.inert = true;
+      step1.inert = false;
+      step1.querySelector('input, button')?.focus();
+    });
+
+    nextStepBtn.addEventListener('click', () => {
+      step2.inert = true;
+      step3.inert = false;
+      step3.querySelector('input, button')?.focus();
+    });
+  </script>
+</body>
+</html>
