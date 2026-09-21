@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FLIP Animation Technique Example</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --radius: 12px;
+      --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: var(--font-family);
+      padding: 2rem;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      align-items: center;
+      background-color: var(--card-bg);
+      padding: 1rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--card-border);
+    }
+
+    .btn {
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: #1d4ed8;
+    }
+
+    .btn-secondary {
+      background-color: #334155;
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      background-color: #475569;
+    }
+
+    .toggle-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-left: auto;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transform-origin: 0 0; /* Crucial for FLIP transform accuracy */
+      will-change: auto;
+    }
+
+    .card-content {
+      transform-origin: 0 0; /* Crucial for inverse scale content fix */
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-id {
+      background-color: rgba(56, 189, 248, 0.1);
+      color: var(--accent);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-body {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+    }
+
+    .card-footer {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Expanded card state styling */
+    .card.expanded {
+      grid-column: span 2;
+      border-color: var(--accent);
+      background-color: #1e293b;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    @media (max-width: 640px) {
+      .card.expanded {
+        grid-column: span 1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>FLIP Animation Technique Demo</h1>
+    <p class="subtitle">Smooth 60fps layout transitions for DOM reordering, filtering, and card expansion.</p>
+  </header>
+
+  <div class="controls">
+    <button id="shuffle-btn" class="btn">Shuffle Items</button>
+    <button id="sort-btn" class="btn btn-secondary">Sort by Title</button>
+
+    <div class="toggle-group">
+      <input type="checkbox" id="flip-toggle" checked>
+      <label for="flip-toggle">Enable FLIP Animation</label>
+    </div>
+  </div>
+
+  <main id="card-grid" class="grid">
+    <!-- Card items -->
+    <div class="card" data-id="1" data-title="Alpha Protocol">
+      <div class="card-content">
+        <div class="card-header">
+          <span class="card-id">#1</span>
+        </div>
+        <h2 class="card-title">Alpha Protocol</h2>
+        <p class="card-body">High-performance grid animation using compositor-thread transforms.</p>
+        <div class="card-footer">
+          <span>Click to expand</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" data-id="2" data-title="Beta System">
+      <div class="card-content">
+        <div class="card-header">
+          <span class="card-id">#2</span>
+        </div>
+        <h2 class="card-title">Beta System</h2>
+        <p class="card-body">Pre-calculates bounding box deltas before browser frame paint.</p>
+        <div class="card-footer">
+          <span>Click to expand</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" data-id="3" data-title="Gamma Engine">
+      <div class="card-content">
+        <div class="card-header">
+          <span class="card-id">#3</span>
+        </div>
+        <h2 class="card-title">Gamma Engine</h2>
+        <p class="card-body">Eliminates layout thrashing by batching all geometric DOM reads.</p>
+        <div class="card-footer">
+          <span>Click to expand</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" data-id="4" data-title="Delta Pipeline">
+      <div class="card-content">
+        <div class="card-header">
+          <span class="card-id">#4</span>
+        </div>
+        <h2 class="card-title">Delta Pipeline</h2>
+        <p class="card-body">Inverts layout positions with temporary transforms during FLIP.</p>
+        <div class="card-footer">
+          <span>Click to expand</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" data-id="5" data-title="Epsilon Architecture">
+      <div class="card-content">
+        <div class="card-header">
+          <span class="card-id">#5</span>
+        </div>
+        <h2 class="card-title">Epsilon Architecture</h2>
+        <p class="card-body">Counter-scales child content to prevent typography stretching.</p>
+        <div class="card-footer">
+          <span>Click to expand</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" data-id="6" data-title="Zeta Controller">
+      <div class="card-content">
+        <div class="card-header">
+          <span class="card-id">#6</span>
+        </div>
+        <h2 class="card-title">Zeta Controller</h2>
+        <p class="card-body">Respects user prefers-reduced-motion accessibility preferences.</p>
+        <div class="card-footer">
+          <span>Click to expand</span>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  // FLIP Helper implementation
+  class FlipManager {
+    static animate(elements, mutator, options = {}) {
+      const {
+        duration = 350,
+        easing = 'cubic-bezier(0.2, 0, 0, 1)',
+        scaleContent = true
+      } = options;
+
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const flipEnabled = document.getElementById('flip-toggle').checked;
+
+      if (prefersReducedMotion || !flipEnabled) {
+        // Execute DOM mutation without animation
+        mutator();
+        return;
+      }
+
+      const elementArray = Array.from(elements);
+
+      // STEP 1: FIRST - Record initial positions
+      const firstBounds = new Map();
+      elementArray.forEach(el => {
+        firstBounds.set(el, el.getBoundingClientRect());
+      });
+
+      // STEP 2: LAST - Execute DOM mutation and record new positions
+      mutator();
+
+      const lastBounds = new Map();
+      elementArray.forEach(el => {
+        lastBounds.set(el, el.getBoundingClientRect());
+      });
+
+      // STEP 3 & 4: INVERT & PLAY
+      elementArray.forEach(el => {
+        const first = firstBounds.get(el);
+        const last = lastBounds.get(el);
+
+        if (!first || !last) return;
+
+        const deltaX = first.left - last.left;
+        const deltaY = first.top - last.top;
+        const scaleX = first.width / last.width;
+        const scaleY = first.height / last.height;
+
+        // Skip animation if element hasn't moved or changed size
+        if (Math.abs(deltaX) < 0.1 && Math.abs(deltaY) < 0.1 &&
+            Math.abs(scaleX - 1) < 0.01 && Math.abs(scaleY - 1) < 0.01) {
+          return;
+        }
+
+        // Apply WAAPI animation to container
+        const cardKeyframes = [
+          {
+            transform: `translate(${deltaX}px, ${deltaY}px) scale(${scaleX}, ${scaleY})`
+          },
+          {
+            transform: 'translate(0px, 0px) scale(1, 1)'
+          }
+        ];
+
+        const animation = el.animate(cardKeyframes, {
+          duration,
+          easing,
+          fill: 'both'
+        });
+
+        // Inverse scaling fix for children to prevent text distortion during card expansion
+        if (scaleContent && (Math.abs(scaleX - 1) >= 0.01 || Math.abs(scaleY - 1) >= 0.01)) {
+          const content = el.querySelector('.card-content');
+          if (content) {
+            const invScaleX = 1 / scaleX;
+            const invScaleY = 1 / scaleY;
+
+            content.animate([
+              { transform: `scale(${invScaleX}, ${invScaleY})` },
+              { transform: 'scale(1, 1)' }
+            ], {
+              duration,
+              easing,
+              fill: 'both'
+            });
+          }
+        }
+
+        // Clean up animation state on completion
+        animation.onfinish = () => {
+          animation.cancel();
+        };
+      });
+    }
+  }
+
+  // DOM Interactivity & Event Handlers
+  const grid = document.getElementById('card-grid');
+  const shuffleBtn = document.getElementById('shuffle-btn');
+  const sortBtn = document.getElementById('sort-btn');
+
+  // Shuffle Action
+  shuffleBtn.addEventListener('click', () => {
+    const cards = Array.from(grid.children);
+    FlipManager.animate(cards, () => {
+      // Fisher-Yates shuffle
+      for (let i = cards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        grid.appendChild(cards[j]);
+      }
+    });
+  });
+
+  // Sort Action
+  sortBtn.addEventListener('click', () => {
+    const cards = Array.from(grid.children);
+    FlipManager.animate(cards, () => {
+      cards.sort((a, b) => {
+        const titleA = a.getAttribute('data-title');
+        const titleB = b.getAttribute('data-title');
+        return titleA.localeCompare(titleB);
+      });
+      cards.forEach(card => grid.appendChild(card));
+    });
+  });
+
+  // Expand Card Action (Shared element FLIP)
+  grid.addEventListener('click', (e) => {
+    const card = e.target.closest('.card');
+    if (!card) return;
+
+    const cards = Array.from(grid.children);
+    FlipManager.animate(cards, () => {
+      card.classList.toggle('expanded');
+    }, { duration: 400 });
+  });
+</script>
+</body>
+</html>
