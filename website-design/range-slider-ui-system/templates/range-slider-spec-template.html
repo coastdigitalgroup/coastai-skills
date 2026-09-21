@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Range Slider UI Specification Template</title>
+  <style>
+    :root {
+      --color-primary: #2563eb;
+      --color-primary-hover: #1d4ed8;
+      --color-surface: #ffffff;
+      --color-surface-subtle: #f8fafc;
+      --color-border: #cbd5e1;
+      --color-track-bg: #e2e8f0;
+      --color-text-main: #0f172a;
+      --color-text-muted: #64748b;
+      --focus-ring: #2563eb;
+
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+      --radius-sm: 6px;
+      --radius-full: 9999px;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-thumb: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    /* Reset & Base Layout */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: #f1f5f9;
+      color: var(--color-text-main);
+      padding: 2rem;
+      line-height: 1.5;
+    }
+
+    .spec-container {
+      max-width: 640px;
+      margin: 0 auto;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 1.5rem 2rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .spec-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .spec-description {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Dual-Thumb Range Slider Component Architecture */
+    .range-slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* Track & Thumb Assembly */
+    .slider-track-container {
+      position: relative;
+      height: 44px; /* Touch target vertical clearance */
+      display: flex;
+      align-items: center;
+      touch-action: none; /* Prevents vertical scroll during touch drag */
+    }
+
+    .slider-track-bg {
+      position: absolute;
+      width: 100%;
+      height: 6px;
+      background-color: var(--color-track-bg);
+      border-radius: var(--radius-full);
+    }
+
+    .slider-track-fill {
+      position: absolute;
+      height: 6px;
+      background-color: var(--color-primary);
+      border-radius: var(--radius-full);
+      left: 10%;  /* Dynamic Min Thumb % */
+      right: 30%; /* Dynamic Max Thumb % */
+    }
+
+    /* Thumb Handles */
+    .slider-thumb {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      background-color: var(--color-surface);
+      border: 2px solid var(--color-primary);
+      border-radius: var(--radius-full);
+      box-shadow: var(--shadow-thumb);
+      cursor: pointer;
+      user-select: none;
+      transform: translate(-50%, 0);
+      transition: transform 0.15s ease, border-color 0.15s ease;
+      z-index: 2;
+    }
+
+    /* Expanded Touch Target Padding via Pseudo-Element (WCAG 2.2 SC 2.5.8) */
+    .slider-thumb::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 44px;
+      height: 44px;
+      transform: translate(-50%, -50%);
+      background: transparent;
+    }
+
+    .slider-thumb:hover {
+      transform: translate(-50%, 0) scale(1.15);
+      border-color: var(--color-primary-hover);
+    }
+
+    .slider-thumb:focus-visible {
+      outline: 2px solid var(--focus-ring);
+      outline-offset: 4px;
+      z-index: 10;
+    }
+
+    .slider-thumb.active {
+      z-index: 10;
+      transform: translate(-50%, 0) scale(1.2);
+    }
+
+    /* Floating Value Tooltip Badges */
+    .thumb-badge {
+      position: absolute;
+      top: -32px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--color-text-main);
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .thumb-badge::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 4px 4px 0 4px;
+      border-style: solid;
+      border-color: var(--color-text-main) transparent transparent transparent;
+    }
+
+    /* Synchronized Numeric Input Row */
+    .inputs-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .input-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      flex: 1;
+    }
+
+    .input-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .currency-prefix {
+      position: absolute;
+      left: 0.75rem;
+      color: var(--color-text-muted);
+      font-size: 0.875rem;
+      font-weight: 500;
+      pointer-events: none;
+    }
+
+    .numeric-input {
+      width: 100%;
+      height: 40px;
+      padding-left: 1.75rem;
+      padding-right: 0.75rem;
+      font-size: 0.875rem;
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      background-color: var(--color-surface);
+      color: var(--color-text-main);
+    }
+
+    .numeric-input:focus-visible {
+      outline: 2px solid var(--focus-ring);
+      outline-offset: 1px;
+      border-color: var(--color-primary);
+    }
+
+    .separator {
+      color: var(--color-text-muted);
+      font-size: 0.875rem;
+      margin-top: 1.25rem;
+    }
+
+    /* Result Summary Block */
+    .summary-block {
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      background-color: var(--color-surface-subtle);
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .summary-block strong {
+      color: var(--color-text-main);
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="spec-container">
+    <h1 class="spec-title">Price Range Filter</h1>
+    <p class="spec-description">Select an inclusive minimum and maximum price range for catalog filtering.</p>
+
+    <div class="range-slider-group">
+      <!-- Dual-Thumb Slider Visual Track -->
+      <div class="slider-track-container" id="price-slider-track">
+        <div class="slider-track-bg"></div>
+        <div class="slider-track-fill" id="track-fill" style="left: 10%; right: 30%;"></div>
+
+        <!-- Lower (Min) Thumb Control -->
+        <div role="slider"
+             tabindex="0"
+             id="min-thumb"
+             class="slider-thumb"
+             style="left: 10%;"
+             aria-label="Minimum Price"
+             aria-valuenow="50"
+             aria-valuemin="0"
+             aria-valuemax="500"
+             aria-valuetext="$50"
+             aria-controls="min-price-input">
+          <div class="thumb-badge">$50</div>
+        </div>
+
+        <!-- Upper (Max) Thumb Control -->
+        <div role="slider"
+             tabindex="0"
+             id="max-thumb"
+             class="slider-thumb"
+             style="left: 70%;"
+             aria-label="Maximum Price"
+             aria-valuenow="350"
+             aria-valuemin="0"
+             aria-valuemax="500"
+             aria-valuetext="$350"
+             aria-controls="max-price-input">
+          <div class="thumb-badge">$350</div>
+        </div>
+      </div>
+
+      <!-- Synchronized Manual Inputs -->
+      <div class="inputs-row">
+        <div class="input-field-group">
+          <label for="min-price-input" class="input-label">Minimum Price</label>
+          <div class="input-wrapper">
+            <span class="currency-prefix" aria-hidden="true">$</span>
+            <input type="text"
+                   id="min-price-input"
+                   class="numeric-input"
+                   inputmode="decimal"
+                   pattern="[0-9]*"
+                   value="50">
+          </div>
+        </div>
+
+        <span class="separator" aria-hidden="true">—</span>
+
+        <div class="input-field-group">
+          <label for="max-price-input" class="input-label">Maximum Price</label>
+          <div class="input-wrapper">
+            <span class="currency-prefix" aria-hidden="true">$</span>
+            <input type="text"
+                   id="max-price-input"
+                   class="numeric-input"
+                   inputmode="decimal"
+                   pattern="[0-9]*"
+                   value="350">
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Summary Region -->
+      <div class="summary-block" aria-live="polite">
+        <span>Active Filter Span:</span>
+        <strong>$50.00 – $350.00</strong>
+      </div>
+    </div>
+  </main>
+
+</body>
+</html>
