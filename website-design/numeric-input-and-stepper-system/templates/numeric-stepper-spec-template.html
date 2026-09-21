@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Numeric Input & Stepper Component Design Spec</title>
+  <style>
+    /* CSS Tokens & System Variables */
+    :root {
+      --color-surface-bg: #F9FAFB;
+      --color-surface-card: #FFFFFF;
+      --color-text-primary: #111827;
+      --color-text-secondary: #4B5563;
+      --color-text-muted: #9CA3AF;
+
+      --color-border-subtle: #D1D5DB;
+      --color-border-hover: #9CA3AF;
+      --color-border-focus: #2563EB;
+
+      --color-brand-primary: #2563EB;
+      --color-brand-hover: #1D4ED8;
+
+      --color-disabled-bg: #F3F4F6;
+      --color-disabled-text: #9CA3AF;
+      --color-disabled-border: #E5E7EB;
+
+      --focus-ring-color: rgba(37, 99, 235, 0.4);
+      --focus-ring: 0 0 0 3px var(--focus-ring-color);
+
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+      --touch-target-min: 44px;
+      --border-radius-base: 8px;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--color-surface-bg);
+      color: var(--color-text-primary);
+      padding: 2rem 1rem;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .spec-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: var(--color-surface-card);
+      padding: 2.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--color-border-subtle);
+    }
+
+    h1, h2, h3 {
+      color: var(--color-text-primary);
+      margin-top: 0;
+    }
+
+    .component-section {
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px dashed var(--color-border-subtle);
+    }
+
+    .component-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    /* Standard Segmented Stepper Styling */
+    .stepper-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-width: 320px;
+    }
+
+    .stepper-label {
+      font-weight: 600;
+      font-size: 0.9375rem;
+      color: var(--color-text-primary);
+    }
+
+    .stepper-control {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--border-radius-base);
+      background: var(--color-surface-card);
+      overflow: hidden;
+      height: var(--touch-target-min);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .stepper-control:focus-within {
+      border-color: var(--color-brand-primary);
+      box-shadow: var(--focus-ring);
+    }
+
+    .stepper-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--touch-target-min);
+      height: var(--touch-target-min);
+      background: transparent;
+      border: none;
+      color: var(--color-text-primary);
+      cursor: pointer;
+      padding: 0;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .stepper-btn:hover:not(:disabled) {
+      background-color: rgba(0, 0, 0, 0.04);
+      color: var(--color-brand-primary);
+    }
+
+    .stepper-btn:focus-visible {
+      outline: 2px solid var(--color-brand-primary);
+      outline-offset: -2px;
+      z-index: 1;
+    }
+
+    .stepper-btn:disabled {
+      color: var(--color-disabled-text);
+      cursor: not-allowed;
+      opacity: 0.4;
+    }
+
+    .stepper-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .stepper-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      height: 100%;
+      border-left: 1px solid var(--color-border-subtle);
+      border-right: 1px solid var(--color-border-subtle);
+    }
+
+    .stepper-input {
+      width: 100%;
+      min-width: 48px;
+      height: 100%;
+      border: none;
+      background: transparent;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      padding: 0 0.5rem;
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
+
+    .stepper-input::-webkit-outer-spin-button,
+    .stepper-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .stepper-input:focus {
+      outline: none;
+    }
+
+    .stepper-unit-suffix {
+      padding-right: 0.75rem;
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+      user-select: none;
+    }
+
+    .stepper-helper-text {
+      font-size: 0.8125rem;
+      color: var(--color-text-secondary);
+    }
+
+    .stepper-helper-text--error {
+      color: #DC2626;
+    }
+
+    /* Screen Reader Only Class */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="spec-container">
+    <h1>Numeric Input & Stepper Component Spec</h1>
+    <p>Production-ready responsive HTML/CSS design spec for accessible numeric quantity selectors and unit-affixed steppers.</p>
+
+    <!-- Section 1: Standard Cart Quantity Stepper -->
+    <div class="component-section">
+      <h2>1. E-Commerce Cart Quantity Stepper</h2>
+      <p>Features 44x44px touch targets, tabular monospaced numbers, and explicit ARIA spinbutton semantics.</p>
+
+      <div class="stepper-group">
+        <label for="cart-qty-input" class="stepper-label">Item Quantity</label>
+
+        <div class="stepper-control">
+          <button type="button"
+                  id="cart-qty-decrement"
+                  class="stepper-btn"
+                  aria-label="Decrease quantity"
+                  aria-controls="cart-qty-input">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
+          </button>
+
+          <div class="stepper-input-wrapper">
+            <input type="text"
+                   id="cart-qty-input"
+                   class="stepper-input"
+                   inputmode="numeric"
+                   pattern="[0-9]*"
+                   role="spinbutton"
+                   aria-valuenow="2"
+                   aria-valuemin="1"
+                   aria-valuemax="10"
+                   aria-valuetext="2 items"
+                   value="2"
+                   autocomplete="off">
+          </div>
+
+          <button type="button"
+                  id="cart-qty-increment"
+                  class="stepper-btn"
+                  aria-label="Increase quantity"
+                  aria-controls="cart-qty-input">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          </button>
+        </div>
+
+        <span id="cart-qty-helper" class="stepper-helper-text">Maximum 10 items per order</span>
+        <div id="cart-qty-announcer" class="sr-only" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <!-- Section 2: Unit-Affixed SaaS Seat Stepper -->
+    <div class="component-section">
+      <h2>2. SaaS Plan Seat Allocation Stepper</h2>
+      <p>Includes an integrated unit suffix ("seats") and minimum boundary locks.</p>
+
+      <div class="stepper-group">
+        <label for="saas-seats-input" class="stepper-label">Team License Seats</label>
+
+        <div class="stepper-control">
+          <button type="button"
+                  id="saas-seats-decrement"
+                  class="stepper-btn"
+                  aria-label="Decrease license seats"
+                  aria-controls="saas-seats-input">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
+          </button>
+
+          <div class="stepper-input-wrapper">
+            <input type="text"
+                   id="saas-seats-input"
+                   class="stepper-input"
+                   inputmode="numeric"
+                   pattern="[0-9]*"
+                   role="spinbutton"
+                   aria-valuenow="5"
+                   aria-valuemin="5"
+                   aria-valuemax="100"
+                   aria-valuetext="5 seats"
+                   value="5"
+                   autocomplete="off">
+            <span class="stepper-unit-suffix" aria-hidden="true">seats</span>
+          </div>
+
+          <button type="button"
+                  id="saas-seats-increment"
+                  class="stepper-btn"
+                  aria-label="Increase license seats"
+                  aria-controls="saas-seats-input">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          </button>
+        </div>
+
+        <span class="stepper-helper-text">Minimum 5 seats required for Pro Plan</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Lightweight Reference Script demonstrating boundary clamping and keyboard handling
+    document.addEventListener('DOMContentLoaded', () => {
+      const setupStepper = (inputId, decId, incId, announcerId) => {
+        const input = document.getElementById(inputId);
+        const decBtn = document.getElementById(decId);
+        const incBtn = document.getElementById(incId);
+        const announcer = announcerId ? document.getElementById(announcerId) : null;
+
+        if (!input || !decBtn || !incBtn) return;
+
+        const min = parseInt(input.getAttribute('aria-valuemin') || '1', 10);
+        const max = parseInt(input.getAttribute('aria-valuemax') || '999', 10);
+
+        const updateState = (val, announce = false) => {
+          let clamped = Math.max(min, Math.min(max, val));
+          input.value = clamped;
+          input.setAttribute('aria-valuenow', clamped);
+          input.setAttribute('aria-valuetext', `${clamped} items`);
+
+          decBtn.disabled = clamped <= min;
+          decBtn.setAttribute('aria-disabled', clamped <= min ? 'true' : 'false');
+
+          incBtn.disabled = clamped >= max;
+          incBtn.setAttribute('aria-disabled', clamped >= max ? 'true' : 'false');
+
+          if (announce && announcer) {
+            announcer.textContent = `Quantity updated to ${clamped}`;
+          }
+        };
+
+        decBtn.addEventListener('click', () => {
+          let current = parseInt(input.value, 10) || min;
+          updateState(current - 1, true);
+        });
+
+        incBtn.addEventListener('click', () => {
+          let current = parseInt(input.value, 10) || min;
+          updateState(current + 1, true);
+        });
+
+        input.addEventListener('blur', () => {
+          let current = parseInt(input.value, 10);
+          if (isNaN(current)) current = min;
+          updateState(current, true);
+        });
+
+        input.addEventListener('keydown', (e) => {
+          let current = parseInt(input.value, 10) || min;
+          if (e.key === 'ArrowUp' || e.key === 'ArrowRight') {
+            e.preventDefault();
+            updateState(current + 1, true);
+          } else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') {
+            e.preventDefault();
+            updateState(current - 1, true);
+          } else if (e.key === 'Home') {
+            e.preventDefault();
+            updateState(min, true);
+          } else if (e.key === 'End') {
+            e.preventDefault();
+            updateState(max, true);
+          }
+        });
+
+        // Initialize state
+        updateState(parseInt(input.value, 10) || min);
+      };
+
+      setupStepper('cart-qty-input', 'cart-qty-decrement', 'cart-qty-increment', 'cart-qty-announcer');
+      setupStepper('saas-seats-input', 'saas-seats-decrement', 'saas-seats-increment');
+    });
+  </script>
+
+</body>
+</html>
