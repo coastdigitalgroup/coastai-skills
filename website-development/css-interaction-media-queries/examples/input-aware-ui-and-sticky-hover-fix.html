@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Interaction Media Queries: Input-Aware UI & Sticky Hover Fix</title>
+  <style>
+    :root {
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-border: #e2e8f0;
+      --color-text: #0f172a;
+      --color-text-muted: #64748b;
+      --color-primary: #2563eb;
+      --color-primary-hover: #1d4ed8;
+      --color-primary-active: #1e40af;
+      --color-accent-bad: #dc2626;
+      --color-accent-good: #16a34a;
+
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+      --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.5;
+      padding: 2rem 1rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    p.subtitle {
+      color: var(--color-text-muted);
+      font-size: 1rem;
+    }
+
+    /* Live Input Status Monitor */
+    .status-panel {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 0.75rem;
+    }
+
+    .status-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.875rem;
+    }
+
+    .status-label {
+      color: var(--color-text-muted);
+      font-weight: 500;
+    }
+
+    .status-value {
+      font-family: monospace;
+      font-weight: 700;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      background-color: #f1f5f9;
+      display: inline-block;
+      width: fit-content;
+    }
+
+    /* Comparison Sections */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    @media (min-width: 768px) {
+      .comparison-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .card-demo {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      border: 2px solid var(--color-border);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .card-demo.bad {
+      border-color: #fecaca;
+    }
+
+    .card-demo.good {
+      border-color: #bbf7d0;
+    }
+
+    .demo-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-bad {
+      background-color: #fee2e2;
+      color: var(--color-accent-bad);
+    }
+
+    .badge-good {
+      background-color: #dcfce7;
+      color: var(--color-accent-good);
+    }
+
+    /* ==========================================================================
+       BEFORE / NAIVE IMPLEMENTATION (Triggers Sticky Hover & Hardcoded Small Targets)
+       ========================================================================== */
+
+    .bad-button {
+      background-color: var(--color-primary);
+      color: white;
+      border: none;
+      padding: 8px 16px; /* Rigid small padding */
+      font-size: 14px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      width: fit-content;
+    }
+
+    /* NAIVE HOVER: Always applies on touch tap, trapping visual transform state! */
+    .bad-button:hover {
+      background-color: var(--color-primary-hover);
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .bad-card-action {
+      position: relative;
+      background: #f1f5f9;
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    /* NAIVE DISCLOSURE: Action button hidden until hovered! Invisible on touch! */
+    .bad-overlay-btn {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-top: 0.5rem;
+    }
+
+    .bad-card-action:hover .bad-overlay-btn {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+
+    /* ==========================================================================
+       AFTER / INPUT-AWARE IMPLEMENTATION (Interaction Media Query Protocol)
+       ========================================================================== */
+
+    .good-button {
+      background-color: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+
+      /* Baseline fine-pointer size */
+      min-height: 36px;
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+
+    /* 1. ADAPTIVE TARGET SIZE: Enlarge hitboxes for coarse primary pointers (touch screens) */
+    @media (pointer: coarse) {
+      .good-button {
+        min-height: 48px; /* WCAG 2.2 Target Size compliance */
+        padding: 12px 24px;
+        font-size: 16px;
+      }
+    }
+
+    /* 2. STICKY HOVER GUARD: Only execute hover animations when real hovering is supported */
+    @media (hover: hover) {
+      .good-button:hover {
+        background-color: var(--color-primary-hover);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
+    }
+
+    /* 3. TACTILE TAP FEEDBACK: Always give active press state feedback on tap */
+    .good-button:active {
+      transform: translateY(0) scale(0.98);
+      background-color: var(--color-primary-active);
+    }
+
+    .good-card-action {
+      background: #f1f5f9;
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .good-overlay-btn {
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+
+      /* Default (hover: none / touch): Persistent inline control */
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 16px;
+      min-height: 44px;
+      font-size: 14px;
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* 4. DISCLOSURE GUARD: Hide hover-only buttons on desktop, but keep visible on touch */
+    @media (hover: hover) {
+      .good-overlay-btn {
+        opacity: 0;
+        visibility: hidden;
+        min-height: 36px;
+        padding: 6px 12px;
+        transition: opacity 0.2s ease, visibility 0.2s ease, background-color 0.15s ease;
+      }
+
+      .good-card-action:hover .good-overlay-btn,
+      .good-card-action:focus-within .good-overlay-btn {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .good-overlay-btn:hover {
+        background-color: var(--color-primary-hover);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>CSS Interaction Media Queries Pattern</h1>
+    <p class="subtitle">Demonstrating Sticky Hover Elimination, WCAG Touch Target Scaling, and Hover Disclosures.</p>
+  </header>
+
+  <!-- Real-time Media Query Status Box -->
+  <section class="status-panel">
+    <h3>Detected Input Mechanism Capabilities</h3>
+    <div class="status-grid">
+      <div class="status-item">
+        <span class="status-label">Primary Pointer (pointer):</span>
+        <span class="status-value" id="val-pointer">Checking...</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Primary Hover (hover):</span>
+        <span class="status-value" id="val-hover">Checking...</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Any Pointer (any-pointer):</span>
+        <span class="status-value" id="val-any-pointer">Checking...</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Any Hover (any-hover):</span>
+        <span class="status-value" id="val-any-hover">Checking...</span>
+      </div>
+    </div>
+  </section>
+
+  <main class="comparison-grid">
+
+    <!-- BEFORE / FLAWED APPROACH -->
+    <article class="card-demo bad">
+      <div class="demo-header">
+        <h2>Naive Implementation</h2>
+        <span class="badge badge-bad">Flawed</span>
+      </div>
+
+      <p>Uses <code>:hover</code> without input media queries and hardcoded desktop button dimensions.</p>
+
+      <div>
+        <p><strong>1. Sticky Hover Test:</strong></p>
+        <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">
+          On touch devices, tap this button. Notice how the blue hover state & scale transform remain stuck!
+        </p>
+        <button class="bad-button">Tap / Hover Me</button>
+      </div>
+
+      <div>
+        <p><strong>2. Hover Disclosure Test:</strong></p>
+        <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">
+          Try finding the "Quick View" button on a touchscreen device. It relies on <code>:hover</code>, so touch users cannot see or tap it easily.
+        </p>
+        <div class="bad-card-action">
+          <p>Product Item Card</p>
+          <button class="bad-overlay-btn">Quick View (Hidden on Touch)</button>
+        </div>
+      </div>
+    </article>
+
+    <!-- AFTER / INPUT-AWARE APPROACH -->
+    <article class="card-demo good">
+      <div class="demo-header">
+        <h2>Input-Aware Implementation</h2>
+        <span class="badge badge-good">Resilient</span>
+      </div>
+
+      <p>Guards <code>:hover</code> with <code>@media (hover: hover)</code> and scales tap targets with <code>@media (pointer: coarse)</code>.</p>
+
+      <div>
+        <p><strong>1. Clean Tap / Hover Test:</strong></p>
+        <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">
+          On touch screens, tapping gives crisp active feedback without sticking. On mice, smooth hover scale is active! Touch targets auto-scale to 48px.
+        </p>
+        <button class="good-button">Tap / Hover Me</button>
+      </div>
+
+      <div>
+        <p><strong>2. Adaptive Disclosure Test:</strong></p>
+        <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">
+          Automatically exposes as an inline button on touch devices, while preserving desktop hover reveal behavior!
+        </p>
+        <div class="good-card-action">
+          <p>Product Item Card</p>
+          <button class="good-overlay-btn">Quick View Action</button>
+        </div>
+      </div>
+    </article>
+
+  </main>
+
+  <script>
+    // Live Diagnostics Script to display input feature states
+    function updateInputDiagnostics() {
+      const getMatch = (q) => window.matchMedia(q).matches;
+
+      const pointer = getMatch('(pointer: fine)') ? 'fine' : (getMatch('(pointer: coarse)') ? 'coarse' : 'none');
+      const hover = getMatch('(hover: hover)') ? 'hover' : 'none';
+
+      const anyPointer = getMatch('(any-pointer: fine)') ? 'fine' : (getMatch('(any-pointer: coarse)') ? 'coarse' : 'none');
+      const anyHover = getMatch('(any-hover: hover)') ? 'hover' : 'none';
+
+      document.getElementById('val-pointer').textContent = pointer;
+      document.getElementById('val-hover').textContent = hover;
+      document.getElementById('val-any-pointer').textContent = anyPointer;
+      document.getElementById('val-any-hover').textContent = anyHover;
+    }
+
+    updateInputDiagnostics();
+
+    // Listen for peripheral attachments or devtools emulation mode changes
+    ['(pointer: fine)', '(pointer: coarse)', '(hover: hover)', '(hover: none)'].forEach(query => {
+      window.matchMedia(query).addEventListener('change', updateInputDiagnostics);
+    });
+  </script>
+</body>
+</html>
