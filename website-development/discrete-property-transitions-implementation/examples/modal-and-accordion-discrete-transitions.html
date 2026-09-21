@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discrete Property Transitions Comparison & Examples</title>
+  <style>
+    :root {
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-text: #0f172a;
+      --color-muted: #64748b;
+      --color-primary: #2563eb;
+      --color-primary-hover: #1d4ed8;
+      --color-border: #e2e8f0;
+      --color-backdrop: rgba(15, 23, 42, 0.6);
+      --radius: 8px;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.5;
+      padding: 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    p.description {
+      color: var(--color-muted);
+      font-size: 1rem;
+    }
+
+    section.example-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge-bad {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge-good {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 0.625rem 1.25rem;
+      border-radius: 6px;
+      border: 1px solid var(--color-border);
+      background-color: var(--color-surface);
+      color: var(--color-text);
+      cursor: pointer;
+      transition: background-color 0.15s, border-color 0.15s;
+    }
+
+    button:hover {
+      background-color: #f1f5f9;
+    }
+
+    button.btn-primary {
+      background-color: var(--color-primary);
+      color: white;
+      border: none;
+    }
+
+    button.btn-primary:hover {
+      background-color: var(--color-primary-hover);
+    }
+
+    /* ==========================================================================
+       BEFORE / BAD APPROACH: Abrupt Display Switch (No Discrete Transition)
+       ========================================================================== */
+
+    .bad-accordion-content {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease; /* Does NOT work on display: none */
+      padding: 1rem;
+      background-color: #f1f5f9;
+      border-radius: 6px;
+      margin-top: 0.75rem;
+    }
+
+    .bad-accordion-content.is-open {
+      display: block;
+      opacity: 1;
+    }
+
+    /* ==========================================================================
+       AFTER / GOOD APPROACH 1: Accordion / Panel with Discrete Display Transition
+       ========================================================================== */
+
+    .good-accordion-content {
+      display: none;
+      opacity: 0;
+      transform: translateY(-8px);
+      padding: 1rem;
+      background-color: #f1f5f9;
+      border-radius: 6px;
+      margin-top: 0.75rem;
+
+      /* Step 1: Transition display allow-discrete alongside continuous properties */
+      transition:
+        display 0.3s allow-discrete,
+        opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .good-accordion-content[aria-hidden="false"] {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Step 2: Set entry starting styles */
+    @starting-style {
+      .good-accordion-content[aria-hidden="false"] {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+    }
+
+    /* ==========================================================================
+       AFTER / GOOD APPROACH 2: Native <dialog> Modal with Top-Layer Overlay
+       ========================================================================== */
+
+    dialog.animated-modal {
+      border: none;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      max-width: 500px;
+      width: 90vw;
+      margin: auto;
+      background: var(--color-surface);
+
+      /* Closed state default values */
+      opacity: 0;
+      transform: scale(0.95) translateY(10px);
+      display: none;
+
+      /* Step 1: Transition display, overlay, and visual transform/opacity */
+      transition:
+        display 0.25s allow-discrete,
+        overlay 0.25s allow-discrete,
+        opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Open Modal State */
+    dialog.animated-modal[open] {
+      display: block;
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+
+    /* Step 2: Entry starting style for Modal */
+    @starting-style {
+      dialog.animated-modal[open] {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+      }
+    }
+
+    /* Modal Backdrop Transitions */
+    dialog.animated-modal::backdrop {
+      background-color: rgba(15, 23, 42, 0);
+      backdrop-filter: blur(0px);
+      transition:
+        display 0.25s allow-discrete,
+        overlay 0.25s allow-discrete,
+        background-color 0.25s ease-out,
+        backdrop-filter 0.25s ease-out;
+    }
+
+    dialog.animated-modal[open]::backdrop {
+      background-color: var(--color-backdrop);
+      backdrop-filter: blur(4px);
+    }
+
+    @starting-style {
+      dialog.animated-modal[open]::backdrop {
+        background-color: rgba(15, 23, 42, 0);
+        backdrop-filter: blur(0px);
+      }
+    }
+
+    /* Reduced Motion Fallback */
+    @media (prefers-reduced-motion: reduce) {
+      .good-accordion-content,
+      dialog.animated-modal,
+      dialog.animated-modal::backdrop {
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Discrete Property Transitions</h1>
+    <p class="description">
+      Demonstrating entry and exit animations for elements toggling <code>display: none</code>
+      and top-layer <code>overlay</code> using CSS <code>@starting-style</code> and <code>allow-discrete</code>.
+    </p>
+  </header>
+
+  <!-- Example 1: BEFORE / Flawed Transition -->
+  <section class="example-card">
+    <h2><span class="badge badge-bad">Before</span> Standard CSS Transition with display: none</h2>
+    <p style="margin-bottom: 1rem; color: var(--color-muted); font-size: 0.875rem;">
+      Notice how closing or opening snaps abruptly because <code>display: none</code> cancels standard CSS transition loops.
+    </p>
+    <button id="bad-toggle-btn">Toggle Flawed Accordion</button>
+    <div id="bad-accordion" class="bad-accordion-content">
+      <p>This content snaps abruptly on close/open because display: none prevents opacity transition without allow-discrete.</p>
+    </div>
+  </section>
+
+  <!-- Example 2: AFTER / Modern Discrete Transition -->
+  <section class="example-card">
+    <h2><span class="badge badge-good">After</span> Discrete Transition with @starting-style & allow-discrete</h2>
+    <p style="margin-bottom: 1rem; color: var(--color-muted); font-size: 0.875rem;">
+      Smooth entry and exit animations directly in CSS without JS timers or forced reflow hacks.
+    </p>
+    <button id="good-toggle-btn" aria-expanded="false" aria-controls="good-accordion">
+      Toggle Smooth Accordion
+    </button>
+    <div id="good-accordion" class="good-accordion-content" aria-hidden="true">
+      <p>This panel smoothly fades and translates both entering from display: none and exiting back into display: none!</p>
+    </div>
+  </section>
+
+  <!-- Example 3: Native <dialog> Modal with Top-Layer Overlay -->
+  <section class="example-card">
+    <h2><span class="badge badge-good">After</span> Native Modal & Backdrop Overlay Transition</h2>
+    <p style="margin-bottom: 1rem; color: var(--color-muted); font-size: 0.875rem;">
+      Transitioning top-layer <code>overlay</code> and <code>display</code> on native <code>&lt;dialog&gt;</code> elements.
+    </p>
+    <button id="open-modal-btn" class="btn-primary">Open Animated Modal Dialog</button>
+
+    <dialog id="modal-dialog" class="animated-modal">
+      <h3 style="margin-bottom: 0.5rem;">Native Dialog with Entry/Exit FX</h3>
+      <p style="color: var(--color-muted); margin-bottom: 1.5rem; font-size: 0.875rem;">
+        The dialog and backdrop animate gracefully on both showModal() and close().
+      </p>
+      <button id="close-modal-btn">Close Dialog</button>
+    </dialog>
+  </section>
+
+  <script>
+    // Flawed Toggle Script
+    const badBtn = document.getElementById('bad-toggle-btn');
+    const badContent = document.getElementById('bad-accordion');
+    badBtn.addEventListener('click', () => {
+      badContent.classList.toggle('is-open');
+    });
+
+    // Modern Discrete Transition Accordion Script
+    const goodBtn = document.getElementById('good-toggle-btn');
+    const goodContent = document.getElementById('good-accordion');
+    goodBtn.addEventListener('click', () => {
+      const isExpanded = goodBtn.getAttribute('aria-expanded') === 'true';
+      goodBtn.setAttribute('aria-expanded', !isExpanded);
+      goodContent.setAttribute('aria-hidden', isExpanded);
+    });
+
+    // Native <dialog> Script
+    const modal = document.getElementById('modal-dialog');
+    const openBtn = document.getElementById('open-modal-btn');
+    const closeBtn = document.getElementById('close-modal-btn');
+
+    openBtn.addEventListener('click', () => {
+      modal.showModal();
+    });
+
+    closeBtn.addEventListener('click', () => {
+      modal.close();
+    });
+  </script>
+
+</body>
+</html>

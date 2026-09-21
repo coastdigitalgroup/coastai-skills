@@ -1,0 +1,158 @@
+/* ==========================================================================
+   Discrete Property Transitions Utility Module
+   Provides reusable CSS classes and properties for entry/exit animations on
+   elements toggling display: none or top-layer overlays.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Design Tokens / Custom Properties
+   -------------------------------------------------------------------------- */
+:root {
+  --discrete-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --discrete-ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --discrete-duration-fast: 0.15s;
+  --discrete-duration-normal: 0.25s;
+  --discrete-duration-slow: 0.35s;
+  --discrete-backdrop-color: rgba(15, 23, 42, 0.6);
+  --discrete-backdrop-blur: 4px;
+}
+
+/* --------------------------------------------------------------------------
+   2. Standard Element Discrete Fade & Slide Transition Utility
+   -------------------------------------------------------------------------- */
+.discrete-panel {
+  /* Closed State Default */
+  display: none;
+  opacity: 0;
+  transform: translateY(-8px);
+
+  /* Enable discrete transition for display alongside opacity & transform */
+  transition:
+    display var(--discrete-duration-normal) allow-discrete,
+    opacity var(--discrete-duration-normal) var(--discrete-ease-out),
+    transform var(--discrete-duration-normal) var(--discrete-ease-out);
+}
+
+/* Open State Trigger (Attribute or Class) */
+.discrete-panel[aria-expanded="true"],
+.discrete-panel[aria-hidden="false"],
+.discrete-panel.is-open {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Entry Starting Style */
+@starting-style {
+  .discrete-panel[aria-expanded="true"],
+  .discrete-panel[aria-hidden="false"],
+  .discrete-panel.is-open {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. Discrete Scale Popover Utility
+   -------------------------------------------------------------------------- */
+.discrete-popover {
+  display: none;
+  opacity: 0;
+  transform: scale(0.92);
+
+  transition:
+    display var(--discrete-duration-fast) allow-discrete,
+    overlay var(--discrete-duration-fast) allow-discrete,
+    opacity var(--discrete-duration-fast) var(--discrete-ease-out),
+    transform var(--discrete-duration-fast) var(--discrete-ease-out);
+}
+
+.discrete-popover:popover-open,
+.discrete-popover[open] {
+  display: block;
+  opacity: 1;
+  transform: scale(1);
+}
+
+@starting-style {
+  .discrete-popover:popover-open,
+  .discrete-popover[open] {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4. Native <dialog> Top-Layer Modal Utility
+   -------------------------------------------------------------------------- */
+dialog.discrete-modal {
+  display: none;
+  opacity: 0;
+  transform: scale(0.95) translateY(12px);
+
+  /* Transition display AND overlay allow-discrete for top-layer persistence */
+  transition:
+    display var(--discrete-duration-normal) allow-discrete,
+    overlay var(--discrete-duration-normal) allow-discrete,
+    opacity var(--discrete-duration-normal) var(--discrete-ease-out),
+    transform var(--discrete-duration-normal) var(--discrete-ease-out);
+}
+
+dialog.discrete-modal[open] {
+  display: block;
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+@starting-style {
+  dialog.discrete-modal[open] {
+    opacity: 0;
+    transform: scale(0.95) translateY(12px);
+  }
+}
+
+/* Backdrop Transition */
+dialog.discrete-modal::backdrop {
+  background-color: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+
+  transition:
+    display var(--discrete-duration-normal) allow-discrete,
+    overlay var(--discrete-duration-normal) allow-discrete,
+    background-color var(--discrete-duration-normal) var(--discrete-ease-out),
+    backdrop-filter var(--discrete-duration-normal) var(--discrete-ease-out);
+}
+
+dialog.discrete-modal[open]::backdrop {
+  background-color: var(--discrete-backdrop-color);
+  backdrop-filter: blur(var(--discrete-backdrop-blur));
+}
+
+@starting-style {
+  dialog.discrete-modal[open]::backdrop {
+    background-color: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0px);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   5. Progressive Enhancement & Accessibility
+   -------------------------------------------------------------------------- */
+/* Fallback for engines lacking discrete transition support */
+@supports not (transition-behavior: allow-discrete) {
+  .discrete-panel,
+  .discrete-popover,
+  dialog.discrete-modal {
+    transition: opacity var(--discrete-duration-normal) var(--discrete-ease-out);
+  }
+}
+
+/* Reduced Motion Override */
+@media (prefers-reduced-motion: reduce) {
+  .discrete-panel,
+  .discrete-popover,
+  dialog.discrete-modal,
+  dialog.discrete-modal::backdrop {
+    transition-duration: 0.01ms !important;
+  }
+}
