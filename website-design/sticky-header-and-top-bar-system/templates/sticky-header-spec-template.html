@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sticky Header & Top Bar System Spec Template</title>
+  <style>
+    /* ==========================================================================
+       1. DESIGN SYSTEM VARIABLES & RESET
+       ========================================================================== */
+    :root {
+      /* Palette Tokens */
+      --color-brand-primary: #2563eb;
+      --color-brand-hover: #1d4ed8;
+      --color-promo-bg: #0f172a;
+      --color-promo-text: #f8fafc;
+      --color-surface-light: #ffffff;
+      --color-surface-glass: rgba(255, 255, 255, 0.88);
+      --color-text-main: #0f172a;
+      --color-text-muted: #475569;
+      --color-border-subtle: rgba(15, 23, 42, 0.08);
+      --color-focus-ring: #2563eb;
+
+      /* Spatial & Layout Tokens */
+      --promo-height: 36px;
+      --header-desktop-height: 72px;
+      --header-desktop-scrolled-height: 56px;
+      --header-mobile-height: 56px;
+      --container-max-width: 1280px;
+
+      /* Dynamic Height Variable for Anchor Margins */
+      --current-header-height: calc(var(--promo-height) + var(--header-desktop-height));
+
+      /* Elevation & Depth */
+      --shadow-scrolled: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+
+      /* Motion & Timing */
+      --transition-standard: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      --z-index-skip-link: 10000;
+      --z-index-sticky-header: 1000;
+      --z-index-drawer: 8000;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--color-text-main);
+      background-color: #f8fafc;
+      line-height: 1.5;
+    }
+
+    /* Target Anchor Scroll Margin Offset */
+    :target, [id] {
+      scroll-margin-top: calc(var(--current-header-height) + 1.5rem);
+    }
+
+    /* ==========================================================================
+       2. SKIP TO MAIN CONTENT LINK (ACCESSIBILITY)
+       ========================================================================== */
+    .skip-link {
+      position: absolute;
+      top: -100px;
+      left: 1rem;
+      z-index: var(--z-index-skip-link);
+      background-color: var(--color-brand-primary);
+      color: #ffffff;
+      padding: 0.75rem 1.25rem;
+      border-radius: 0 0 6px 6px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: top 0.2s ease;
+    }
+
+    .skip-link:focus {
+      top: 0;
+      outline: 3px solid #facc15;
+      outline-offset: 2px;
+    }
+
+    /* ==========================================================================
+       3. TOP BAR STACK (PROMO BAR + PRIMARY NAV)
+       ========================================================================== */
+    .header-stack-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: var(--z-index-sticky-header);
+      width: 100%;
+      transition: transform var(--transition-standard);
+    }
+
+    /* Hidden-on-scroll-down state */
+    .header-stack-container.is-hidden {
+      transform: translateY(-100%);
+    }
+
+    /* TIER 1: Announcement Promo Bar */
+    .promo-bar {
+      height: var(--promo-height);
+      background-color: var(--color-promo-bg);
+      color: var(--color-promo-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      padding: 0 1rem;
+      overflow: hidden;
+      transition: height var(--transition-standard), opacity var(--transition-standard);
+    }
+
+    .promo-bar a {
+      color: #38bdf8;
+      text-decoration: underline;
+      margin-left: 0.5rem;
+    }
+
+    .promo-bar a:hover, .promo-bar a:focus {
+      color: #7dd3fc;
+    }
+
+    /* TIER 2: Primary Navigation Header */
+    .primary-header {
+      height: var(--header-desktop-height);
+      background-color: var(--color-surface-light);
+      border-bottom: 1px solid var(--color-border-subtle);
+      transition: height var(--transition-standard),
+                  background-color var(--transition-standard),
+                  box-shadow var(--transition-standard),
+                  backdrop-filter var(--transition-standard);
+    }
+
+    /* Scrolled Elevation & Glassmorphism State */
+    .header-stack-container.is-scrolled .primary-header {
+      height: var(--header-desktop-scrolled-height);
+      background-color: var(--color-surface-glass);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-scrolled);
+    }
+
+    .header-inner {
+      max-width: var(--container-max-width);
+      height: 100%;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    /* Brand Logo */
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--color-text-main);
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .brand-logo svg {
+      width: 28px;
+      height: 28px;
+      fill: var(--color-brand-primary);
+    }
+
+    /* Desktop Nav Links */
+    .desktop-nav {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+      list-style: none;
+    }
+
+    .nav-link {
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      text-decoration: none;
+      padding: 0.5rem 0;
+      position: relative;
+      transition: color 0.2s ease;
+    }
+
+    .nav-link:hover, .nav-link:focus {
+      color: var(--color-brand-primary);
+    }
+
+    .nav-link:focus-visible {
+      outline: 2px solid var(--color-focus-ring);
+      outline-offset: 4px;
+      border-radius: 2px;
+    }
+
+    /* Actions & CTA Group */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-shrink: 0;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border-radius: 6px;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      color: var(--color-text-main);
+    }
+
+    .btn-secondary:hover {
+      background-color: rgba(15, 23, 42, 0.05);
+    }
+
+    .btn-primary {
+      background-color: var(--color-brand-primary);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--color-brand-hover);
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid var(--color-focus-ring);
+      outline-offset: 2px;
+    }
+
+    /* Mobile Hamburger Trigger Toggle */
+    .mobile-menu-trigger {
+      display: none;
+      background: none;
+      border: none;
+      padding: 0.5rem;
+      color: var(--color-text-main);
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    .mobile-menu-trigger:focus-visible {
+      outline: 2px solid var(--color-focus-ring);
+    }
+
+    /* ==========================================================================
+       4. MOBILE NAVIGATION DRAWER
+       ========================================================================== */
+    .mobile-drawer {
+      display: none;
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: var(--z-index-drawer);
+      background-color: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .mobile-drawer.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .drawer-panel {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 80%;
+      max-width: 320px;
+      background-color: var(--color-surface-light);
+      padding: 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .mobile-drawer.is-open .drawer-panel {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+
+    .drawer-close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--color-text-main);
+      cursor: pointer;
+    }
+
+    .mobile-nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .mobile-nav-link {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--color-text-main);
+      text-decoration: none;
+    }
+
+    /* ==========================================================================
+       5. RESPONSIVE BREAKPOINTS
+       ========================================================================== */
+    @media (max-width: 768px) {
+      :root {
+        --current-header-height: calc(var(--promo-height) + var(--header-mobile-height));
+      }
+
+      .desktop-nav, .header-actions .btn-secondary {
+        display: none;
+      }
+
+      .mobile-menu-trigger {
+        display: inline-flex;
+      }
+
+      .mobile-drawer {
+        display: block;
+      }
+
+      .primary-header {
+        height: var(--header-mobile-height);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .header-stack-container, .primary-header, .drawer-panel, .skip-link {
+        transition: none !important;
+      }
+    }
+
+    /* Page Content Buffer */
+    main {
+      padding-top: calc(var(--promo-height) + var(--header-desktop-height) + 2rem);
+      max-width: var(--container-max-width);
+      margin: 0 auto;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+
+    section {
+      margin-bottom: 4rem;
+      padding: 2rem;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid var(--color-border-subtle);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Accessible Skip to Main Content Link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Header Stack Container -->
+  <header class="header-stack-container" id="site-header" role="banner">
+
+    <!-- Tier 1: Announcement Promo Bar -->
+    <aside class="promo-bar" aria-label="Special Announcement">
+      <span>🚀 Spring Release 2.0 is live!</span>
+      <a href="#features">Explore Features &rarr;</a>
+    </aside>
+
+    <!-- Tier 2: Primary Navigation Header -->
+    <div class="primary-header">
+      <div class="header-inner">
+        <!-- Brand Logo -->
+        <a href="#" class="brand-logo" aria-label="Acme System Home">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          <span>Acme System</span>
+        </a>
+
+        <!-- Primary Desktop Navigation -->
+        <nav aria-label="Main Navigation">
+          <ul class="desktop-nav">
+            <li><a href="#features" class="nav-link">Features</a></li>
+            <li><a href="#solutions" class="nav-link">Solutions</a></li>
+            <li><a href="#pricing" class="nav-link">Pricing</a></li>
+            <li><a href="#docs" class="nav-link">Documentation</a></li>
+          </ul>
+        </nav>
+
+        <!-- Actions & Primary CTA -->
+        <div class="header-actions">
+          <a href="#login" class="btn btn-secondary">Sign In</a>
+          <a href="#signup" class="btn btn-primary">Start Free Trial</a>
+          <button class="mobile-menu-trigger" id="drawer-toggle" aria-expanded="false" aria-controls="mobile-drawer" aria-label="Open menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer -->
+  <div class="mobile-drawer" id="mobile-drawer" aria-hidden="true">
+    <div class="drawer-panel">
+      <div class="drawer-header">
+        <span class="brand-logo">Acme System</span>
+        <button class="drawer-close-btn" id="drawer-close" aria-label="Close menu">&times;</button>
+      </div>
+      <ul class="mobile-nav-list">
+        <li><a href="#features" class="mobile-nav-link">Features</a></li>
+        <li><a href="#solutions" class="mobile-nav-link">Solutions</a></li>
+        <li><a href="#pricing" class="mobile-nav-link">Pricing</a></li>
+        <li><a href="#docs" class="mobile-nav-link">Documentation</a></li>
+        <li><a href="#login" class="mobile-nav-link">Sign In</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <main id="main-content">
+    <section id="features">
+      <h2>Features Section</h2>
+      <p>Content demonstrating smooth anchor scrolling with correct <code>scroll-margin-top</code> compensation.</p>
+    </section>
+
+    <section id="solutions">
+      <h2>Solutions Section</h2>
+      <p>Scroll down further to test hide-on-scroll down and reveal-on-scroll up mechanics.</p>
+    </section>
+
+    <section id="pricing">
+      <h2>Pricing Section</h2>
+      <p>Notice how the top header stack shrinks gracefully and maintains WCAG AA contrast.</p>
+    </section>
+
+    <section id="docs">
+      <h2>Documentation Section</h2>
+      <p>End of sample layout demo.</p>
+    </section>
+  </main>
+
+  <!-- JavaScript Controller -->
+  <script>
+    class StickyHeaderSystem {
+      constructor(headerId) {
+        this.header = document.getElementById(headerId);
+        this.drawerToggle = document.getElementById('drawer-toggle');
+        this.drawerClose = document.getElementById('drawer-close');
+        this.drawer = document.getElementById('mobile-drawer');
+
+        this.lastScrollY = 0;
+        this.threshold = 100;
+        this.ticking = false;
+
+        this.init();
+      }
+
+      init() {
+        window.addEventListener('scroll', () => this.onScroll(), { passive: true });
+        this.initDrawer();
+      }
+
+      onScroll() {
+        if (!this.ticking) {
+          window.requestAnimationFrame(() => {
+            this.updateScrollState();
+            this.ticking = false;
+          });
+          this.ticking = true;
+        }
+      }
+
+      updateScrollState() {
+        const currentScrollY = window.scrollY;
+
+        // Scrolled Elevation Threshold
+        if (currentScrollY > 30) {
+          this.header.classList.add('is-scrolled');
+        } else {
+          this.header.classList.remove('is-scrolled');
+        }
+
+        // Smart Hide / Reveal Threshold
+        if (currentScrollY > this.threshold) {
+          if (currentScrollY > this.lastScrollY && currentScrollY - this.lastScrollY > 12) {
+            // Scrolling down -> Hide header
+            this.header.classList.add('is-hidden');
+          } else if (this.lastScrollY - currentScrollY > 12) {
+            // Scrolling up -> Reveal header
+            this.header.classList.remove('is-hidden');
+          }
+        } else {
+          this.header.classList.remove('is-hidden');
+        }
+
+        this.lastScrollY = currentScrollY;
+      }
+
+      initDrawer() {
+        if (!this.drawerToggle || !this.drawer) return;
+
+        const openDrawer = () => {
+          this.drawer.classList.add('is-open');
+          this.drawer.setAttribute('aria-hidden', 'false');
+          this.drawerToggle.setAttribute('aria-expanded', 'true');
+        };
+
+        const closeDrawer = () => {
+          this.drawer.classList.remove('is-open');
+          this.drawer.setAttribute('aria-hidden', 'true');
+          this.drawerToggle.setAttribute('aria-expanded', 'false');
+        };
+
+        this.drawerToggle.addEventListener('click', openDrawer);
+        if (this.drawerClose) this.drawerClose.addEventListener('click', closeDrawer);
+
+        // Close on ESC key
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && this.drawer.classList.contains('is-open')) {
+            closeDrawer();
+          }
+        });
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      new StickyHeaderSystem('site-header');
+    });
+  </script>
+</body>
+</html>
