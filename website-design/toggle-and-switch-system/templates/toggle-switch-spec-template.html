@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toggle Switch Component Specification Template</title>
+  <style>
+    /* CSS Custom Properties / Design Tokens */
+    :root {
+      /* Colors - Light Theme */
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-border: #e2e8f0;
+      --color-border-strong: #94a3b8;
+      --color-text-primary: #0f172a;
+      --color-text-secondary: #475569;
+      --color-text-muted: #64748b;
+
+      /* Switch Tokens - Off State */
+      --switch-track-off-bg: #e2e8f0;
+      --switch-track-off-border: #cbd5e1;
+      --switch-thumb-off-bg: #ffffff;
+      --switch-thumb-off-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+
+      /* Switch Tokens - On State */
+      --switch-track-on-bg: #2563eb;
+      --switch-track-on-border: #1d4ed8;
+      --switch-thumb-on-bg: #ffffff;
+
+      /* Switch Tokens - Focus & Disabled */
+      --switch-focus-ring: #2563eb;
+      --switch-disabled-opacity: 0.5;
+
+      /* Standard Geometry */
+      --switch-width: 44px;
+      --switch-height: 24px;
+      --switch-padding: 2px;
+      --switch-thumb-size: 20px;
+      --switch-translate-x: 20px;
+
+      /* Compact Geometry */
+      --switch-compact-width: 36px;
+      --switch-compact-height: 20px;
+      --switch-compact-padding: 2px;
+      --switch-compact-thumb-size: 16px;
+      --switch-compact-translate-x: 16px;
+
+      /* Animation */
+      --switch-transition-duration: 200ms;
+      --switch-transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Dark Theme Support */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-bg: #0f172a;
+        --color-surface: #1e293b;
+        --color-border: #334155;
+        --color-border-strong: #475569;
+        --color-text-primary: #f8fafc;
+        --color-text-secondary: #cbd5e1;
+        --color-text-muted: #94a3b8;
+
+        --switch-track-off-bg: #334155;
+        --switch-track-off-border: #475569;
+        --switch-track-on-bg: #3b82f6;
+        --switch-track-on-border: #2563eb;
+      }
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--color-bg);
+      color: var(--color-text-primary);
+      line-height: 1.5;
+      padding: 2rem;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .card {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin: 0 0 1rem 0;
+      color: var(--color-text-primary);
+    }
+
+    /* Base Toggle Switch Component Styles */
+    .switch {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+      width: var(--switch-width);
+      height: var(--switch-height);
+      padding: var(--switch-padding);
+      background-color: var(--switch-track-off-bg);
+      border: 1px solid var(--switch-track-off-border);
+      border-radius: 999px;
+      cursor: pointer;
+      box-sizing: border-box;
+      transition: background-color var(--switch-transition-duration) var(--switch-transition-easing),
+                  border-color var(--switch-transition-duration) var(--switch-transition-easing);
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      appearance: none;
+      outline: none;
+    }
+
+    /* Extended Touch Hit Area (Minimum 44x44px for accessibility) */
+    .switch::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 44px;
+      height: 44px;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Switch Thumb */
+    .switch__thumb {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--switch-thumb-size);
+      height: var(--switch-thumb-size);
+      background-color: var(--switch-thumb-off-bg);
+      border-radius: 50%;
+      box-shadow: var(--switch-thumb-off-shadow);
+      transition: transform var(--switch-transition-duration) var(--switch-transition-easing);
+      pointer-events: none;
+    }
+
+    /* Active / Checked State */
+    .switch[aria-checked="true"] {
+      background-color: var(--switch-track-on-bg);
+      border-color: var(--switch-track-on-border);
+    }
+
+    .switch[aria-checked="true"] .switch__thumb {
+      transform: translateX(var(--switch-translate-x));
+    }
+
+    /* Focus-Visible State */
+    .switch:focus-visible {
+      outline: 2px solid var(--switch-focus-ring);
+      outline-offset: 2px;
+    }
+
+    /* Hover State */
+    .switch:hover:not([disabled]) {
+      opacity: 0.95;
+    }
+
+    /* Disabled State */
+    .switch[disabled],
+    .switch--disabled {
+      opacity: var(--switch-disabled-opacity);
+      cursor: not-allowed;
+    }
+
+    /* Compact Switch Variant */
+    .switch--compact {
+      width: var(--switch-compact-width);
+      height: var(--switch-compact-height);
+    }
+
+    .switch--compact .switch__thumb {
+      width: var(--switch-compact-thumb-size);
+      height: var(--switch-compact-thumb-size);
+    }
+
+    .switch--compact[aria-checked="true"] .switch__thumb {
+      transform: translateX(var(--switch-compact-translate-x));
+    }
+
+    /* Pending / Loading State */
+    .switch--loading .switch__thumb::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      border: 2px solid var(--color-border-strong);
+      border-top-color: var(--color-text-primary);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Setting Item Preference Row Layout */
+    .preference-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .preference-item {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .preference-item:last-child {
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .preference-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .preference-title {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin: 0;
+    }
+
+    .preference-description {
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+      margin: 0;
+    }
+
+    /* Hero Pricing Toggle Layout */
+    .pricing-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.875rem;
+      background-color: var(--color-bg);
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      border: 1px solid var(--color-border);
+    }
+
+    .pricing-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .pricing-label--active {
+      color: var(--color-text-primary);
+      font-weight: 600;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.125rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background-color: #dcfce7;
+      color: #166534;
+      margin-left: 0.25rem;
+    }
+
+    /* Accessibility reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      .switch,
+      .switch__thumb {
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Section 1: Preference Settings List -->
+    <div class="card">
+      <h2 class="card-title">Notification Preferences</h2>
+
+      <div class="preference-list">
+
+        <!-- Preference Item 1 (ON) -->
+        <div class="preference-item">
+          <div class="preference-text">
+            <label id="push-label" for="push-switch" class="preference-title">Push Notifications</label>
+            <p id="push-desc" class="preference-description">Receive instant alerts on your desktop when someone mentions you in a thread.</p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked="true"
+            id="push-switch"
+            aria-labelledby="push-label"
+            aria-describedby="push-desc"
+            class="switch">
+            <span class="switch__thumb"></span>
+          </button>
+        </div>
+
+        <!-- Preference Item 2 (OFF) -->
+        <div class="preference-item">
+          <div class="preference-text">
+            <label id="email-label" for="email-switch" class="preference-title">Email Activity Digest</label>
+            <p id="email-desc" class="preference-description">Receive a daily summary of team activity and project changes.</p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked="false"
+            id="email-switch"
+            aria-labelledby="email-label"
+            aria-describedby="email-desc"
+            class="switch">
+            <span class="switch__thumb"></span>
+          </button>
+        </div>
+
+        <!-- Preference Item 3 (Disabled) -->
+        <div class="preference-item">
+          <div class="preference-text">
+            <label id="sms-label" for="sms-switch" class="preference-title">SMS Security Alerts (Enforced)</label>
+            <p id="sms-desc" class="preference-description">Required by enterprise organization security policies.</p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked="true"
+            id="sms-switch"
+            disabled
+            aria-labelledby="sms-label"
+            aria-describedby="sms-desc"
+            class="switch">
+            <span class="switch__thumb"></span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Section 2: Pricing Tier Flanking Switch -->
+    <div class="card" style="text-align: center;">
+      <h2 class="card-title">Choose Billing Cycle</h2>
+
+      <div class="pricing-toggle">
+        <span id="monthly-label" class="pricing-label pricing-label--active">Monthly</span>
+        <button
+          type="button"
+          role="switch"
+          aria-checked="false"
+          id="billing-switch"
+          aria-label="Toggle between monthly and annual billing"
+          class="switch">
+          <span class="switch__thumb"></span>
+        </button>
+        <span id="annual-label" class="pricing-label">
+          Annual <span class="badge">Save 20%</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Section 3: Compact Variant & Pending State -->
+    <div class="card">
+      <h2 class="card-title">Compact & Async States</h2>
+
+      <div class="preference-list">
+
+        <!-- Compact Switch -->
+        <div class="preference-item">
+          <div class="preference-text">
+            <label id="compact-label" for="compact-switch" class="preference-title">Compact Table Switch</label>
+            <p class="preference-description">Designed for dense data table rows and toolbar action bars.</p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked="true"
+            id="compact-switch"
+            aria-labelledby="compact-label"
+            class="switch switch--compact">
+            <span class="switch__thumb"></span>
+          </button>
+        </div>
+
+        <!-- Pending / Loading Switch -->
+        <div class="preference-item">
+          <div class="preference-text">
+            <label id="async-label" for="async-switch" class="preference-title">Async Processing Switch</label>
+            <p class="preference-description">Displays loading indicator during server verification latency.</p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked="true"
+            id="async-switch"
+            aria-labelledby="async-label"
+            class="switch switch--loading">
+            <span class="switch__thumb"></span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Client-side interaction script for interactive demo & ARIA state toggling
+    document.querySelectorAll('button[role="switch"]:not([disabled])').forEach(switchEl => {
+      switchEl.addEventListener('click', () => {
+        const isChecked = switchEl.getAttribute('aria-checked') === 'true';
+        switchEl.setAttribute('aria-checked', (!isChecked).toString());
+      });
+    });
+  </script>
+</body>
+</html>
