@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Long Animation Frames (LoAF) API Diagnostic Monitor</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --danger: #f43f5e;
+      --warning: #fbbf24;
+      --success: #34d399;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 900px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    header {
+      grid-column: 1 / -1;
+      border-bottom: 1fr solid var(--surface-border);
+      padding-bottom: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    .card h2 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    button {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.25rem;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      text-align: left;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    button.danger {
+      background: #dc2626;
+    }
+    button.danger:hover {
+      background: #b91c1c;
+    }
+
+    button.success {
+      background: #059669;
+    }
+    button.success:hover {
+      background: #047857;
+    }
+
+    .btn-desc {
+      display: block;
+      font-weight: normal;
+      font-size: 0.8rem;
+      opacity: 0.85;
+      margin-top: 0.25rem;
+    }
+
+    /* LoAF Monitor Feed */
+    .loaf-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .loaf-item {
+      background: #0f172a;
+      border-left: 4px solid var(--warning);
+      border-radius: 4px;
+      padding: 0.85rem;
+      font-family: var(--font-mono);
+      font-size: 0.825rem;
+    }
+
+    .loaf-item.severe {
+      border-left-color: var(--danger);
+    }
+
+    .loaf-item-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+
+    .badge {
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+    }
+
+    .badge-danger {
+      background: rgba(244, 63, 94, 0.2);
+      color: var(--danger);
+    }
+
+    .badge-warning {
+      background: rgba(251, 191, 36, 0.2);
+      color: var(--warning);
+    }
+
+    .loaf-metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+
+    .metric-val {
+      color: var(--primary);
+      font-size: 0.95rem;
+      font-weight: bold;
+    }
+
+    .script-attribution {
+      color: var(--text-muted);
+      border-top: 1px dashed var(--surface-border);
+      padding-top: 0.5rem;
+      margin-top: 0.5rem;
+      word-break: break-all;
+    }
+
+    .script-invoker {
+      color: var(--success);
+      font-weight: bold;
+    }
+
+    .status-banner {
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      padding: 0.75rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+
+    /* Animated test box to show jank */
+    .anim-box-container {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: #0f172a;
+      border-radius: 6px;
+    }
+
+    .anim-box {
+      width: 40px;
+      height: 40px;
+      background: var(--primary);
+      border-radius: 6px;
+      animation: moveRight 2s linear infinite alternate;
+    }
+
+    @keyframes moveRight {
+      from { transform: translateX(0); }
+      to { transform: translateX(calc(100% - 40px)); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>Long Animation Frames (LoAF) API Diagnostic Monitor</h1>
+    <p class="subtitle">Demonstration of capturing, attributing, and profiling main-thread blocking frames (>50ms) using PerformanceObserver in Chrome/Edge 123+.</p>
+  </header>
+
+  <!-- Left Column: Controls & Jank Generators -->
+  <div class="card">
+    <h2>⚡ Interaction Test Panel</h2>
+    <div id="support-status" class="status-banner">Checking LoAF Support...</div>
+
+    <div class="btn-group">
+      <button class="danger" id="btn-unbatched-cpu">
+        Trigger Heavy CPU Blocking Task
+        <span class="btn-desc">Runs a synchronous loop for ~150ms inside a click listener (Triggers LoAF).</span>
+      </button>
+
+      <button class="danger" id="btn-layout-thrash">
+        Trigger Forced Synchronous Reflow
+        <span class="btn-desc">Interleaves DOM reads (offsetHeight) and writes in a loop (Triggers forcedStyleAndLayoutDuration).</span>
+      </button>
+
+      <button class="success" id="btn-yielded-task">
+        Run Optimally Yielded Task (No LoAF)
+        <span class="btn-desc">Uses scheduler.yield() or micro-chunking to keep frame duration &lt; 16ms.</span>
+      </button>
+    </div>
+
+    <div class="anim-box-container">
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">Visual Jank Detector (Smooth animation stutters when main thread is blocked):</p>
+      <div class="anim-box"></div>
+    </div>
+  </div>
+
+  <!-- Right Column: Real-Time LoAF Feed -->
+  <div class="card">
+    <h2>🔍 Real-Time LoAF Inspector Feed</h2>
+    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+      Frames taking &gt; 50ms are captured below with exact script attribution, function names, and forced layout timing:
+    </p>
+
+    <div id="loaf-feed" class="loaf-feed">
+      <div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 2rem 0;">
+        No Long Animation Frames recorded yet. Click a test button above.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Dynamic DOM Container for Layout Thrash Test -->
+<div id="thrash-container" style="position: absolute; opacity: 0; pointer-events: none; top: -9999px;"></div>
+
+<script>
+  // 1. Check Browser Support for Long Animation Frames API
+  const statusEl = document.getElementById('support-status');
+  const isLoAFSupported = 'PerformanceObserver' in window &&
+    PerformanceObserver.supportedEntryTypes?.includes('long-animation-frame');
+
+  if (isLoAFSupported) {
+    statusEl.innerHTML = '✅ <strong>LoAF API Supported:</strong> Real-time frame observer active (Chrome/Edge 123+).';
+  } else {
+    statusEl.style.borderColor = 'var(--warning)';
+    statusEl.style.color = 'var(--warning)';
+    statusEl.innerHTML = '⚠️ <strong>LoAF Not Supported:</strong> Your browser does not support <code>long-animation-frame</code>. (Requires Chromium 123+).';
+  }
+
+  // 2. Initialize LoAF Performance Observer
+  const loafFeed = document.getElementById('loaf-feed');
+  let hasEntries = false;
+
+  if (isLoAFSupported) {
+    const observer = new PerformanceObserver((list) => {
+      const entries = list.getEntries();
+
+      entries.forEach((entry) => {
+        if (!hasEntries) {
+          loafFeed.innerHTML = '';
+          hasEntries = true;
+        }
+
+        renderLoAFItem(entry);
+      });
+    });
+
+    // Observe long-animation-frame with buffered option to catch page load frames
+    observer.observe({ type: 'long-animation-frame', buffered: true });
+  }
+
+  // 3. Render Captured LoAF Details to Inspector UI
+  function renderLoAFItem(entry) {
+    const item = document.createElement('div');
+    const isSevere = entry.duration > 150;
+    item.className = `loaf-item ${isSevere ? 'severe' : ''}`;
+
+    const blockingDuration = entry.blockingDuration || Math.max(0, entry.duration - 50);
+    const styleLayoutDuration = (entry.styleAndLayoutStart && entry.renderStart)
+      ? (entry.duration - (entry.styleAndLayoutStart - entry.startTime)).toFixed(1)
+      : '0.0';
+
+    // Parse script attributions
+    let scriptDetailsHtml = '';
+    if (entry.scripts && entry.scripts.length > 0) {
+      scriptDetailsHtml = entry.scripts.map((script) => {
+        const url = script.sourceURL ? script.sourceURL.split('/').pop() : 'inline script';
+        const func = script.sourceFunctionName || 'anonymous';
+        const invoker = script.invoker || 'unknown invoker';
+        const forcedLayout = script.forcedStyleAndLayoutDuration
+          ? `${script.forcedStyleAndLayoutDuration.toFixed(1)}ms`
+          : 'None';
+
+        return `
+          <div class="script-attribution">
+            <div><span class="script-invoker">${escapeHtml(script.invokerType || 'script')}:</span> ${escapeHtml(invoker)}</div>
+            <div>Source: <code>${escapeHtml(url)}:${script.sourceCharPosition || 0}</code> (${escapeHtml(func)}())</div>
+            ${script.forcedStyleAndLayoutDuration ? `<div style="color: var(--danger);">⚠️ Forced Layout Thrash: ${forcedLayout}</div>` : ''}
+          </div>
+        `;
+      }).join('');
+    } else {
+      scriptDetailsHtml = `<div class="script-attribution">No script attribution available (Style/Paint overhead or cross-origin script).</div>`;
+    }
+
+    item.innerHTML = `
+      <div class="loaf-item-header">
+        <span>Frame Duration: ${entry.duration.toFixed(1)}ms</span>
+        <span class="badge ${isSevere ? 'badge-danger' : 'badge-warning'}">
+          ${isSevere ? 'CRITICAL INP' : 'LONG FRAME'}
+        </span>
+      </div>
+
+      <div class="loaf-metric-grid">
+        <div>
+          <div style="font-size:0.7rem; color:var(--text-muted)">Blocking Time</div>
+          <div class="metric-val" style="color:${blockingDuration > 100 ? 'var(--danger)' : 'var(--warning)'}">
+            ${blockingDuration.toFixed(1)}ms
+          </div>
+        </div>
+        <div>
+          <div style="font-size:0.7rem; color:var(--text-muted)">Render Delay</div>
+          <div class="metric-val">
+            ${(entry.renderStart ? entry.duration - (entry.renderStart - entry.startTime) : 0).toFixed(1)}ms
+          </div>
+        </div>
+        <div>
+          <div style="font-size:0.7rem; color:var(--text-muted)">Style & Layout</div>
+          <div class="metric-val">
+            ${styleLayoutDuration}ms
+          </div>
+        </div>
+      </div>
+
+      ${scriptDetailsHtml}
+    `;
+
+    loafFeed.prepend(item);
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  // 4. Test Case Handlers
+
+  // Scenario A: Heavy CPU Blocking Task
+  document.getElementById('btn-unbatched-cpu').addEventListener('click', function handleHeavyCPUClick() {
+    const start = performance.now();
+    // Simulate heavy calculation loop blocking main thread for 180ms
+    while (performance.now() - start < 180) {
+      Math.sqrt(Math.random() * 999999);
+    }
+  });
+
+  // Scenario B: Forced Synchronous Layout Thrashing
+  document.getElementById('btn-layout-thrash').addEventListener('click', function handleLayoutThrashClick() {
+    const container = document.getElementById('thrash-container');
+    container.innerHTML = '';
+
+    // Create 100 elements
+    const elements = [];
+    for (let i = 0; i < 100; i++) {
+      const div = document.createElement('div');
+      div.style.width = '100px';
+      div.textContent = `Item ${i}`;
+      container.appendChild(div);
+      elements.push(div);
+    }
+
+    // Interleave reads and writes -> Forces Synchronous Layout Thrashing!
+    elements.forEach((el, index) => {
+      // READ (forces recalculate style & layout)
+      const h = el.offsetHeight;
+      // WRITE (dirties layout tree)
+      el.style.height = `${h + (index % 5)}px`;
+    });
+  });
+
+  // Scenario C: Optimally Yielded Task using scheduler.yield() or setTimeout micro-chunks
+  document.getElementById('btn-yielded-task').addEventListener('click', async function handleYieldedClick() {
+    const totalItems = 10000;
+    const chunkSize = 500;
+
+    for (let i = 0; i < totalItems; i += chunkSize) {
+      // Process chunk
+      for (let j = i; j < i + chunkSize; j++) {
+        Math.sqrt(Math.random() * 9999);
+      }
+
+      // Yield to main thread every chunk to allow browser rendering
+      if ('scheduler' in window && 'yield' in window.scheduler) {
+        await window.scheduler.yield();
+      } else {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
