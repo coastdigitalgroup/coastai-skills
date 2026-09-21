@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dropdown and Menu System Specification Template</title>
+  <style>
+    /* ==========================================================================
+       Design System Tokens & CSS Variables
+       ========================================================================== */
+    :root {
+      /* Color Surface Tokens */
+      --menu-bg-surface: #ffffff;
+      --menu-bg-hover: #f1f5f9;
+      --menu-bg-active: #e2e8f0;
+      --menu-border-color: #cbd5e1;
+      --menu-text-primary: #0f172a;
+      --menu-text-secondary: #475569;
+      --menu-text-tertiary: #64748b;
+
+      /* Danger Color Tokens */
+      --menu-danger-text: #dc2626;
+      --menu-danger-bg-hover: #fef2f2;
+
+      /* Focus Ring Tokens */
+      --menu-focus-ring: #2563eb;
+      --menu-focus-ring-offset: 2px;
+
+      /* Shadow & Elevation Tokens */
+      --elevation-popover: 0 10px 15px -3px rgba(15, 23, 42, 0.1), 0 4px 6px -2px rgba(15, 23, 42, 0.05);
+      --z-popover: 1000;
+
+      /* Typography & Radii Tokens */
+      --menu-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --menu-radius-container: 8px;
+      --menu-radius-item: 4px;
+    }
+
+    /* Dark Mode Theme Tokens Overrides */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --menu-bg-surface: #1e293b;
+        --menu-bg-hover: #334155;
+        --menu-bg-active: #475569;
+        --menu-border-color: #334155;
+        --menu-text-primary: #f8fafc;
+        --menu-text-secondary: #cbd5e1;
+        --menu-text-tertiary: #94a3b8;
+        --menu-danger-text: #ef4444;
+        --menu-danger-bg-hover: #450a0a;
+        --elevation-popover: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    body {
+      font-family: var(--menu-font-family);
+      background-color: var(--menu-bg-hover);
+      color: var(--menu-text-primary);
+      padding: 3rem;
+    }
+
+    /* ==========================================================================
+       Menu Trigger & Positioning Wrapper
+       ========================================================================== */
+    .menu-trigger-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .menu-trigger-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      height: 36px;
+      padding: 0 0.75rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--menu-text-primary);
+      background-color: var(--menu-bg-surface);
+      border: 1px solid var(--menu-border-color);
+      border-radius: var(--menu-radius-item);
+      cursor: pointer;
+      transition: background-color 150ms ease, border-color 150ms ease;
+    }
+
+    .menu-trigger-btn:hover {
+      background-color: var(--menu-bg-hover);
+    }
+
+    .menu-trigger-btn:focus-visible {
+      outline: 2px solid var(--menu-focus-ring);
+      outline-offset: var(--menu-focus-ring-offset);
+    }
+
+    .menu-trigger-btn[aria-expanded="true"] {
+      background-color: var(--menu-bg-active);
+    }
+
+    /* ==========================================================================
+       Dropdown Menu Floating Panel Specification
+       ========================================================================== */
+    .dropdown-menu-panel {
+      position: absolute;
+      top: calc(100% + 4px);
+      right: 0; /* Right aligned to trigger boundary */
+      min-width: 220px;
+      max-width: 280px;
+      padding: 0.25rem;
+      margin: 0;
+      list-style: none;
+      background-color: var(--menu-bg-surface);
+      border: 1px solid var(--menu-border-color);
+      border-radius: var(--menu-radius-container);
+      box-shadow: var(--elevation-popover);
+      z-index: var(--z-popover);
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 150ms ease, transform 150ms ease;
+    }
+
+    .dropdown-menu-panel[aria-hidden="true"] {
+      display: none;
+      opacity: 0;
+      transform: translateY(-6px);
+      pointer-events: none;
+    }
+
+    /* ==========================================================================
+       Menu Items & Section Anatomy
+       ========================================================================== */
+    .menu-section-header {
+      padding: 0.5rem 0.5rem 0.25rem 0.5rem;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--menu-text-tertiary);
+    }
+
+    .menu-separator {
+      height: 1px;
+      margin: 0.25rem -0.25rem;
+      background-color: var(--menu-border-color);
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      height: 34px;
+      padding: 0 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 400;
+      color: var(--menu-text-primary);
+      background: none;
+      border: none;
+      border-radius: var(--menu-radius-item);
+      cursor: pointer;
+      text-decoration: none;
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    .menu-item:hover,
+    .menu-item:focus-visible,
+    .menu-item[data-focused="true"] {
+      background-color: var(--menu-bg-hover);
+      color: var(--menu-text-primary);
+      outline: none;
+    }
+
+    .menu-item-left {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+    }
+
+    .menu-item-icon {
+      width: 16px;
+      height: 16px;
+      color: var(--menu-text-secondary);
+      flex-shrink: 0;
+    }
+
+    .menu-item-shortcut {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.75rem;
+      color: var(--menu-text-tertiary);
+    }
+
+    /* Destructive Item Token Overrides */
+    .menu-item-danger {
+      color: var(--menu-danger-text);
+    }
+
+    .menu-item-danger .menu-item-icon {
+      color: var(--menu-danger-text);
+    }
+
+    .menu-item-danger:hover,
+    .menu-item-danger:focus-visible {
+      background-color: var(--menu-danger-bg-hover);
+      color: var(--menu-danger-text);
+    }
+
+    /* Checkable & Radio Items */
+    .menu-item[role="menuitemcheckbox"] .check-indicator,
+    .menu-item[role="menuitemradio"] .radio-indicator {
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--menu-focus-ring);
+    }
+
+    /* ==========================================================================
+       Responsive Touch Adaptation (< 768px -> Bottom Action Sheet)
+       ========================================================================== */
+    @media (max-width: 767px) {
+      .dropdown-menu-panel {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-width: 100%;
+        border-radius: 16px 16px 0 0;
+        padding: 0.75rem 1rem 1.5rem 1rem;
+        box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.2);
+        animation: slideUp 200ms cubic-bezier(0, 0, 0.2, 1);
+      }
+
+      .menu-item {
+        height: 48px; /* Touch target >= 44px */
+        font-size: 1rem;
+        padding: 0 0.75rem;
+      }
+
+      .menu-sheet-handle {
+        width: 36px;
+        height: 4px;
+        background-color: var(--menu-text-tertiary);
+        border-radius: 2px;
+        margin: 0.25rem auto 0.75rem auto;
+        opacity: 0.4;
+      }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Menu System Blueprint Container -->
+  <div class="menu-trigger-wrapper">
+
+    <!-- Trigger Button Spec -->
+    <button
+      type="button"
+      id="invoice-actions-trigger"
+      class="menu-trigger-btn"
+      aria-haspopup="menu"
+      aria-expanded="false"
+      aria-controls="invoice-actions-menu"
+      aria-label="Actions for Invoice #1042"
+    >
+      <span>Actions</span>
+      <svg class="menu-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+      </svg>
+    </button>
+
+    <!-- Floating Dropdown Menu Panel Spec -->
+    <div
+      id="invoice-actions-menu"
+      class="dropdown-menu-panel"
+      role="menu"
+      aria-labelledby="invoice-actions-trigger"
+      aria-hidden="true"
+      tabindex="-1"
+    >
+      <!-- Mobile Touch Drag Handle -->
+      <div class="menu-sheet-handle" aria-hidden="true"></div>
+
+      <!-- Group 1: Quick Actions -->
+      <div class="menu-section-header" role="presentation">Quick Actions</div>
+
+      <button type="button" class="menu-item" role="menuitem" tabindex="-1">
+        <span class="menu-item-left">
+          <svg class="menu-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+          </svg>
+          <span>View Invoice</span>
+        </span>
+        <span class="menu-item-shortcut">⌘O</span>
+      </button>
+
+      <button type="button" class="menu-item" role="menuitem" tabindex="-1">
+        <span class="menu-item-left">
+          <svg class="menu-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+          </svg>
+          <span>Send Reminder</span>
+        </span>
+      </button>
+
+      <button type="button" class="menu-item" role="menuitem" tabindex="-1">
+        <span class="menu-item-left">
+          <svg class="menu-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+          </svg>
+          <span>Download PDF</span>
+        </span>
+        <span class="menu-item-shortcut">⌘D</span>
+      </button>
+
+      <!-- Divider -->
+      <div class="menu-separator" role="separator"></div>
+
+      <!-- Group 2: Preferences (Checkable) -->
+      <div class="menu-section-header" role="presentation">Preferences</div>
+
+      <button type="button" class="menu-item" role="menuitemcheckbox" aria-checked="true" tabindex="-1">
+        <span class="menu-item-left">
+          <span class="check-indicator">✓</span>
+          <span>Auto-Sync Payment</span>
+        </span>
+      </button>
+
+      <!-- Divider -->
+      <div class="menu-separator" role="separator"></div>
+
+      <!-- Group 3: Destructive Operations -->
+      <button type="button" class="menu-item menu-item-danger" role="menuitem" tabindex="-1">
+        <span class="menu-item-left">
+          <svg class="menu-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+          <span>Delete Invoice</span>
+        </span>
+        <span class="menu-item-shortcut">⌫</span>
+      </button>
+    </div>
+
+  </div>
+
+</body>
+</html>
