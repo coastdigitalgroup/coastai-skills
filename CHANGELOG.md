@@ -5,6 +5,10 @@ All notable changes to this project will be documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- Updated `@types/node`, `eslint`, `tsx`, and `typescript-eslint` development dependencies.
+
 ## [0.3.0] — 2026-08-16
 
 ### Added
