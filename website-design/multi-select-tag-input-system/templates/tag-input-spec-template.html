@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi-Select Tag Input Specification Template</title>
+  <style>
+    /* CSS Custom Properties & Design Tokens */
+    :root {
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-text-main: #0f172a;
+      --color-text-muted: #64748b;
+      --color-border: #cbd5e1;
+      --color-border-hover: #94a3b8;
+      --color-primary: #2563eb;
+      --color-primary-light: #eff6ff;
+      --color-primary-ring: rgba(37, 99, 235, 0.25);
+
+      --chip-bg: #f1f5f9;
+      --chip-text: #1e293b;
+      --chip-border: #e2e8f0;
+      --chip-selected-bg: #dbeafe;
+      --chip-selected-text: #1e40af;
+
+      --radius-sm: 0.25rem;
+      --radius-md: 0.375rem;
+      --radius-lg: 0.5rem;
+      --radius-full: 9999px;
+
+      --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--color-bg);
+      color: var(--color-text-main);
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .demo-card {
+      width: 100%;
+      max-width: 560px;
+      background: var(--color-surface);
+      padding: 1.5rem;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e8f0;
+    }
+
+    .form-group {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .field-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-text-main);
+    }
+
+    .field-hint {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+    }
+
+    /* Tag Input Outer Flex Container */
+    .tag-input-container {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.375rem;
+      min-height: 44px;
+      padding: 0.375rem 0.5rem;
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background-color: var(--color-surface);
+      cursor: text;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .tag-input-container:hover {
+      border-color: var(--color-border-hover);
+    }
+
+    .tag-input-container.is-focused {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-ring);
+    }
+
+    /* Selected Tag List */
+    .tag-chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.375rem;
+      list-style: none;
+    }
+
+    /* Tag Chip Item */
+    .tag-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.5rem;
+      background-color: var(--chip-bg);
+      color: var(--chip-text);
+      border: 1px solid var(--chip-border);
+      border-radius: var(--radius-full);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      line-height: 1.2;
+      user-select: none;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .tag-chip.is-selected {
+      background-color: var(--chip-selected-bg);
+      color: var(--chip-selected-text);
+      border-color: var(--color-primary);
+      outline: 2px solid var(--color-primary);
+    }
+
+    .chip-avatar {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .chip-label {
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Touch-Compliant Remove Button */
+    .chip-remove-btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    /* Touch hit-target extension for WCAG 2.5.8 */
+    .chip-remove-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 32px;
+      height: 32px;
+      transform: translate(-50%, -50%);
+    }
+
+    .chip-remove-btn:hover {
+      background-color: rgba(0, 0, 0, 0.08);
+      color: var(--color-text-main);
+    }
+
+    .chip-remove-btn:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 1px;
+    }
+
+    .chip-remove-icon {
+      width: 12px;
+      height: 12px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+
+    /* Embedded Combobox Text Input */
+    .tag-text-input {
+      flex: 1 1 120px;
+      min-width: 80px;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 0.875rem;
+      color: var(--color-text-main);
+      padding: 0.25rem 0.25rem;
+    }
+
+    .tag-text-input::placeholder {
+      color: var(--color-text-muted);
+    }
+
+    /* Floating Suggestions Listbox */
+    .tag-suggestions-list {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      max-height: 200px;
+      overflow-y: auto;
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+      list-style: none;
+      z-index: 1000;
+    }
+
+    .tag-suggestions-list[hidden] {
+      display: none;
+    }
+
+    .suggestion-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.625rem 0.875rem;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: background-color 0.1s ease;
+    }
+
+    .suggestion-item:hover,
+    .suggestion-item.is-active {
+      background-color: var(--color-primary-light);
+      color: var(--color-primary);
+    }
+
+    .suggestion-meta {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+    }
+
+    /* Screen Reader Only Utility Class */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="demo-card">
+    <div class="form-group">
+      <label id="tag-input-label" for="tag-input-field" class="field-label">
+        Assign Team Members
+      </label>
+      <span id="tag-input-hint" class="field-hint">
+        Type a name or email address. Press Enter or comma to create. Use Left Arrow to select chips.
+      </span>
+
+      <!-- Multi-select Container -->
+      <div class="tag-input-container" id="tag-container" onclick="document.getElementById('tag-input-field').focus()">
+
+        <ul class="tag-chip-list" id="chip-list" role="list" aria-label="Assigned team members">
+          <li class="tag-chip" data-value="alex@example.com">
+            <span class="chip-label">Alex Rivera</span>
+            <button type="button" class="chip-remove-btn" aria-label="Remove Alex Rivera" onclick="removeTag(this)">
+              <svg class="chip-remove-icon" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M4 4l8 8M12 4l-8 8"/>
+              </svg>
+            </button>
+          </li>
+          <li class="tag-chip" data-value="sarah@example.com">
+            <span class="chip-label">Sarah Chen</span>
+            <button type="button" class="chip-remove-btn" aria-label="Remove Sarah Chen" onclick="removeTag(this)">
+              <svg class="chip-remove-icon" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M4 4l8 8M12 4l-8 8"/>
+              </svg>
+            </button>
+          </li>
+        </ul>
+
+        <!-- Combobox Text Input -->
+        <input
+          type="text"
+          id="tag-input-field"
+          class="tag-text-input"
+          role="combobox"
+          aria-expanded="false"
+          aria-haspopup="listbox"
+          aria-autocomplete="list"
+          aria-controls="tag-suggestions"
+          aria-labelledby="tag-input-label"
+          aria-describedby="tag-input-hint"
+          placeholder="Add member..."
+          autocomplete="off"
+        />
+      </div>
+
+      <!-- Auto-Complete Suggestions -->
+      <ul id="tag-suggestions" class="tag-suggestions-list" role="listbox" aria-label="Team member suggestions" hidden>
+        <li role="option" id="opt-1" class="suggestion-item" data-value="marcus@example.com" onclick="selectSuggestion(this)">
+          <span>Marcus Vance</span>
+          <span class="suggestion-meta">Engineering</span>
+        </li>
+        <li role="option" id="opt-2" class="suggestion-item" data-value="elena@example.com" onclick="selectSuggestion(this)">
+          <span>Elena Rostova</span>
+          <span class="suggestion-meta">Product Design</span>
+        </li>
+      </ul>
+
+      <!-- Screen Reader Live Region -->
+      <div id="tag-live-region" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+    </div>
+  </div>
+
+  <script>
+    const container = document.getElementById('tag-container');
+    const input = document.getElementById('tag-input-field');
+    const chipList = document.getElementById('chip-list');
+    const suggestions = document.getElementById('tag-suggestions');
+    const liveRegion = document.getElementById('tag-live-region');
+
+    // Focus state toggles
+    input.addEventListener('focus', () => container.classList.add('is-focused'));
+    input.addEventListener('blur', () => {
+      container.classList.remove('is-focused');
+      setTimeout(() => suggestions.hidden = true, 200);
+    });
+
+    // Announce to Screen Reader
+    function announce(msg) {
+      liveRegion.textContent = '';
+      setTimeout(() => liveRegion.textContent = msg, 50);
+    }
+
+    // Remove Tag Chip
+    function removeTag(btn) {
+      const chip = btn.closest('.tag-chip');
+      const label = chip.querySelector('.chip-label').textContent;
+      chip.remove();
+      const count = chipList.children.length;
+      announce(`Removed ${label}. ${count} items remaining.`);
+      input.focus();
+    }
+
+    // Add Tag Chip
+    function addTag(value) {
+      if (!value.trim()) return;
+      const li = document.createElement('li');
+      li.className = 'tag-chip';
+      li.dataset.value = value;
+      li.innerHTML = `
+        <span class="chip-label">${value}</span>
+        <button type="button" class="chip-remove-btn" aria-label="Remove ${value}" onclick="removeTag(this)">
+          <svg class="chip-remove-icon" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M4 4l8 8M12 4l-8 8"/>
+          </svg>
+        </button>
+      `;
+      chipList.appendChild(li);
+      input.value = '';
+      const count = chipList.children.length;
+      announce(`Added ${value}. ${count} items total.`);
+    }
+
+    // Keyboard handlers
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ',') {
+        e.preventDefault();
+        addTag(input.value);
+        suggestions.hidden = true;
+      } else if (e.key === 'Backspace' && input.value === '') {
+        const lastChip = chipList.lastElementChild;
+        if (lastChip) {
+          if (lastChip.classList.contains('is-selected')) {
+            const label = lastChip.querySelector('.chip-label').textContent;
+            lastChip.remove();
+            announce(`Deleted ${label}.`);
+          } else {
+            lastChip.classList.add('is-selected');
+            announce(`Selected ${lastChip.querySelector('.chip-label').textContent}. Press Backspace again to delete.`);
+          }
+        }
+      } else {
+        const selected = chipList.querySelector('.is-selected');
+        if (selected) selected.classList.remove('is-selected');
+      }
+    });
+
+    // Input suggestion trigger
+    input.addEventListener('input', () => {
+      if (input.value.trim().length > 0) {
+        suggestions.hidden = false;
+        input.setAttribute('aria-expanded', 'true');
+      } else {
+        suggestions.hidden = true;
+        input.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    function selectSuggestion(opt) {
+      const text = opt.querySelector('span').textContent;
+      addTag(text);
+      suggestions.hidden = true;
+      input.focus();
+    }
+  </script>
+</body>
+</html>
