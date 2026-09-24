@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rich Text Editor UI System - Component Spec Template</title>
+  <style>
+    :root {
+      --color-bg-body: #f8fafc;
+      --color-bg-surface: #ffffff;
+      --color-border: #e2e8f0;
+      --color-border-hover: #cbd5e1;
+      --color-border-focus: #2563eb;
+
+      --color-text-main: #0f172a;
+      --color-text-muted: #64748b;
+      --color-text-placeholder: #94a3b8;
+
+      --color-primary-50: #eff6ff;
+      --color-primary-100: #dbeafe;
+      --color-primary-600: #2563eb;
+      --color-primary-700: #1d4ed8;
+
+      --color-danger-500: #ef4444;
+      --color-warning-500: #f59e0b;
+
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    /* Base Reset */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--color-bg-body);
+      color: var(--color-text-main);
+      padding: 32px 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .editor-wrapper {
+      width: 100%;
+      max-width: 880px;
+      background: var(--color-bg-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* -----------------------------------------------------------------
+       1. FORMATTING TOOLBAR
+    ----------------------------------------------------------------- */
+    .editor-toolbar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 8px 12px;
+      background-color: #f1f5f9;
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .toolbar-separator {
+      width: 1px;
+      height: 24px;
+      background-color: var(--color-border);
+      margin: 0 6px;
+    }
+
+    .toolbar-btn {
+      appearance: none;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      color: var(--color-text-main);
+      min-width: 36px;
+      height: 36px;
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+
+    .toolbar-btn:hover {
+      background-color: var(--color-border);
+      color: var(--color-text-main);
+    }
+
+    .toolbar-btn:focus-visible {
+      outline: 2px solid var(--color-border-focus);
+      outline-offset: 1px;
+    }
+
+    .toolbar-btn[aria-pressed="true"] {
+      background-color: var(--color-primary-100);
+      color: var(--color-primary-700);
+      border-color: var(--color-primary-600);
+    }
+
+    .toolbar-select {
+      height: 36px;
+      padding: 0 8px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      background-color: var(--color-bg-surface);
+      color: var(--color-text-main);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .toolbar-select:focus-visible {
+      outline: 2px solid var(--color-border-focus);
+    }
+
+    /* -----------------------------------------------------------------
+       2. EDITABLE CONTENT CANVAS
+    ----------------------------------------------------------------- */
+    .editor-canvas {
+      min-height: 360px;
+      padding: 32px;
+      outline: none;
+      font-size: 1.125rem;
+      line-height: 1.65;
+      color: var(--color-text-main);
+      position: relative;
+    }
+
+    .editor-canvas:focus-visible {
+      box-shadow: inset 0 0 0 2px var(--color-primary-100);
+    }
+
+    .editor-canvas:empty::before {
+      content: attr(data-placeholder);
+      color: var(--color-text-placeholder);
+      pointer-events: none;
+      display: block;
+    }
+
+    /* Canvas Typography Elements */
+    .editor-canvas h1 {
+      font-size: 2.25rem;
+      line-height: 1.25;
+      margin-bottom: 1rem;
+      color: var(--color-text-main);
+    }
+
+    .editor-canvas h2 {
+      font-size: 1.65rem;
+      line-height: 1.3;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .editor-canvas p {
+      margin-bottom: 1.25rem;
+    }
+
+    .editor-canvas blockquote {
+      border-left: 4px solid var(--color-primary-600);
+      padding-left: 16px;
+      margin: 1.5rem 0;
+      font-style: italic;
+      color: var(--color-text-muted);
+    }
+
+    .editor-canvas code {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      background-color: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .editor-canvas ul, .editor-canvas ol {
+      margin-bottom: 1.25rem;
+      padding-left: 24px;
+    }
+
+    /* -----------------------------------------------------------------
+       3. FLOATING SELECTION BUBBLE MENU
+    ----------------------------------------------------------------- */
+    .bubble-menu {
+      position: absolute;
+      top: 120px;
+      left: 200px;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 4px;
+      background: var(--color-text-main);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      z-index: 20;
+    }
+
+    .bubble-btn {
+      appearance: none;
+      background: transparent;
+      border: none;
+      color: #f8fafc;
+      min-width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .bubble-btn:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .bubble-btn[aria-pressed="true"] {
+      background-color: var(--color-primary-600);
+      color: #ffffff;
+    }
+
+    /* -----------------------------------------------------------------
+       4. STATUS & COUNTER BAR
+    ----------------------------------------------------------------- */
+    .editor-status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background-color: #f8fafc;
+      border-top: 1px solid var(--color-border);
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+
+    .status-metrics {
+      display: flex;
+      gap: 16px;
+    }
+
+    .status-save-state {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+
+    .save-indicator-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #10b981; /* Green active saved indicator */
+    }
+
+    /* Mobile Responsive Dock Adaptation */
+    @media (max-width: 640px) {
+      .editor-wrapper {
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .editor-toolbar {
+        position: fixed;
+        bottom: 0;
+        top: auto;
+        left: 0;
+        right: 0;
+        box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+        justify-content: space-around;
+        padding: 12px 8px;
+      }
+      .editor-canvas {
+        padding: 20px 16px 80px 16px;
+      }
+      .editor-status-bar {
+        margin-bottom: 60px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- MASTER EDITOR CONTAINER -->
+  <div class="editor-wrapper">
+
+    <!-- 1. ACCESSIBLE FORMATTING TOOLBAR -->
+    <div class="editor-toolbar" role="toolbar" aria-label="Formatting options" tabindex="0">
+
+      <!-- Block Format Selector Group -->
+      <div class="toolbar-group">
+        <select class="toolbar-select" aria-label="Text block type">
+          <option value="p">Paragraph</option>
+          <option value="h1">Heading 1</option>
+          <option value="h2">Heading 2</option>
+          <option value="h3">Heading 3</option>
+          <option value="blockquote">Quote</option>
+        </select>
+      </div>
+
+      <div class="toolbar-separator" role="separator" aria-orientation="vertical"></div>
+
+      <!-- Inline Text Formatting Group -->
+      <div class="toolbar-group">
+        <button type="button" class="toolbar-btn" aria-label="Bold (Cmd+B)" aria-pressed="true" title="Bold">
+          <b>B</b>
+        </button>
+        <button type="button" class="toolbar-btn" aria-label="Italic (Cmd+I)" aria-pressed="false" title="Italic">
+          <i>I</i>
+        </button>
+        <button type="button" class="toolbar-btn" aria-label="Underline (Cmd+U)" aria-pressed="false" title="Underline">
+          <u>U</u>
+        </button>
+        <button type="button" class="toolbar-btn" aria-label="Strikethrough" aria-pressed="false" title="Strikethrough">
+          <s>S</s>
+        </button>
+        <button type="button" class="toolbar-btn" aria-label="Inline Code" aria-pressed="false" title="Inline Code">
+          &lt;/&gt;
+        </button>
+      </div>
+
+      <div class="toolbar-separator" role="separator" aria-orientation="vertical"></div>
+
+      <!-- List Structure Group -->
+      <div class="toolbar-group">
+        <button type="button" class="toolbar-btn" aria-label="Bulleted list" aria-pressed="false" title="Bulleted list">
+          &bull; List
+        </button>
+        <button type="button" class="toolbar-btn" aria-label="Numbered list" aria-pressed="false" title="Numbered list">
+          1. List
+        </button>
+      </div>
+
+      <div class="toolbar-separator" role="separator" aria-orientation="vertical"></div>
+
+      <!-- Media & Link Group -->
+      <div class="toolbar-group">
+        <button type="button" class="toolbar-btn" aria-label="Insert Link (Cmd+K)" aria-pressed="false" title="Insert Link">
+          &infin; Link
+        </button>
+        <button type="button" class="toolbar-btn" aria-label="Insert Image" aria-pressed="false" title="Insert Image">
+          Img
+        </button>
+      </div>
+
+    </div>
+
+    <!-- 2. FLOATING SELECTION BUBBLE MENU (Simulated Overlay) -->
+    <div class="bubble-menu" role="tooltip" aria-label="Quick format selection">
+      <button type="button" class="bubble-btn" aria-pressed="true" aria-label="Bold">B</button>
+      <button type="button" class="bubble-btn" aria-pressed="false" aria-label="Italic"><i>I</i></button>
+      <button type="button" class="bubble-btn" aria-pressed="false" aria-label="Link">&infin;</button>
+      <button type="button" class="bubble-btn" aria-pressed="false" aria-label="Highlight">H2</button>
+    </div>
+
+    <!-- 3. ACCESSIBLE CONTENTEDITABLE CANVAS -->
+    <div
+      class="editor-canvas"
+      contenteditable="true"
+      role="textbox"
+      aria-multiline="true"
+      aria-label="Document content canvas"
+      data-placeholder="Start typing your document or use '/' for block commands..."
+    >
+      <h1>Designing Modern Web Systems</h1>
+      <p>
+        Building adaptable web applications requires a clear visual hierarchy, accessible keyboard navigation, and reliable focus indicators. When composing content, editors need simple tools that stay out of the way.
+      </p>
+      <blockquote>
+        "Simplicity in composition tools directly improves publishing velocity."
+      </blockquote>
+      <p>
+        Try selecting text to reveal the <code>floating bubble menu</code> or press <b>Cmd + B</b> to toggle bold formatting.
+      </p>
+    </div>
+
+    <!-- 4. STATUS & COUNTER BAR -->
+    <div class="editor-status-bar">
+      <div class="status-metrics">
+        <span><b>94</b> words</span>
+        <span><b>612</b> characters</span>
+        <span>~1 min read</span>
+      </div>
+      <div class="status-save-state">
+        <span class="save-indicator-dot"></span>
+        <span>Draft saved</span>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
