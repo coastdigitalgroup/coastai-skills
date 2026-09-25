@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rich Text Editor UI System - Component Design Spec</title>
+  <style>
+    /* CSS Tokens & Theme Variables */
+    :root {
+      --color-surface-bg: #F8FAFC;
+      --color-surface-card: #FFFFFF;
+      --color-surface-elevated: #FFFFFF;
+      --color-surface-hover: #F1F5F9;
+      --color-surface-active: #E2E8F0;
+
+      --color-text-primary: #0F172A;
+      --color-text-secondary: #475569;
+      --color-text-muted: #94A3B8;
+
+      --color-border-subtle: #E2E8F0;
+      --color-border-hover: #CBD5E1;
+      --color-border-focus: #2563EB;
+
+      --color-brand-primary: #2563EB;
+      --color-brand-hover: #1D4ED8;
+      --color-brand-subtle: #EFF6FF;
+
+      --focus-ring-color: rgba(37, 99, 235, 0.3);
+      --focus-ring: 0 0 0 3px var(--focus-ring-color);
+
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+      --touch-target-min: 44px;
+      --border-radius-sm: 4px;
+      --border-radius-base: 8px;
+      --border-radius-lg: 12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-surface-bg: #0F172A;
+        --color-surface-card: #1E293B;
+        --color-surface-elevated: #334155;
+        --color-surface-hover: #334155;
+        --color-surface-active: #475569;
+
+        --color-text-primary: #F8FAFC;
+        --color-text-secondary: #CBD5E1;
+        --color-text-muted: #64748B;
+
+        --color-border-subtle: #334155;
+        --color-border-hover: #475569;
+        --color-border-focus: #3B82F6;
+
+        --color-brand-primary: #3B82F6;
+        --color-brand-hover: #60A5FA;
+        --color-brand-subtle: #1E3A8A;
+
+        --focus-ring-color: rgba(59, 130, 246, 0.4);
+      }
+    }
+
+    /* Reset & Page Layout */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--color-surface-bg);
+      color: var(--color-text-primary);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+
+    .spec-container {
+      max-width: 1024px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+    }
+
+    .spec-header {
+      border-bottom: 2px solid var(--color-border-subtle);
+      padding-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .spec-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .spec-subtitle {
+      color: var(--color-text-secondary);
+      font-size: 0.95rem;
+      margin-top: 0.25rem;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-title::before {
+      content: "";
+      display: inline-block;
+      width: 4px;
+      height: 1.25rem;
+      background-color: var(--color-brand-primary);
+      border-radius: 2px;
+    }
+
+    /* Spec Component 1: Document Canvas Editor */
+    .editor-wrapper {
+      background: var(--color-surface-card);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Sticky Formatting Toolbar */
+    .editor-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--color-surface-elevated);
+      border-bottom: 1px solid var(--color-border-subtle);
+      padding: 0.5rem 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .toolbar-divider {
+      width: 1px;
+      height: 20px;
+      background-color: var(--color-border-subtle);
+      margin: 0 0.375rem;
+    }
+
+    .tb-btn {
+      appearance: none;
+      background: transparent;
+      border: none;
+      color: var(--color-text-secondary);
+      min-width: 32px;
+      height: 32px;
+      padding: 0 0.5rem;
+      border-radius: var(--border-radius-sm);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: background-color 150ms ease, color 150ms ease;
+    }
+
+    .tb-btn:hover {
+      background-color: var(--color-surface-hover);
+      color: var(--color-text-primary);
+    }
+
+    .tb-btn:focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+    }
+
+    .tb-btn[aria-pressed="true"] {
+      background-color: var(--color-brand-subtle);
+      color: var(--color-brand-primary);
+    }
+
+    .tb-select {
+      background: transparent;
+      border: 1px solid var(--color-border-subtle);
+      color: var(--color-text-primary);
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--border-radius-sm);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      height: 32px;
+    }
+
+    .tb-select:focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+    }
+
+    /* Document Canvas Area */
+    .editor-canvas-container {
+      padding: 2.5rem 1.5rem 3rem 1.5rem;
+      min-height: 420px;
+      position: relative;
+    }
+
+    .editor-canvas {
+      max-width: 680px;
+      margin: 0 auto;
+      outline: none;
+    }
+
+    .editor-canvas:focus-visible {
+      box-shadow: var(--focus-ring);
+      border-radius: var(--border-radius-sm);
+    }
+
+    .editor-canvas h1 {
+      font-size: 1.85rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .editor-canvas h2 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .editor-canvas p {
+      font-size: 1rem;
+      color: var(--color-text-primary);
+      margin-bottom: 1rem;
+      line-height: 1.65;
+    }
+
+    /* Floating Selection Popover Overlay */
+    .floating-selection-menu {
+      position: absolute;
+      top: 105px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0F172A;
+      color: #FFFFFF;
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--border-radius-base);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      z-index: 60;
+    }
+
+    .floating-selection-menu .tb-btn {
+      color: #94A3B8;
+    }
+
+    .floating-selection-menu .tb-btn:hover {
+      background: #1E293B;
+      color: #FFFFFF;
+    }
+
+    .floating-selection-menu .tb-btn[aria-pressed="true"] {
+      background: #2563EB;
+      color: #FFFFFF;
+    }
+
+    /* Slash Menu Overlay */
+    .slash-menu-popup {
+      position: absolute;
+      top: 250px;
+      left: calc(50% - 180px);
+      width: 280px;
+      background: var(--color-surface-card);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--border-radius-base);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      z-index: 70;
+    }
+
+    .slash-menu-header {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      padding: 0.5rem 0.75rem;
+      background: var(--color-surface-hover);
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+
+    .slash-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0.75rem;
+      cursor: pointer;
+      transition: background-color 150ms ease;
+    }
+
+    .slash-item:hover, .slash-item.active {
+      background-color: var(--color-brand-subtle);
+    }
+
+    .slash-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: var(--color-brand-primary);
+      background: var(--color-surface-hover);
+      border-radius: var(--border-radius-sm);
+      font-size: 0.8rem;
+    }
+
+    .slash-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slash-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .slash-desc {
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+    }
+
+    /* Editor Footer Status Bar */
+    .editor-status-bar {
+      background: var(--color-surface-hover);
+      border-top: 1px solid var(--color-border-subtle);
+      padding: 0.375rem 1rem;
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-left {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background-color: #22C55E;
+      border-radius: 50%;
+    }
+
+    /* Spec Component 2: Inline Comment Composer */
+    .comment-composer {
+      background: var(--color-surface-card);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--border-radius-base);
+      box-shadow: var(--shadow-sm);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    .comment-composer:focus-within {
+      border-color: var(--color-border-focus);
+      box-shadow: var(--focus-ring);
+    }
+
+    .comment-toolbar {
+      padding: 0.375rem 0.5rem;
+      border-bottom: 1px solid var(--color-border-subtle);
+      background: var(--color-surface-hover);
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      border-top-left-radius: var(--border-radius-base);
+      border-top-right-radius: var(--border-radius-base);
+    }
+
+    .comment-input-area {
+      padding: 0.75rem 1rem;
+      min-height: 100px;
+      outline: none;
+      font-size: 0.95rem;
+      color: var(--color-text-primary);
+    }
+
+    .comment-action-bar {
+      padding: 0.5rem 0.75rem;
+      border-top: 1px solid var(--color-border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--color-surface-card);
+      border-bottom-left-radius: var(--border-radius-base);
+      border-bottom-right-radius: var(--border-radius-base);
+    }
+
+    .attachment-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      font-size: 0.75rem;
+      background: var(--color-surface-hover);
+      padding: 0.25rem 0.5rem;
+      border-radius: 12px;
+      color: var(--color-text-secondary);
+    }
+
+    .btn-primary {
+      background-color: var(--color-brand-primary);
+      color: #FFFFFF;
+      border: none;
+      padding: 0.375rem 0.875rem;
+      border-radius: var(--border-radius-sm);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 150ms ease;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--color-brand-hover);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--color-text-secondary);
+      border: 1px solid var(--color-border-subtle);
+      padding: 0.375rem 0.75rem;
+      border-radius: var(--border-radius-sm);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      margin-right: 0.5rem;
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--color-surface-hover);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="spec-container">
+
+    <!-- Spec Header -->
+    <header class="spec-header">
+      <div>
+        <h1 class="spec-title">Rich Text Editor UI System Spec</h1>
+        <p class="spec-subtitle">WYSIWYG Document Canvas & Inline Comment Composer Design Architecture</p>
+      </div>
+    </header>
+
+    <!-- Component 1: Document Canvas Editor -->
+    <section>
+      <h2 class="section-title">1. Document Canvas Editor with Sticky Toolbar & Overlays</h2>
+
+      <div class="editor-wrapper">
+        <!-- Sticky Formatting Toolbar -->
+        <div class="editor-toolbar" role="toolbar" aria-label="Document formatting tools">
+          <div class="toolbar-group">
+            <select class="tb-select" aria-label="Text block style">
+              <option>Paragraph</option>
+              <option>Heading 1</option>
+              <option>Heading 2</option>
+              <option>Code Block</option>
+            </select>
+          </div>
+
+          <div class="toolbar-divider"></div>
+
+          <div class="toolbar-group">
+            <button class="tb-btn" aria-pressed="true" aria-label="Bold (Cmd+B)"><b>B</b></button>
+            <button class="tb-btn" aria-pressed="false" aria-label="Italic (Cmd+I)"><i>I</i></button>
+            <button class="tb-btn" aria-pressed="false" aria-label="Underline (Cmd+U)"><u>U</u></button>
+            <button class="tb-btn" aria-pressed="false" aria-label="Strikethrough"><s>S</s></button>
+          </div>
+
+          <div class="toolbar-divider"></div>
+
+          <div class="toolbar-group">
+            <button class="tb-btn" aria-pressed="false" aria-label="Insert Link (Cmd+K)">🔗</button>
+            <button class="tb-btn" aria-pressed="false" aria-label="Inline Code">&lt;/&gt;</button>
+          </div>
+
+          <div class="toolbar-divider"></div>
+
+          <div class="toolbar-group">
+            <button class="tb-btn" aria-pressed="false" aria-label="Bulleted List">• List</button>
+            <button class="tb-btn" aria-pressed="false" aria-label="Numbered List">1. List</button>
+            <button class="tb-btn" aria-pressed="false" aria-label="Task List">☑ Task</button>
+          </div>
+
+          <div class="toolbar-divider"></div>
+
+          <div class="toolbar-group">
+            <button class="tb-btn" aria-pressed="false" aria-label="Undo">↩</button>
+            <button class="tb-btn" aria-pressed="false" aria-label="Redo">↪</button>
+          </div>
+        </div>
+
+        <!-- Document Canvas -->
+        <div class="editor-canvas-container">
+
+          <!-- Floating Selection Menu Overlay -->
+          <div class="floating-selection-menu" role="toolbar" aria-label="Selection quick formatting">
+            <button class="tb-btn" aria-pressed="true" aria-label="Bold"><b>B</b></button>
+            <button class="tb-btn" aria-pressed="false" aria-label="Italic"><i>I</i></button>
+            <button class="tb-btn" aria-pressed="false" aria-label="Link">🔗</button>
+            <button class="tb-btn" aria-pressed="false" aria-label="Comment">💬</button>
+          </div>
+
+          <!-- Active Canvas Content -->
+          <div class="editor-canvas" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Document editor canvas">
+            <h1>Architecture Design System Specification</h1>
+            <p>Designing an accessible rich text editor requires balancing dense formatting controls with clean, distraction-free writing canvases, responsive spatial constraints, and keyboard shortcuts.</p>
+            <p>Type <strong>/</strong> on a new line to trigger block creation or select text to reveal floating contextual options.</p>
+          </div>
+
+          <!-- Slash Menu Popup Overlay -->
+          <div class="slash-menu-popup" role="menu" aria-label="Insert block menu">
+            <div class="slash-menu-header">Basic Blocks</div>
+            <div class="slash-item active" role="menuitem">
+              <div class="slash-icon">H1</div>
+              <div class="slash-text">
+                <span class="slash-title">Heading 1</span>
+                <span class="slash-desc">Big section heading</span>
+              </div>
+            </div>
+            <div class="slash-item" role="menuitem">
+              <div class="slash-icon">•</div>
+              <div class="slash-text">
+                <span class="slash-title">Bulleted List</span>
+                <span class="slash-desc">Simple bulleted list</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Status Bar -->
+        <footer class="editor-status-bar">
+          <div class="status-left">
+            <span class="status-dot"></span>
+            <span>Saved to cloud 2m ago</span>
+          </div>
+          <div>
+            <span>48 words | 312 characters</span>
+          </div>
+        </footer>
+      </div>
+    </section>
+
+    <!-- Component 2: Inline Comment Composer -->
+    <section>
+      <h2 class="section-title">2. Compact Inline Comment Composer</h2>
+
+      <div class="comment-composer">
+        <div class="comment-toolbar" role="toolbar" aria-label="Comment formatting">
+          <button class="tb-btn" aria-pressed="false" aria-label="Bold"><b>B</b></button>
+          <button class="tb-btn" aria-pressed="false" aria-label="Italic"><i>I</i></button>
+          <button class="tb-btn" aria-pressed="false" aria-label="Code">&lt;/&gt;</button>
+          <button class="tb-btn" aria-pressed="false" aria-label="Link">🔗</button>
+          <div class="toolbar-divider"></div>
+          <button class="tb-btn" aria-pressed="false" aria-label="Mention someone">@</button>
+        </div>
+
+        <div class="comment-input-area" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Leave a comment">
+          Looks great! Let's make sure the <code>aria-pressed</code> attribute toggles properly when formatting buttons are clicked.
+        </div>
+
+        <div class="comment-action-bar">
+          <div>
+            <span class="attachment-chip">📎 screenshot.png (14 KB)</span>
+          </div>
+          <div>
+            <button class="btn-secondary">Cancel</button>
+            <button class="btn-primary">Comment</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    // Minimal interaction script for design spec testing
+    document.querySelectorAll('.tb-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const current = btn.getAttribute('aria-pressed');
+        if (current !== null) {
+          btn.setAttribute('aria-pressed', current === 'true' ? 'false' : 'true');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
