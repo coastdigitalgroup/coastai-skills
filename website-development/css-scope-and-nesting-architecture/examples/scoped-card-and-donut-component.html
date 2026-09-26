@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Scope & Nesting Architecture Example</title>
+  <style>
+    /* Global Reset & Base Layout */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      padding: 2rem;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /* NATIVE CSS @SCOPE & NESTING DEMONSTRATION                              */
+    /* ---------------------------------------------------------------------- */
+
+    /* 1. Scoped Card Component with Donut Hole Boundary to (.content-slot) */
+    @scope (.article-card) to (.content-slot) {
+      /* Scope Root Styling using :scope pseudo-class */
+      :scope {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+        /* Native Nesting for interactive state */
+        &:hover {
+          border-color: #3b82f6;
+          box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.1);
+        }
+
+        &:focus-within {
+          outline: 2px solid #2563eb;
+          outline-offset: 4px;
+        }
+      }
+
+      /* Card Header & Title inside Scope */
+      .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 0.75rem;
+
+        /* Nested Badge */
+        .badge {
+          background-color: #eff6ff;
+          color: #1d4ed8;
+          font-size: 0.75rem;
+          font-weight: 600;
+          padding: 0.25rem 0.625rem;
+          border-radius: 9999px;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+      }
+
+      /* Scoped Heading Rule */
+      .title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #0f172a;
+
+        /* Nested Link State */
+        a {
+          color: inherit;
+          text-decoration: none;
+
+          &:hover, &:focus-visible {
+            color: #2563eb;
+            text-decoration: underline;
+          }
+        }
+      }
+
+      /* Card Footer Actions */
+      .card-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+
+        /* Nested Button States */
+        .btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0.5rem 1rem;
+          font-size: 0.875rem;
+          font-weight: 600;
+          border-radius: 6px;
+          border: 1px solid transparent;
+          cursor: pointer;
+          transition: background-color 0.15s ease, color 0.15s ease;
+
+          /* Nested Variants */
+          &.btn-primary {
+            background-color: #2563eb;
+            color: #ffffff;
+
+            &:hover {
+              background-color: #1d4ed8;
+            }
+          }
+
+          &.btn-secondary {
+            background-color: #f1f5f9;
+            color: #334155;
+            border-color: #cbd5e1;
+
+            &:hover {
+              background-color: #e2e8f0;
+            }
+          }
+        }
+      }
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /* 2. DEMONSTRATION OF DONUT HOLE ISOLATION                               */
+    /* Content inside .content-slot has an <h3>.title element, but it must   */
+    /* NOT inherit the .article-card .title styles!                            */
+    /* ---------------------------------------------------------------------- */
+
+    .content-slot {
+      background-color: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      padding: 1rem;
+      border-radius: 8px;
+
+      .slot-label {
+        font-size: 0.75rem;
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+      }
+    }
+
+    /* Independent styling for slotted nested article */
+    @scope (.user-comment) {
+      :scope {
+        background: #ffffff;
+        padding: 0.75rem;
+        border-radius: 6px;
+        border: 1px solid #e2e8f0;
+      }
+
+      /* Unaffected by .article-card .title styling thanks to 'to (.content-slot)' */
+      .title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #059669; /* Distinct Green Title */
+      }
+
+      .comment-text {
+        font-size: 0.875rem;
+        color: #475569;
+      }
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /* 3. SCOPING PROXIMITY RESOLUTION DEMO                                  */
+    /* Nested themes resolve by proximity (closest ancestor scope root wins) */
+    /* ---------------------------------------------------------------------- */
+
+    @scope ([data-theme="light"]) {
+      :scope {
+        background-color: #ffffff;
+        color: #0f172a;
+        padding: 1.25rem;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+      }
+
+      .text {
+        color: #1e293b;
+      }
+    }
+
+    @scope ([data-theme="dark"]) {
+      :scope {
+        background-color: #0f172a;
+        color: #f8fafc;
+        padding: 1.25rem;
+        border-radius: 8px;
+        border: 1px solid #334155;
+      }
+
+      .text {
+        color: #38bdf8; /* Cyan text for dark theme */
+      }
+    }
+
+    /* Fallback indicator for unsupported engines */
+    .support-notice {
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+    }
+
+    @supports (@scope (.a) to (.b)) {
+      .support-notice {
+        background-color: #dcfce7;
+        color: #166534;
+        border: 1px solid #86efac;
+      }
+      .support-notice::before {
+        content: "✓ W3C Native @scope is supported in your browser.";
+      }
+    }
+
+    @supports not (@scope (.a) to (.b)) {
+      .support-notice {
+        background-color: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fde68a;
+      }
+      .support-notice::before {
+        content: "⚠ W3C Native @scope is NOT supported in this engine. Progressive fallback applies.";
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>CSS Scope & Nesting Architecture</h1>
+      <p>Demonstrating modular scoped component styles with donut boundaries and proximity resolution.</p>
+    </header>
+
+    <div class="support-notice"></div>
+
+    <!-- Section 1: Article Card with Donut Hole Slot -->
+    <section>
+      <h2>1. Component Scope with Donut Hole (`to (.content-slot)`)</h2>
+
+      <article class="article-card">
+        <header class="card-header">
+          <h3 class="title"><a href="#">Modular Frontend Architecture</a></h3>
+          <span class="badge">Architecture</span>
+        </header>
+
+        <p>This outer article card uses <code>@scope (.article-card) to (.content-slot)</code>. The card title above is styled by the parent scope rules.</p>
+
+        <!-- Donut Hole: Nested Content Slot -->
+        <div class="content-slot">
+          <div class="slot-label">Slotted User Content (Donut Boundary)</div>
+
+          <article class="user-comment">
+            <h4 class="title">User Comment Title</h4>
+            <p class="comment-text">This title element has class <code>.title</code> but is protected from parent card title styling because it resides inside the <code>.content-slot</code> boundary!</p>
+          </article>
+        </div>
+
+        <footer class="card-actions">
+          <button type="button" class="btn btn-primary">Read Article</button>
+          <button type="button" class="btn btn-secondary">Bookmark</button>
+        </footer>
+      </article>
+    </section>
+
+    <!-- Section 2: Scoping Proximity Resolution -->
+    <section>
+      <h2>2. Scoping Proximity Resolution</h2>
+      <p>The dark theme box is nested inside the light theme box. Scoping proximity ensures the cyan text color wins for the nested box because the dark scope root is closer in the DOM tree.</p>
+
+      <div class="theme-box" data-theme="light">
+        <p class="text">Outer Scope: Light Theme Panel Text</p>
+
+        <div class="theme-box" data-theme="dark" style="margin-top: 1rem;">
+          <p class="text">Inner Scope: Dark Theme Panel Text (Closer DOM Proximity Wins!)</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</body>
+</html>

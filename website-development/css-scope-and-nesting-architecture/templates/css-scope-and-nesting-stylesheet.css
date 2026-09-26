@@ -1,0 +1,171 @@
+/**
+ * CSS Scope and Nesting Architecture Boilerplate Stylesheet
+ * Reusable production-grade CSS template demonstrating @scope, donut limits,
+ * native CSS nesting, state management, and progressive degradation fallbacks.
+ */
+
+/* ==========================================================================
+   1. STANDARD COMPONENT SCOPE WITH DONUT LIMIT
+   ========================================================================== */
+
+/**
+ * Component: Modular Card (.component-card)
+ * Donut Hole: Excludes .slot-boundary and its children from parent styles.
+ */
+@supports (@scope (.a) to (.b)) {
+  @scope (.component-card) to (.slot-boundary) {
+    /* Target Scope Root (:scope) */
+    :scope {
+      display: flex;
+      flex-direction: column;
+      gap: var(--card-gap, 1rem);
+      padding: var(--card-padding, 1.5rem);
+      background-color: var(--card-bg, #ffffff);
+      border: 1px solid var(--card-border, #e2e8f0);
+      border-radius: var(--card-radius, 12px);
+      box-shadow: var(--card-shadow, 0 1px 3px rgba(0, 0, 0, 0.1));
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+
+      /* Native CSS Nesting for Interactive States */
+      &:hover {
+        border-color: var(--card-border-hover, #3b82f6);
+        box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+      }
+
+      &:focus-within {
+        outline: 2px solid var(--card-focus-ring, #2563eb);
+        outline-offset: 4px;
+      }
+
+      /* Container Query Adaptation Nested Inside Scope */
+      @container (min-width: 500px) {
+        flex-direction: row;
+        align-items: center;
+      }
+    }
+
+    /* Sub-elements inside Scope */
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--card-title-color, #0f172a);
+      margin: 0;
+
+      /* Nested Link Selector */
+      a {
+        color: inherit;
+        text-decoration: none;
+
+        &:hover, &:focus-visible {
+          color: var(--card-accent, #2563eb);
+          text-decoration: underline;
+        }
+      }
+    }
+
+    .card-body {
+      font-size: 0.95rem;
+      color: var(--card-body-color, #475569);
+      line-height: 1.6;
+    }
+
+    .card-footer {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: auto;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--card-divider, #f1f5f9);
+
+      /* Nested Button Variants */
+      .card-btn {
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        cursor: pointer;
+
+        &.btn-primary {
+          background-color: #2563eb;
+          color: #ffffff;
+
+          &:hover {
+            background-color: #1d4ed8;
+          }
+        }
+
+        &.btn-outline {
+          background-color: transparent;
+          color: #334155;
+          border-color: #cbd5e1;
+
+          &:hover {
+            background-color: #f8fafc;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* ==========================================================================
+   2. SCOPING PROXIMITY THEME TEMPLATE
+   ========================================================================== */
+
+@supports (@scope (.a) to (.b)) {
+  /* Light Theme Scope */
+  @scope ([data-theme="light"]) {
+    :scope {
+      --theme-bg: #ffffff;
+      --theme-text: #0f172a;
+      --theme-border: #e2e8f0;
+      background-color: var(--theme-bg);
+      color: var(--theme-text);
+      border-color: var(--theme-border);
+    }
+  }
+
+  /* Dark Theme Scope */
+  @scope ([data-theme="dark"]) {
+    :scope {
+      --theme-bg: #0f172a;
+      --theme-text: #f8fafc;
+      --theme-border: #334155;
+      background-color: var(--theme-bg);
+      color: var(--theme-text);
+      border-color: var(--theme-border);
+    }
+  }
+}
+
+/* ==========================================================================
+   3. PROGRESSIVE DEGRADATION FALLBACK FOR LEGACY BROWSERS
+   ========================================================================== */
+
+@supports not (@scope (.a) to (.b)) {
+  /* Fallback using standard descendant selectors */
+  .component-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+  }
+
+  .component-card .card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .component-card .card-body {
+    font-size: 0.95rem;
+    color: #475569;
+  }
+
+  .component-card .card-footer {
+    display: flex;
+    gap: 0.75rem;
+  }
+}
