@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rich Text Editor UI System - Spec Template</title>
+  <style>
+    /* CSS Custom Properties & Design Tokens */
+    :root {
+      --color-bg-canvas: #ffffff;
+      --color-bg-surface: #f8fafc;
+      --color-bg-surface-hover: #f1f5f9;
+      --color-bg-active: #e2e8f0;
+      --color-border: #cbd5e1;
+      --color-border-focus: #2563eb;
+      --color-text-main: #0f172a;
+      --color-text-muted: #64748b;
+      --color-primary: #2563eb;
+      --color-primary-light: #eff6ff;
+
+      --radius-s: 4px;
+      --radius-m: 8px;
+      --radius-l: 12px;
+
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+
+      --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: #f1f5f9;
+      color: var(--color-text-main);
+      display: flex;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+
+    /* Editor Container Shell */
+    .rte-container {
+      width: 100%;
+      max-width: 860px;
+      background: var(--color-bg-canvas);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-l);
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Persistent Top Toolbar */
+    .rte-toolbar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 8px 12px;
+      background: var(--color-bg-surface);
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .rte-button-group {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .rte-divider {
+      width: 1px;
+      height: 20px;
+      background-color: var(--color-border);
+      margin: 0 4px;
+    }
+
+    .rte-btn {
+      min-width: 34px;
+      height: 34px;
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: var(--radius-s);
+      color: var(--color-text-main);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .rte-btn:hover {
+      background-color: var(--color-bg-surface-hover);
+    }
+
+    .rte-btn:focus-visible {
+      outline: 2px solid var(--color-border-focus);
+      outline-offset: 1px;
+    }
+
+    .rte-btn[aria-pressed="true"] {
+      background-color: var(--color-primary-light);
+      color: var(--color-primary);
+      border-color: var(--color-primary);
+    }
+
+    .rte-select {
+      height: 34px;
+      padding: 0 8px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-s);
+      background: var(--color-bg-canvas);
+      font-size: 0.875rem;
+      color: var(--color-text-main);
+      cursor: pointer;
+    }
+
+    .rte-select:focus-visible {
+      outline: 2px solid var(--color-border-focus);
+    }
+
+    /* Main Content Editable Canvas */
+    .rte-canvas-wrapper {
+      position: relative;
+      padding: 32px 48px;
+      min-height: 400px;
+    }
+
+    .rte-canvas {
+      outline: none;
+      min-height: 320px;
+      font-size: 1.0625rem;
+      line-height: 1.65;
+      color: var(--color-text-main);
+    }
+
+    .rte-canvas:focus-visible {
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+      border-radius: var(--radius-s);
+    }
+
+    .rte-canvas h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      line-height: 1.25;
+    }
+
+    .rte-canvas p {
+      margin-bottom: 16px;
+    }
+
+    .rte-canvas ul {
+      margin-bottom: 16px;
+      padding-left: 24px;
+    }
+
+    .rte-canvas code {
+      font-family: var(--font-mono);
+      font-size: 0.875em;
+      background: var(--color-bg-surface-hover);
+      padding: 2px 6px;
+      border-radius: var(--radius-s);
+    }
+
+    /* Block Handle Side Gutter */
+    .rte-block-gutter {
+      position: absolute;
+      left: 12px;
+      top: 36px;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      opacity: 0.6;
+      transition: opacity 0.15s ease;
+    }
+
+    .rte-block-gutter:hover {
+      opacity: 1;
+    }
+
+    .rte-handle-btn {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-s);
+      color: var(--color-text-muted);
+      cursor: pointer;
+    }
+
+    .rte-handle-btn:hover {
+      background: var(--color-bg-active);
+      color: var(--color-text-main);
+    }
+
+    /* Floating Selection Menu */
+    .rte-floating-menu {
+      position: absolute;
+      top: 100px;
+      left: 180px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 4px;
+      background: #0f172a;
+      border-radius: var(--radius-m);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .rte-floating-menu .rte-btn {
+      color: #f8fafc;
+      min-width: 30px;
+      height: 30px;
+    }
+
+    .rte-floating-menu .rte-btn:hover {
+      background: #334155;
+    }
+
+    .rte-floating-menu .rte-btn[aria-pressed="true"] {
+      background: #2563eb;
+      color: #ffffff;
+    }
+
+    /* Status Bar Footer */
+    .rte-status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      background: var(--color-bg-surface);
+      border-top: 1px solid var(--color-border);
+      font-size: 0.8125rem;
+      color: var(--color-text-muted);
+    }
+
+    .rte-status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .rte-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #10b981;
+    }
+
+    .rte-metrics {
+      display: flex;
+      gap: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Rich Text Editor System Shell -->
+  <div class="rte-container" id="editor-shell">
+
+    <!-- Sticky Main Formatting Toolbar -->
+    <header class="rte-toolbar" role="toolbar" aria-label="Document formatting options">
+
+      <!-- History Controls -->
+      <div class="rte-button-group" role="group" aria-label="History">
+        <button type="button" class="rte-btn" aria-label="Undo (Ctrl+Z)" title="Undo (Ctrl+Z)">↺</button>
+        <button type="button" class="rte-btn" aria-label="Redo (Ctrl+Y)" title="Redo (Ctrl+Y)">↻</button>
+      </div>
+
+      <div class="rte-divider" role="separator"></div>
+
+      <!-- Block Format Selector -->
+      <div class="rte-button-group" role="group" aria-label="Text block style">
+        <select class="rte-select" aria-label="Text block style">
+          <option value="p">Paragraph</option>
+          <option value="h1">Heading 1</option>
+          <option value="h2">Heading 2</option>
+          <option value="h3">Heading 3</option>
+          <option value="code">Code Block</option>
+        </select>
+      </div>
+
+      <div class="rte-divider" role="separator"></div>
+
+      <!-- Inline Text Formatting -->
+      <div class="rte-button-group" role="group" aria-label="Inline text formatting">
+        <button type="button" class="rte-btn" aria-pressed="true" aria-label="Bold (Ctrl+B)" title="Bold (Ctrl+B)"><b>B</b></button>
+        <button type="button" class="rte-btn" aria-pressed="false" aria-label="Italic (Ctrl+I)" title="Italic (Ctrl+I)"><i>I</i></button>
+        <button type="button" class="rte-btn" aria-pressed="false" aria-label="Strikethrough" title="Strikethrough"><s>S</s></button>
+        <button type="button" class="rte-btn" aria-pressed="false" aria-label="Inline Code" title="Inline Code"><code>&lt;&gt;</code></button>
+      </div>
+
+      <div class="rte-divider" role="separator"></div>
+
+      <!-- Lists and Structure -->
+      <div class="rte-button-group" role="group" aria-label="List structures">
+        <button type="button" class="rte-btn" aria-pressed="false" aria-label="Bulleted List" title="Bulleted List">• List</button>
+        <button type="button" class="rte-btn" aria-pressed="false" aria-label="Numbered List" title="Numbered List">1. List</button>
+      </div>
+
+      <div class="rte-divider" role="separator"></div>
+
+      <!-- Inserts & Media -->
+      <div class="rte-button-group" role="group" aria-label="Insert media and links">
+        <button type="button" class="rte-btn" aria-label="Insert Link (Ctrl+K)" title="Insert Link (Ctrl+K)">🔗 Link</button>
+        <button type="button" class="rte-btn" aria-label="Insert Image" title="Insert Image">🖼️ Image</button>
+      </div>
+
+    </header>
+
+    <!-- Document Canvas Area -->
+    <div class="rte-canvas-wrapper">
+
+      <!-- Block Handle (Visible on line hover) -->
+      <div class="rte-block-gutter" aria-hidden="true">
+        <button type="button" class="rte-handle-btn" title="Add block below">+</button>
+        <button type="button" class="rte-handle-btn" title="Drag to reorder block">⋮⋮</button>
+      </div>
+
+      <!-- Floating Contextual Selection Toolbar (Pop-up on text selection) -->
+      <div class="rte-floating-menu" role="toolbar" aria-label="Floating text formatting">
+        <button type="button" class="rte-btn" aria-pressed="true" aria-label="Bold"><b>B</b></button>
+        <button type="button" class="rte-btn" aria-pressed="false" aria-label="Italic"><i>I</i></button>
+        <button type="button" class="rte-btn" aria-label="Link">🔗</button>
+        <button type="button" class="rte-btn" aria-label="Highlight">🖍️</button>
+      </div>
+
+      <!-- Primary Content Editable Node -->
+      <main
+        class="rte-canvas"
+        contenteditable="true"
+        role="textbox"
+        aria-multiline="true"
+        aria-label="Document Content Canvas"
+        tabindex="0"
+      >
+        <h1>Designing High-Performance Editor Interfaces</h1>
+        <p>
+          Rich text editors require a strict, predictable layout architecture to maintain high productivity.
+          By combining a <b>sticky header toolbar</b>, floating contextual menus, and block-level gutter handles,
+          creators can format content seamlessly without visual friction.
+        </p>
+        <ul>
+          <li>Accessible ARIA keyboard navigation between toolbar and canvas.</li>
+          <li>Floating selection menu positioned relative to text selection bounds.</li>
+          <li>Live status region providing autosave confirmation and character counts.</li>
+        </ul>
+      </main>
+
+    </div>
+
+    <!-- Status Bar Footer -->
+    <footer class="rte-status-bar">
+      <div class="rte-status-indicator" aria-live="polite">
+        <span class="rte-status-dot"></span>
+        <span>All changes saved to cloud</span>
+      </div>
+
+      <div class="rte-metrics" aria-label="Document statistics">
+        <span>64 words</span>
+        <span>412 characters</span>
+      </div>
+    </footer>
+
+  </div>
+
+</body>
+</html>
