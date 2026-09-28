@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trusted Types DOM XSS Prevention Example</title>
+  <!-- Configure CSP with Trusted Types enforcement -->
+  <!-- Note: In production, configure this via HTTP Response Header:
+       Content-Security-Policy: require-trusted-types-for 'script'; trusted-types app-policy default;
+  -->
+  <meta http-equiv="Content-Security-Policy" content="require-trusted-types-for 'script'; trusted-types app-policy default;">
+  <style>
+    :root {
+      --color-bg: #f8fafc;
+      --color-card: #ffffff;
+      --color-border: #e2e8f0;
+      --color-text: #0f172a;
+      --color-danger: #ef4444;
+      --color-danger-bg: #fef2f2;
+      --color-success: #10b981;
+      --color-success-bg: #ecfdf5;
+      --color-warning: #f59e0b;
+      --color-warning-bg: #fffbeb;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      line-height: 1.5;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: #64748b;
+      margin-bottom: 2rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 640px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .card {
+      background: var(--color-card);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .card h2 {
+      font-size: 1.15rem;
+      margin-top: 0;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge-vulnerable {
+      background-color: var(--color-danger-bg);
+      color: var(--color-danger);
+      border: 1px solid #fca5a5;
+    }
+
+    .badge-protected {
+      background-color: var(--color-success-bg);
+      color: var(--color-success);
+      border: 1px solid #6ee7b7;
+    }
+
+    .input-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-family: monospace;
+      font-size: 0.875rem;
+    }
+
+    button {
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+
+    button:hover {
+      background-color: #1d4ed8;
+    }
+
+    .output-box {
+      min-height: 60px;
+      background: #f1f5f9;
+      border: 1px dashed #cbd5e1;
+      border-radius: 6px;
+      padding: 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.875rem;
+      word-break: break-all;
+    }
+
+    .status-log {
+      margin-top: 2rem;
+      background: #0f172a;
+      color: #38bdf8;
+      font-family: monospace;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .status-log p {
+      margin: 0 0 0.5rem 0;
+    }
+
+    .status-log .error {
+      color: #f87171;
+    }
+
+    .status-log .success {
+      color: #4ade80;
+    }
+  </style>
+  <!-- Load DOMPurify for HTML sanitization -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+</head>
+<body>
+
+  <h1>Trusted Types DOM XSS Prevention</h1>
+  <p class="subtitle">Demonstrating browser-enforced sink protection against string injection vulnerabilities.</p>
+
+  <div class="grid">
+    <!-- Unsafe Raw String Injection Block -->
+    <div class="card">
+      <h2>
+        Raw String Injection
+        <span class="badge badge-vulnerable">Blocked by CSP</span>
+      </h2>
+      <div class="input-group">
+        <label for="unsafe-input">Payload Input:</label>
+        <input type="text" id="unsafe-input" value="<img src=x onerror=alert('DOM-XSS!')> <b>Hello User</b>">
+      </div>
+      <button id="btn-unsafe">Inject Raw String</button>
+      <div class="output-box" id="unsafe-output">Output will appear here...</div>
+    </div>
+
+    <!-- Protected Trusted Types Injection Block -->
+    <div class="card">
+      <h2>
+        Trusted Types Policy
+        <span class="badge badge-protected">Protected</span>
+      </h2>
+      <div class="input-group">
+        <label for="safe-input">Payload Input:</label>
+        <input type="text" id="safe-input" value="<img src=x onerror=alert('DOM-XSS!')> <b>Hello User</b>">
+      </div>
+      <button id="btn-safe">Inject via App Policy</button>
+      <div class="output-box" id="safe-output">Output will appear here...</div>
+    </div>
+  </div>
+
+  <div class="status-log" id="status-log">
+    <p>[System] Initializing Trusted Types demonstration console...</p>
+  </div>
+
+  <script>
+    const logConsole = document.getElementById('status-log');
+
+    function log(message, type = 'info') {
+      const p = document.createElement('p');
+      p.className = type;
+      p.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logConsole.appendChild(p);
+      logConsole.scrollTop = logConsole.scrollHeight;
+    }
+
+    // Check if Trusted Types is supported natively
+    const isTTSupported = window.trustedTypes && typeof window.trustedTypes.createPolicy === 'function';
+    log(`Trusted Types native support: ${isTTSupported ? 'ENABLED' : 'DISABLED (Using Fallback wrapper)'}`, isTTSupported ? 'success' : 'error');
+
+    // 1. Initialize Trusted Types Named Policy
+    let appPolicy;
+    if (isTTSupported) {
+      appPolicy = window.trustedTypes.createPolicy('app-policy', {
+        createHTML(input) {
+          log(`[app-policy] Sanitizing raw HTML string via DOMPurify...`, 'info');
+          // Use DOMPurify to strip dangerous XSS scripts/handlers
+          return DOMPurify.sanitize(input, { RETURN_TRUSTED_TYPE: false });
+        },
+        createScriptURL(input) {
+          log(`[app-policy] Validating script URL origin...`, 'info');
+          const url = new URL(input, window.location.href);
+          if (url.origin === window.location.origin) {
+            return url.href;
+          }
+          throw new TypeError(`Disallowed script URL origin: ${url.origin}`);
+        }
+      });
+
+      // 2. Register optional Default Policy for unhandled legacy sink assignments
+      if (!window.trustedTypes.defaultPolicy) {
+        window.trustedTypes.createPolicy('default', {
+          createHTML(input) {
+            log(`[default-policy] Fallback caught raw string assignment! Sanitizing...`, 'error');
+            return DOMPurify.sanitize(input);
+          }
+        });
+      }
+    } else {
+      // Manual fallback interface for legacy non-supporting engines
+      appPolicy = {
+        createHTML: (input) => DOMPurify.sanitize(input),
+        createScriptURL: (input) => input
+      };
+    }
+
+    // Event Handler: Raw String Injection (Demonstrates Sink Block)
+    document.getElementById('btn-unsafe').addEventListener('click', () => {
+      const payload = document.getElementById('unsafe-input').value;
+      const targetBox = document.getElementById('unsafe-output');
+
+      try {
+        log(`Attempting direct raw string assignment to innerHTML...`, 'info');
+        // This direct string assignment throws a TypeError when Trusted Types is enforced via CSP
+        targetBox.innerHTML = payload;
+        log(`Raw string assigned directly! (Unprotected browser or default policy active)`, 'error');
+      } catch (err) {
+        log(`BLOCKED BY TRUSTED TYPES: ${err.message}`, 'error');
+      }
+    });
+
+    // Event Handler: Policy Sanitized Injection (Demonstrates Clean Assignment)
+    document.getElementById('btn-safe').addEventListener('click', () => {
+      const payload = document.getElementById('safe-input').value;
+      const targetBox = document.getElementById('safe-output');
+
+      try {
+        log(`Generating TrustedHTML object via appPolicy.createHTML()...`, 'info');
+        const trustedHTML = appPolicy.createHTML(payload);
+
+        // Assign strongly typed TrustedHTML object to sink
+        targetBox.innerHTML = trustedHTML;
+        log(`Successfully injected sanitized TrustedHTML into DOM sink!`, 'success');
+      } catch (err) {
+        log(`Policy Execution Failed: ${err.message}`, 'error');
+      }
+    });
+  </script>
+</body>
+</html>
