@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Subgrid Alignment Comparison Example</title>
+  <style>
+    /* Reset & Core Styles */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.5;
+      color: #1e293b;
+      background-color: #f8fafc;
+      margin: 0;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p.intro {
+      color: #64748b;
+      margin-bottom: 2.5rem;
+      max-width: 800px;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .badge-problem {
+      background-color: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-solution {
+      background-color: #f0fdf4;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Common Card Styling */
+    .card-tag {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #2563eb;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .card-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+    }
+
+    .card-body {
+      font-size: 0.875rem;
+      color: #475569;
+      margin: 0;
+    }
+
+    .card-footer {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 0.75rem;
+    }
+
+    .btn {
+      display: inline-block;
+      background-color: #2563eb;
+      color: #ffffff;
+      font-weight: 500;
+      font-size: 0.875rem;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn:hover, .btn:focus-visible {
+      background-color: #1d4ed8;
+      outline: 2px solid #2563eb;
+      outline-offset: 2px;
+    }
+
+    /* ==========================================================================
+       BEFORE: Standard Flexbox Grid (Misalignment Problem)
+       ========================================================================== */
+    .grid-before {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card-before {
+      background-color: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      position: relative;
+    }
+
+    /* Visual guide lines showing misalignment across cards */
+    .grid-before::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      border-bottom: 2px dashed #f43f5e;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* ==========================================================================
+       AFTER: CSS Subgrid Implementation (Perfect Alignment)
+       ========================================================================== */
+    /* 1. Define Parent Grid with explicit row track patterns */
+    .grid-after {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+
+      /* Explicit track allocation per card:
+         Row 1: Category Tag (auto)
+         Row 2: Title (auto - sizes to tallest title in the row)
+         Row 3: Body Copy (1fr - absorbs remaining height)
+         Row 4: Card Footer (auto) */
+      grid-template-rows: repeat(auto-fill, auto auto 1fr auto);
+      gap: 1.5rem;
+    }
+
+    /* 2. Subgrid Component Container */
+    .card-after {
+      /* Span 4 parent grid tracks */
+      grid-row: span 4;
+      display: grid;
+      grid-template-rows: subgrid;
+      row-gap: 0.75rem;
+      background-color: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+
+    /* 3. Child Placement in Inherited Tracks */
+    .card-after .card-tag {
+      grid-row: 1;
+    }
+
+    .card-after .card-title {
+      grid-row: 2;
+    }
+
+    .card-after .card-body {
+      grid-row: 3;
+    }
+
+    .card-after .card-footer {
+      grid-row: 4;
+    }
+
+    /* Progressive Enhancement Fallback Notice */
+    .subgrid-notice {
+      background-color: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 2rem;
+      font-size: 0.875rem;
+    }
+
+    @supports not (grid-template-rows: subgrid) {
+      .subgrid-notice::after {
+        content: " (Note: Your browser does not natively support CSS Subgrid. Fallback styles active.)";
+        font-weight: bold;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>CSS Subgrid Card Layout Comparison</h1>
+    <p class="intro">
+      This example demonstrates how CSS Subgrid aligns internal component segments (category tags, titles, body content, and action footers) across adjacent cards in a row without hardcoded heights or JavaScript.
+    </p>
+
+    <div class="subgrid-notice">
+      <strong>Browser Inspector Tip:</strong> Inspect the "AFTER" grid in DevTools and toggle Grid line overlays to see how internal card elements lock onto parent grid track lines.
+    </div>
+
+    <!-- BEFORE SECTION -->
+    <div class="section-title">
+      <span>BEFORE: Standard Independent Flex Cards</span>
+      <span class="badge-problem">Misaligned Segment Lines</span>
+    </div>
+
+    <div class="grid-before">
+      <!-- Card 1: Multi-line Title -->
+      <article class="card-before">
+        <span class="card-tag">Engineering</span>
+        <h3 class="card-title">Building Resilient Systems with Modern CSS Subgrid and Container Queries</h3>
+        <p class="card-body">A detailed guide exploring subgrid track inheritance across complex responsive web apps.</p>
+        <footer class="card-footer">
+          <a href="#" class="btn">Read Article</a>
+        </footer>
+      </article>
+
+      <!-- Card 2: Single-line Title -->
+      <article class="card-before">
+        <span class="card-tag">Design</span>
+        <h3 class="card-title">Short Title</h3>
+        <p class="card-body">Notice how the body copy and title top/bottom lines fail to align with Card 1 because Card 1's title spans 3 lines while Card 2 spans 1 line.</p>
+        <footer class="card-footer">
+          <a href="#" class="btn">Read Article</a>
+        </footer>
+      </article>
+
+      <!-- Card 3: Long Body Copy -->
+      <article class="card-before">
+        <span class="card-tag">Architecture</span>
+        <h3 class="card-title">Standard Title Example</h3>
+        <p class="card-body">This card has much longer body copy. While flex-grow pushes the footer down, the body text starting position is misaligned relative to Card 1 due to differing title lengths.</p>
+        <footer class="card-footer">
+          <a href="#" class="btn">Read Article</a>
+        </footer>
+      </article>
+    </div>
+
+    <!-- AFTER SECTION -->
+    <div class="section-title">
+      <span>AFTER: CSS Subgrid Implementation</span>
+      <span class="badge-solution">Synchronized Row Alignment</span>
+    </div>
+
+    <div class="grid-after">
+      <!-- Card 1: Multi-line Title -->
+      <article class="card-after">
+        <span class="card-tag">Engineering</span>
+        <h3 class="card-title">Building Resilient Systems with Modern CSS Subgrid and Container Queries</h3>
+        <p class="card-body">A detailed guide exploring subgrid track inheritance across complex responsive web apps.</p>
+        <footer class="card-footer">
+          <a href="#" class="btn">Read Article</a>
+        </footer>
+      </article>
+
+      <!-- Card 2: Single-line Title -->
+      <article class="card-after">
+        <span class="card-tag">Design</span>
+        <h3 class="card-title">Short Title</h3>
+        <p class="card-body">Notice how track line 2 expands across the entire row to accommodate Card 1's title. Card 2's body copy automatically starts at the exact same vertical baseline!</p>
+        <footer class="card-footer">
+          <a href="#" class="btn">Read Article</a>
+        </footer>
+      </article>
+
+      <!-- Card 3: Long Body Copy -->
+      <article class="card-after">
+        <span class="card-tag">Architecture</span>
+        <h3 class="card-title">Standard Title Example</h3>
+        <p class="card-body">This card has longer body copy. Track line 3 (1fr) absorbs the body content height while keeping all titles, tags, and footers aligned across all three cards.</p>
+        <footer class="card-footer">
+          <a href="#" class="btn">Read Article</a>
+        </footer>
+      </article>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,132 @@
+/* ==========================================================================
+   CSS Subgrid Reusable Layout Patterns
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Pattern 1: Multi-Card Grid Alignment (Row Subgrid)
+   Aligns Tag, Title, Body, and Footer across independent card components.
+   -------------------------------------------------------------------------- */
+
+/* Fallback for non-subgrid browsers */
+.subgrid-card-item {
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+  background-color: var(--card-bg, #ffffff);
+  border: 1px solid var(--card-border, #cbd5e1);
+  border-radius: var(--card-radius, 8px);
+}
+
+.subgrid-card-body {
+  flex-grow: 1;
+}
+
+/* Enhanced Subgrid Layout */
+@supports (grid-template-rows: subgrid) {
+  .subgrid-card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--card-min-width, 300px), 1fr));
+    /* Explicit 4-row track definition for card segments */
+    grid-template-rows: repeat(auto-fill, auto auto 1fr auto);
+    gap: var(--grid-gap, 1.5rem);
+  }
+
+  .subgrid-card-item {
+    /* Span all 4 row tracks */
+    grid-row: span 4;
+    display: grid;
+    grid-template-rows: subgrid;
+    row-gap: var(--card-inner-gap, 0.75rem);
+  }
+
+  .subgrid-card-tag {
+    grid-row: 1;
+  }
+
+  .subgrid-card-title {
+    grid-row: 2;
+    margin: 0;
+  }
+
+  .subgrid-card-body {
+    grid-row: 3;
+    margin: 0;
+    flex-grow: auto;
+  }
+
+  .subgrid-card-footer {
+    grid-row: 4;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Pattern 2: Multi-Column Pricing Matrix Cards
+   Aligns Tier Name, Price Header, Feature Bullet List, and CTA button.
+   -------------------------------------------------------------------------- */
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-rows: repeat(auto-fill, auto auto 1fr auto);
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.pricing-card {
+  grid-row: span 4;
+  display: grid;
+  grid-template-rows: subgrid;
+  row-gap: 1rem;
+  padding: 2rem 1.5rem;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.pricing-badge {
+  grid-row: 1;
+}
+
+.pricing-header {
+  grid-row: 2;
+}
+
+.pricing-features {
+  grid-row: 3;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pricing-cta {
+  grid-row: 4;
+}
+
+/* --------------------------------------------------------------------------
+   Pattern 3: Form Fieldset Alignment (Column Subgrid)
+   Synchronizes label widths and input controls across fieldsets.
+   -------------------------------------------------------------------------- */
+
+.form-subgrid-container {
+  display: grid;
+  grid-template-columns: minmax(140px, max-content) minmax(240px, 1fr);
+  gap: 1rem 1.5rem;
+  max-width: 640px;
+}
+
+.form-field-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  align-items: center;
+}
+
+.form-field-label {
+  grid-column: 1;
+  font-weight: 600;
+}
+
+.form-field-input {
+  grid-column: 2;
+  width: 100%;
+}
