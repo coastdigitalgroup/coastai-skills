@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Range Slider UI System - Specification Template</title>
+  <style>
+    /* ==========================================================================
+       RANGE SLIDER DESIGN SYSTEM TOKENS & BASE STYLES
+       ========================================================================== */
+    :root {
+      --slider-track-bg: #E5E7EB;         /* 3.2:1 contrast against white background */
+      --slider-track-fill: #2563EB;       /* Primary accent, 4.6:1 contrast ratio */
+      --slider-thumb-bg: #FFFFFF;
+      --slider-thumb-border: #2563EB;
+      --slider-thumb-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+      --slider-focus-ring: #3B82F6;
+      --slider-text-main: #111827;        /* 14.5:1 text contrast ratio */
+      --slider-text-muted: #6B7280;       /* 4.6:1 text contrast ratio */
+      --slider-radius-full: 9999px;
+      --slider-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--slider-font-family);
+      color: var(--slider-text-main);
+      background-color: #F9FAFB;
+      padding: 2rem 1rem;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .slider-card {
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .slider-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--slider-text-main);
+    }
+
+    /* ==========================================================================
+       1. DUAL-THUMB RANGE SLIDER COMPONENT (PRICE FILTER)
+       ========================================================================== */
+    .dual-input-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .number-field-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .number-field-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--slider-text-muted);
+    }
+
+    .number-field-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .currency-prefix {
+      position: absolute;
+      left: 0.75rem;
+      font-size: 0.875rem;
+      color: var(--slider-text-muted);
+      pointer-events: none;
+    }
+
+    .number-input {
+      width: 100%;
+      height: 40px;
+      padding: 0.5rem 0.75rem 0.5rem 1.75rem;
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--slider-text-main);
+      background: #FFFFFF;
+      border: 1px solid #D1D5DB;
+      border-radius: 6px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .number-input:focus {
+      outline: none;
+      border-color: var(--slider-track-fill);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .input-separator {
+      color: var(--slider-text-muted);
+      font-size: 0.875rem;
+      margin-top: 1rem;
+    }
+
+    /* Track Rail Geometry */
+    .range-slider-widget {
+      position: relative;
+      height: 32px; /* Provides vertical hit area container */
+      display: flex;
+      align-items: center;
+      margin: 1rem 0 0.5rem;
+    }
+
+    .range-track-rail {
+      position: absolute;
+      width: 100%;
+      height: 6px;
+      background-color: var(--slider-track-bg);
+      border-radius: var(--slider-radius-full);
+      pointer-events: none;
+    }
+
+    .range-track-fill {
+      position: absolute;
+      height: 6px;
+      background-color: var(--slider-track-fill);
+      border-radius: var(--slider-radius-full);
+      pointer-events: none;
+      /* Dynamic positions applied via CSS properties or JavaScript */
+      left: 10%;
+      right: 30%;
+    }
+
+    /* Accessible Native Input Range Overlay for Dual Slider */
+    .range-native-input {
+      position: absolute;
+      width: 100%;
+      height: 6px;
+      margin: 0;
+      background: none;
+      pointer-events: none;
+      -webkit-appearance: none;
+      appearance: none;
+      z-index: 2;
+    }
+
+    /* Webkit Thumb Styling & Target Size Expansion */
+    .range-native-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--slider-thumb-bg);
+      border: 2.5px solid var(--slider-thumb-border);
+      box-shadow: var(--slider-thumb-shadow);
+      cursor: pointer;
+      pointer-events: auto;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      /* Hit Area Expansion via pseudo sizing or margin offset */
+      margin-top: 0px;
+    }
+
+    .range-native-input::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+      box-shadow: 0 0 0 8px rgba(37, 99, 235, 0.12);
+    }
+
+    .range-native-input:focus-visible::-webkit-slider-thumb {
+      outline: 2px solid var(--slider-focus-ring);
+      outline-offset: 3px;
+      box-shadow: 0 0 0 8px rgba(37, 99, 235, 0.2);
+    }
+
+    /* Firefox Thumb Styling */
+    .range-native-input::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--slider-thumb-bg);
+      border: 2.5px solid var(--slider-thumb-border);
+      box-shadow: var(--slider-thumb-shadow);
+      cursor: pointer;
+      pointer-events: auto;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    .range-native-input::-moz-range-thumb:hover {
+      transform: scale(1.15);
+      box-shadow: 0 0 0 8px rgba(37, 99, 235, 0.12);
+    }
+
+    .range-native-input:focus-visible::-moz-range-thumb {
+      outline: 2px solid var(--slider-focus-ring);
+      outline-offset: 3px;
+    }
+
+    .legend-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--slider-text-muted);
+      margin-top: 0.5rem;
+    }
+
+    /* ==========================================================================
+       2. SINGLE-THUMB STEPPED SLIDER WITH FLOATING TOOLTIP BADGE
+       ========================================================================== */
+    .single-slider-container {
+      position: relative;
+      margin-top: 2.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Floating Tooltip Value Badge */
+    .floating-tooltip-badge {
+      position: absolute;
+      top: -36px;
+      left: 40%; /* Sync with thumb position */
+      transform: translateX(-50%);
+      background: #111827;
+      color: #FFFFFF;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      pointer-events: none;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Tooltip Pointer Triangle */
+    .floating-tooltip-badge::after {
+      content: "";
+      position: absolute;
+      bottom: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 4px 4px 0 4px;
+      border-style: solid;
+      border-color: #111827 transparent transparent transparent;
+    }
+
+    .single-range-track {
+      position: relative;
+      height: 8px;
+      background: var(--slider-track-bg);
+      border-radius: var(--slider-radius-full);
+      display: flex;
+      align-items: center;
+    }
+
+    .single-track-fill {
+      position: absolute;
+      height: 100%;
+      width: 40%; /* Dynamic fill % */
+      background: var(--slider-track-fill);
+      border-radius: var(--slider-radius-full);
+    }
+
+    .single-range-input {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 3;
+    }
+
+    .custom-thumb-visual {
+      position: absolute;
+      left: 40%; /* Sync with value position */
+      transform: translateX(-50%);
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 3px solid var(--slider-track-fill);
+      box-shadow: var(--slider-thumb-shadow);
+      pointer-events: none;
+      z-index: 2;
+      transition: transform 0.1s ease;
+    }
+
+    .single-range-input:focus-visible ~ .custom-thumb-visual {
+      outline: 2px solid var(--slider-focus-ring);
+      outline-offset: 4px;
+      box-shadow: 0 0 0 8px rgba(37, 99, 235, 0.15);
+    }
+
+    /* Tick Mark Milestones */
+    .tick-mark-row {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      margin-top: 0.75rem;
+      padding: 0 4px;
+    }
+
+    .tick-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .tick-line {
+      width: 2px;
+      height: 6px;
+      background: #D1D5DB;
+    }
+
+    .tick-item.active .tick-line {
+      background: var(--slider-track-fill);
+    }
+
+    .tick-label {
+      font-size: 0.75rem;
+      color: var(--slider-text-muted);
+    }
+
+    .tick-item.active .tick-label {
+      color: var(--slider-text-main);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ======================================================================
+       TEMPLATE 1: DUAL-THUMB PRICE RANGE FILTER
+       ====================================================================== -->
+  <section class="slider-card" aria-labelledby="price-filter-heading">
+    <div class="slider-header">
+      <h2 id="price-filter-heading" class="slider-title">Filter by Price ($)</h2>
+    </div>
+
+    <!-- Synchronized Direct Numeric Input Boxes -->
+    <div class="dual-input-group">
+      <div class="number-field-wrapper">
+        <label for="min-price-input" class="number-field-label">Min Price</label>
+        <div class="number-field-container">
+          <span class="currency-prefix" aria-hidden="true">$</span>
+          <input
+            type="number"
+            id="min-price-input"
+            class="number-input"
+            value="100"
+            min="0"
+            max="1000"
+            step="10"
+            aria-label="Minimum price in dollars"
+          >
+        </div>
+      </div>
+
+      <span class="input-separator" aria-hidden="true">to</span>
+
+      <div class="number-field-wrapper">
+        <label for="max-price-input" class="number-field-label">Max Price</label>
+        <div class="number-field-container">
+          <span class="currency-prefix" aria-hidden="true">$</span>
+          <input
+            type="number"
+            id="max-price-input"
+            class="number-input"
+            value="700"
+            min="0"
+            max="1000"
+            step="10"
+            aria-label="Maximum price in dollars"
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Dual Slider Track & Native Range Controls -->
+    <div class="range-slider-widget" aria-label="Price range selection">
+      <div class="range-track-rail"></div>
+      <div class="range-track-fill" style="left: 10%; right: 30%;"></div>
+
+      <!-- Lower Bound Range Control -->
+      <input
+        type="range"
+        class="range-native-input"
+        id="min-range-slider"
+        min="0"
+        max="1000"
+        step="10"
+        value="100"
+        aria-label="Minimum price bound"
+        aria-valuemin="0"
+        aria-valuemax="1000"
+        aria-valuenow="100"
+        aria-valuetext="$100 USD"
+      >
+
+      <!-- Upper Bound Range Control -->
+      <input
+        type="range"
+        class="range-native-input"
+        id="max-range-slider"
+        min="0"
+        max="1000"
+        step="10"
+        value="700"
+        aria-label="Maximum price bound"
+        aria-valuemin="0"
+        aria-valuemax="1000"
+        aria-valuenow="700"
+        aria-valuetext="$700 USD"
+      >
+    </div>
+
+    <div class="legend-labels">
+      <span>$0</span>
+      <span>$500</span>
+      <span>$1,000+</span>
+    </div>
+  </section>
+
+
+  <!-- ======================================================================
+       TEMPLATE 2: SINGLE-THUMB STEPPED STORAGE CALCULATOR
+       ====================================================================== -->
+  <section class="slider-card" aria-labelledby="storage-calc-heading">
+    <div class="slider-header">
+      <h2 id="storage-calc-heading" class="slider-title">Select Storage Capacity</h2>
+    </div>
+
+    <div class="single-slider-container">
+      <!-- Dynamic Floating Tooltip Badge -->
+      <div class="floating-tooltip-badge" id="storage-badge" role="status" aria-live="polite">
+        1,000 GB (1 TB) — $80/mo
+      </div>
+
+      <!-- Stepped Track Rail & Custom Thumb Visual -->
+      <div class="single-range-track">
+        <div class="single-track-fill" style="width: 40%;"></div>
+
+        <!-- Native Invisible Accessible Range Control -->
+        <input
+          type="range"
+          class="single-range-input"
+          id="storage-range-slider"
+          min="100"
+          max="10000"
+          step="100"
+          value="1000"
+          aria-label="Cloud storage capacity in gigabytes"
+          aria-valuemin="100"
+          aria-valuemax="10000"
+          aria-valuenow="1000"
+          aria-valuetext="1,000 Gigabytes, 80 dollars per month"
+        >
+
+        <div class="custom-thumb-visual" style="left: 40%;" aria-hidden="true"></div>
+      </div>
+
+      <!-- Tick Mark Milestones -->
+      <div class="tick-mark-row">
+        <div class="tick-item active">
+          <div class="tick-line"></div>
+          <span class="tick-label">100 GB</span>
+        </div>
+        <div class="tick-item active">
+          <div class="tick-line"></div>
+          <span class="tick-label">500 GB</span>
+        </div>
+        <div class="tick-item active">
+          <div class="tick-line"></div>
+          <span class="tick-label">1 TB</span>
+        </div>
+        <div class="tick-item">
+          <div class="tick-line"></div>
+          <span class="tick-label">5 TB</span>
+        </div>
+        <div class="tick-item">
+          <div class="tick-line"></div>
+          <span class="tick-label">10 TB</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>
