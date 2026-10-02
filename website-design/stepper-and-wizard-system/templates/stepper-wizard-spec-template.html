@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accessible Multi-Step Wizard Template</title>
+  <style>
+    :root {
+      --color-primary: #2563eb;
+      --color-primary-hover: #1d4ed8;
+      --color-primary-light: #eff6ff;
+      --color-success: #16a34a;
+      --color-text-main: #0f172a;
+      --color-text-muted: #64748b;
+      --color-border: #cbd5e1;
+      --color-bg-subtle: #f8fafc;
+      --color-error: #dc2626;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      color: var(--color-text-main);
+      background-color: #f1f5f9;
+      line-height: 1.5;
+      padding: 24px 16px;
+    }
+
+    .wizard-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    /* Desktop Horizontal Stepper Navigation */
+    .stepper-nav {
+      padding: 24px;
+      background-color: var(--color-bg-subtle);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .stepper-list {
+      display: flex;
+      justify-content: space-between;
+      list-style: none;
+      position: relative;
+    }
+
+    .stepper-item {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+
+    .stepper-item:not(:last-child)::after {
+      content: "";
+      flex: 1;
+      height: 2px;
+      background-color: var(--color-border);
+      margin: 0 12px;
+    }
+
+    .stepper-item.completed:not(:last-child)::after {
+      background-color: var(--color-success);
+    }
+
+    .step-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      text-decoration: none;
+      padding: 4px;
+      border-radius: var(--radius-md);
+    }
+
+    .step-btn:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+
+    .step-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--color-border);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--color-text-muted);
+      background-color: #ffffff;
+      transition: all 0.2s ease;
+    }
+
+    /* Step States */
+    .stepper-item.active .step-badge {
+      border-color: var(--color-primary);
+      background-color: var(--color-primary);
+      color: #ffffff;
+    }
+
+    .stepper-item.active .step-label {
+      color: var(--color-primary);
+    }
+
+    .stepper-item.completed .step-badge {
+      border-color: var(--color-success);
+      background-color: var(--color-success);
+      color: #ffffff;
+    }
+
+    .stepper-item.completed .step-label {
+      color: var(--color-text-main);
+    }
+
+    .stepper-item.disabled .step-btn {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    /* Mobile Progress Banner (Hidden on Desktop) */
+    .mobile-stepper-header {
+      display: none;
+      padding: 16px;
+      background-color: var(--color-bg-subtle);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .mobile-step-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      margin-bottom: 8px;
+    }
+
+    .progress-bar-track {
+      width: 100%;
+      height: 6px;
+      background-color: var(--color-border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background-color: var(--color-primary);
+      transition: width 0.3s ease;
+    }
+
+    /* Wizard Content Panel Canvas */
+    .wizard-panel-canvas {
+      padding: 32px;
+    }
+
+    .wizard-step-panel {
+      display: none;
+    }
+
+    .wizard-step-panel.active {
+      display: block;
+    }
+
+    .panel-heading {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      outline: none;
+    }
+
+    .panel-subheading {
+      color: var(--color-text-muted);
+      margin-bottom: 24px;
+      font-size: 0.95rem;
+    }
+
+    /* Form Fields */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 1rem;
+      font-family: inherit;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .field-error-msg {
+      color: var(--color-error);
+      font-size: 0.8125rem;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .form-group.has-error .form-control {
+      border-color: var(--color-error);
+    }
+
+    .form-group.has-error .field-error-msg {
+      display: block;
+    }
+
+    /* Action Dock Bar */
+    .wizard-action-dock {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 32px;
+      border-top: 1px solid var(--color-border);
+      background-color: var(--color-bg-subtle);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 20px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background-color: var(--color-primary);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--color-primary-hover);
+    }
+
+    .btn-secondary {
+      background-color: #ffffff;
+      border-color: var(--color-border);
+      color: var(--color-text-main);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--color-bg-subtle);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Mobile Responsive Breakdown Rules */
+    @media (max-width: 768px) {
+      .stepper-nav {
+        display: none;
+      }
+
+      .mobile-stepper-header {
+        display: block;
+      }
+
+      .wizard-panel-canvas {
+        padding: 20px 16px;
+      }
+
+      .wizard-action-dock {
+        position: sticky;
+        bottom: 0;
+        padding: 16px;
+        background-color: #ffffff;
+        box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="wizard-container">
+
+  <!-- Desktop Progress Stepper Navigation -->
+  <nav class="stepper-nav" aria-label="Registration Progress">
+    <ol class="stepper-list">
+      <li class="stepper-item completed" id="step-node-1">
+        <button type="button" class="step-btn" onclick="goToStep(1)">
+          <span class="step-badge">✓</span>
+          <span class="step-label">1. Account</span>
+        </button>
+      </li>
+      <li class="stepper-item active" id="step-node-2">
+        <button type="button" class="step-btn" aria-current="step">
+          <span class="step-badge">2</span>
+          <span class="step-label">2. Details</span>
+        </button>
+      </li>
+      <li class="stepper-item disabled" id="step-node-3">
+        <button type="button" class="step-btn" disabled>
+          <span class="step-badge">3</span>
+          <span class="step-label">3. Confirm</span>
+        </button>
+      </li>
+    </ol>
+  </nav>
+
+  <!-- Mobile Compact Progress Bar -->
+  <div class="mobile-stepper-header" aria-hidden="true">
+    <div class="mobile-step-title" id="mobile-step-label">Step 2 of 3: Details</div>
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="mobile-progress-bar" style="width: 66.6%;"></div>
+    </div>
+  </div>
+
+  <!-- Main Wizard Form Content Panels -->
+  <main class="wizard-panel-canvas">
+    <form id="wizard-form" onsubmit="return false;" novalidate>
+
+      <!-- Panel Step 1 -->
+      <section class="wizard-step-panel" id="panel-step-1" aria-labelledby="heading-step-1">
+        <h2 class="panel-heading" id="heading-step-1" tabindex="-1">Step 1: Account Information</h2>
+        <p class="panel-subheading">Create your credentials to get started.</p>
+
+        <div class="form-group" id="group-email">
+          <label for="input-email" class="form-label">Email Address *</label>
+          <input type="email" id="input-email" class="form-control" value="alex@example.com" required>
+          <div class="field-error-msg">Please enter a valid email address.</div>
+        </div>
+      </section>
+
+      <!-- Panel Step 2 (Active by Default) -->
+      <section class="wizard-step-panel active" id="panel-step-2" aria-labelledby="heading-step-2">
+        <h2 class="panel-heading" id="heading-step-2" tabindex="-1">Step 2: Personal Details</h2>
+        <p class="panel-subheading">Tell us a little about yourself.</p>
+
+        <div class="form-group" id="group-fullname">
+          <label for="input-fullname" class="form-label">Full Name *</label>
+          <input type="text" id="input-fullname" class="form-control" placeholder="Jane Doe" required>
+          <div class="field-error-msg">Full name is required.</div>
+        </div>
+
+        <div class="form-group" id="group-company">
+          <label for="input-company" class="form-label">Company / Organization</label>
+          <input type="text" id="input-company" class="form-control" placeholder="Acme Inc.">
+        </div>
+      </section>
+
+      <!-- Panel Step 3 -->
+      <section class="wizard-step-panel" id="panel-step-3" aria-labelledby="heading-step-3">
+        <h2 class="panel-heading" id="heading-step-3" tabindex="-1">Step 3: Confirm & Submit</h2>
+        <p class="panel-subheading">Review your entered details before completing registration.</p>
+
+        <div class="summary-box" style="padding: 16px; background: var(--color-bg-subtle); border-radius: var(--radius-md);">
+          <p><strong>Email:</strong> <span id="summary-email">alex@example.com</span></p>
+          <p><strong>Full Name:</strong> <span id="summary-fullname">-</span></p>
+          <p><strong>Company:</strong> <span id="summary-company">-</span></p>
+        </div>
+      </section>
+
+    </form>
+  </main>
+
+  <!-- Persistent Action Dock Footer -->
+  <footer class="wizard-action-dock">
+    <button type="button" class="btn btn-secondary" id="btn-back" onclick="handleBack()">Back</button>
+    <button type="button" class="btn btn-primary" id="btn-next" onclick="handleNext()">Continue</button>
+  </footer>
+
+</div>
+
+<!-- Live Region for Screen Reader Announcements -->
+<div id="sr-announcer" class="sr-only" aria-live="polite" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0);"></div>
+
+<script>
+  let currentStep = 2;
+  const totalSteps = 3;
+
+  const stepLabels = [
+    "Step 1 of 3: Account Information",
+    "Step 2 of 3: Personal Details",
+    "Step 3 of 3: Confirm & Submit"
+  ];
+
+  function goToStep(targetStep) {
+    if (targetStep < 1 || targetStep > totalSteps) return;
+
+    // Hide active panel
+    document.querySelector('.wizard-step-panel.active').classList.remove('active');
+
+    // Show target panel
+    const targetPanel = document.getElementById(`panel-step-${targetStep}`);
+    targetPanel.classList.add('active');
+
+    // Update Step Nodes in Navigation
+    for (let i = 1; i <= totalSteps; i++) {
+      const node = document.getElementById(`step-node-${i}`);
+      const btn = node.querySelector('.step-btn');
+
+      node.className = 'stepper-item';
+      btn.removeAttribute('aria-current');
+
+      if (i < targetStep) {
+        node.classList.add('completed');
+        btn.querySelector('.step-badge').textContent = '✓';
+      } else if (i === targetStep) {
+        node.classList.add('active');
+        btn.setAttribute('aria-current', 'step');
+        btn.querySelector('.step-badge').textContent = i;
+      } else {
+        node.classList.add('disabled');
+        btn.querySelector('.step-badge').textContent = i;
+      }
+    }
+
+    // Update Mobile Header
+    document.getElementById('mobile-step-label').textContent = stepLabels[targetStep - 1];
+    document.getElementById('mobile-progress-bar').style.width = `${(targetStep / totalSteps) * 100}%`;
+
+    // Update Dock Buttons
+    document.getElementById('btn-back').style.visibility = targetStep === 1 ? 'hidden' : 'visible';
+    document.getElementById('btn-next').textContent = targetStep === totalSteps ? 'Submit Order' : 'Continue';
+
+    // Announce and shift focus
+    currentStep = targetStep;
+    document.getElementById('sr-announcer').textContent = stepLabels[targetStep - 1];
+    targetPanel.querySelector('.panel-heading').focus();
+  }
+
+  function handleNext() {
+    if (currentStep === 2) {
+      const nameInput = document.getElementById('input-fullname');
+      const group = document.getElementById('group-fullname');
+      if (!nameInput.value.trim()) {
+        group.classList.add('has-error');
+        nameInput.focus();
+        return;
+      } else {
+        group.classList.remove('has-error');
+      }
+
+      // Populate Summary
+      document.getElementById('summary-fullname').textContent = nameInput.value;
+      document.getElementById('summary-company').textContent = document.getElementById('input-company').value || 'N/A';
+    }
+
+    if (currentStep < totalSteps) {
+      goToStep(currentStep + 1);
+    } else {
+      alert("Form submitted successfully!");
+    }
+  }
+
+  function handleBack() {
+    if (currentStep > 1) {
+      goToStep(currentStep - 1);
+    }
+  }
+</script>
+
+</body>
+</html>
