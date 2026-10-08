@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Range Slider UI System Spec Template</title>
+  <style>
+    :root {
+      --color-primary: #0284c7;
+      --color-primary-hover: #0369a1;
+      --color-primary-light: rgba(2, 132, 199, 0.15);
+      --color-track: #e2e8f0;
+      --color-text: #0f172a;
+      --color-muted: #64748b;
+      --color-surface: #ffffff;
+      --color-border: #cbd5e1;
+      --focus-ring: 3px solid #0284c7;
+
+      --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-family);
+      color: var(--color-text);
+      background-color: #f8fafc;
+      padding: 2rem;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .slider-section {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 1rem;
+    }
+
+    .slider-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .slider-value-display {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    /* Single Thumb Native Input Styling */
+    .single-slider-container {
+      position: relative;
+      width: 100%;
+      margin: 1.5rem 0;
+    }
+
+    .single-range-input {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: var(--color-track);
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Single Slider Webkit/Firefox Thumbs */
+    .single-range-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      border: 2px solid var(--color-surface);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      cursor: grab;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+
+    .single-range-input::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      border: 2px solid var(--color-surface);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      cursor: grab;
+    }
+
+    .single-range-input:focus-visible::-webkit-slider-thumb {
+      outline: var(--focus-ring);
+      outline-offset: 3px;
+    }
+
+    .single-range-input:focus-visible::-moz-range-thumb {
+      outline: var(--focus-ring);
+      outline-offset: 3px;
+    }
+
+    /* Dual Thumb Range Slider Custom Layout */
+    .dual-slider-wrapper {
+      position: relative;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      touch-action: pan-y;
+    }
+
+    .dual-slider-track {
+      position: absolute;
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background-color: var(--color-track);
+    }
+
+    .dual-slider-fill {
+      position: absolute;
+      height: 8px;
+      border-radius: 4px;
+      background-color: var(--color-primary);
+    }
+
+    .dual-range-input {
+      position: absolute;
+      width: 100%;
+      pointer-events: none;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 0;
+      outline: none;
+      background: none;
+    }
+
+    .dual-range-input::-webkit-slider-thumb {
+      pointer-events: auto;
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      border: 2px solid var(--color-surface);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      cursor: grab;
+      position: relative;
+      z-index: 10;
+    }
+
+    .dual-range-input::-moz-range-thumb {
+      pointer-events: auto;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      border: 2px solid var(--color-surface);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      cursor: grab;
+      position: relative;
+      z-index: 10;
+    }
+
+    .dual-range-input:focus-visible::-webkit-slider-thumb {
+      outline: var(--focus-ring);
+      outline-offset: 3px;
+    }
+
+    /* Coupled Inputs Grid */
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .input-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .input-label {
+      font-size: 0.875rem;
+      color: var(--color-muted);
+    }
+
+    .number-input {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      font-size: 1rem;
+      color: var(--color-text);
+    }
+
+    .number-input:focus-visible {
+      outline: var(--focus-ring);
+      border-color: var(--color-primary);
+    }
+
+    /* High Contrast Mode Fallbacks */
+    @media (forced-colors: active) {
+      .single-range-input::-webkit-slider-thumb,
+      .dual-range-input::-webkit-slider-thumb {
+        border: 2px solid CanvasText;
+        background: Highlight;
+      }
+      .dual-slider-fill {
+        background: Highlight;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Example 1: Single Thumb Slider -->
+  <section class="slider-section" aria-labelledby="single-slider-heading">
+    <div class="slider-header">
+      <h2 id="single-slider-heading" class="slider-title">Team Workspace Seats</h2>
+      <span id="single-value-text" class="slider-value-display">25 Seats</span>
+    </div>
+
+    <div class="single-slider-container">
+      <input
+        type="range"
+        id="single-slider"
+        class="single-range-input"
+        min="1"
+        max="100"
+        value="25"
+        step="1"
+        aria-labelledby="single-slider-heading"
+        aria-valuetext="25 Seats"
+      >
+    </div>
+  </section>
+
+  <!-- Example 2: Dual Thumb Price Filter -->
+  <section class="slider-section" aria-labelledby="dual-slider-heading">
+    <div class="slider-header">
+      <h2 id="dual-slider-heading" class="slider-title">Price Range Filter</h2>
+      <span id="dual-value-text" class="slider-value-display">$100 — $400</span>
+    </div>
+
+    <div class="dual-slider-wrapper">
+      <div class="dual-slider-track"></div>
+      <div id="dual-fill" class="dual-slider-fill" style="left: 10%; width: 30%;"></div>
+
+      <input
+        type="range"
+        id="min-range-input"
+        class="dual-range-input"
+        min="0"
+        max="1000"
+        value="100"
+        step="10"
+        aria-label="Minimum Price Filter"
+        aria-valuetext="$100 dollars"
+      >
+      <input
+        type="range"
+        id="max-range-input"
+        class="dual-range-input"
+        min="0"
+        max="1000"
+        value="400"
+        step="10"
+        aria-label="Maximum Price Filter"
+        aria-valuetext="$400 dollars"
+      >
+    </div>
+
+    <div class="input-grid">
+      <div class="input-field">
+        <label for="min-number-input" class="input-label">Minimum ($)</label>
+        <input type="number" id="min-number-input" class="number-input" min="0" max="1000" value="100">
+      </div>
+      <div class="input-field">
+        <label for="max-number-input" class="input-label">Maximum ($)</label>
+        <input type="number" id="max-number-input" class="number-input" min="0" max="1000" value="400">
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Single Thumb Sync
+    const singleSlider = document.getElementById('single-slider');
+    const singleValueText = document.getElementById('single-value-text');
+
+    singleSlider.addEventListener('input', (e) => {
+      const val = e.target.value;
+      singleValueText.textContent = `${val} Seats`;
+      singleSlider.setAttribute('aria-valuetext', `${val} Seats`);
+    });
+
+    // Dual Thumb Sync & Fill Alignment Logic
+    const minInput = document.getElementById('min-range-input');
+    const maxInput = document.getElementById('max-range-input');
+    const minNum = document.getElementById('min-number-input');
+    const maxNum = document.getElementById('max-number-input');
+    const fillBar = document.getElementById('dual-fill');
+    const dualValueText = document.getElementById('dual-value-text');
+
+    const minGap = 20;
+    const maxLimit = 1000;
+
+    function updateDualSlider(e) {
+      let minVal = parseInt(minInput.value);
+      let maxVal = parseInt(maxInput.value);
+
+      if (maxVal - minVal < minGap) {
+        if (e && e.target === minInput) {
+          minInput.value = maxVal - minGap;
+          minVal = maxVal - minGap;
+        } else {
+          maxInput.value = minVal + minGap;
+          maxVal = minVal + minGap;
+        }
+      }
+
+      const minPercent = (minVal / maxLimit) * 100;
+      const maxPercent = (maxVal / maxLimit) * 100;
+
+      fillBar.style.left = `${minPercent}%`;
+      fillBar.style.width = `${maxPercent - minPercent}%`;
+
+      minNum.value = minVal;
+      maxNum.value = maxVal;
+
+      dualValueText.textContent = `$${minVal} — $${maxVal}`;
+      minInput.setAttribute('aria-valuetext', `$${minVal} dollars`);
+      maxInput.setAttribute('aria-valuetext', `$${maxVal} dollars`);
+    }
+
+    minInput.addEventListener('input', updateDualSlider);
+    maxInput.addEventListener('input', updateDualSlider);
+
+    minNum.addEventListener('change', () => {
+      let val = parseInt(minNum.value) || 0;
+      if (val < 0) val = 0;
+      if (val > parseInt(maxInput.value) - minGap) val = parseInt(maxInput.value) - minGap;
+      minInput.value = val;
+      updateDualSlider();
+    });
+
+    maxNum.addEventListener('change', () => {
+      let val = parseInt(maxNum.value) || maxLimit;
+      if (val > maxLimit) val = maxLimit;
+      if (val < parseInt(minInput.value) + minGap) val = parseInt(minInput.value) + minGap;
+      maxInput.value = val;
+      updateDualSlider();
+    });
+
+    // Initial run
+    updateDualSlider();
+  </script>
+</body>
+</html>
