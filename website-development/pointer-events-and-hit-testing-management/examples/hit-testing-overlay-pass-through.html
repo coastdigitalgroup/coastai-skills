@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pointer Events & Hit-Testing Management Demo</title>
+  <style>
+    :root {
+      --color-bg: #0f172a;
+      --color-surface: #1e293b;
+      --color-border: #334155;
+      --color-primary: #38bdf8;
+      --color-primary-hover: #0284c7;
+      --color-text: #f8fafc;
+      --color-muted: #94a3b8;
+      --color-accent: #f43f5e;
+      --color-success: #10b981;
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      padding: 2rem;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: var(--color-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Base Grid Layout */
+    .app-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      color: var(--color-primary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Section 1: Floating HUD & Pass-Through Overlay */
+    .viewport-container {
+      position: relative;
+      height: 300px;
+      background: #020617;
+      border: 1px dashed var(--color-border);
+      border-radius: 0.5rem;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .underlying-button {
+      background: var(--color-border);
+      color: var(--color-text);
+      border: none;
+      padding: 0.75rem 1.25rem;
+      border-radius: 0.375rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .underlying-button:hover {
+      background: var(--color-primary-hover);
+    }
+
+    /* BEFORE (Broken Overlay Blocking Clicks) */
+    .hud-overlay-broken {
+      position: absolute;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.4);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 1rem;
+      /* CRITICAL BUG: Missing pointer-events: none! Blocks all underlying clicks */
+    }
+
+    /* AFTER (Fixed Pass-Through Overlay) */
+    .hud-overlay-fixed {
+      position: absolute;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.4);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 1rem;
+      /* SOLUTION: Pass pointer events through the overlay frame */
+      pointer-events: none;
+    }
+
+    /* Re-enable pointer events on interactive children */
+    .hud-overlay-fixed .hud-action-btn {
+      pointer-events: auto;
+    }
+
+    .hud-action-btn {
+      background: var(--color-primary);
+      color: #000;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.25rem;
+      font-size: 0.875rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Section 2: Continuous Slider with setPointerCapture */
+    .slider-demo-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .custom-slider-track {
+      position: relative;
+      height: 12px;
+      background: var(--color-border);
+      border-radius: 6px;
+      touch-action: none; /* Prevents scroll interference on touch */
+      cursor: pointer;
+    }
+
+    .custom-slider-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      background: var(--color-primary);
+      border-radius: 6px;
+      width: 40%;
+    }
+
+    .custom-slider-handle {
+      position: absolute;
+      top: 50%;
+      left: 40%;
+      width: 24px;
+      height: 24px;
+      background: var(--color-text);
+      border: 3px solid var(--color-primary);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .custom-slider-handle.is-dragging {
+      cursor: grabbing;
+      background: var(--color-primary);
+      scale: 1.25;
+    }
+
+    /* Section 3: Touch Target Expansion via Pseudo-element */
+    .target-expansion-demo {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      padding: 1rem;
+      background: #020617;
+      border-radius: 0.5rem;
+    }
+
+    .small-icon-btn {
+      position: relative;
+      width: 18px;
+      height: 18px;
+      background: var(--color-accent);
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    /* Invisible 48px hit-box expansion using ::before */
+    .small-icon-btn.expanded::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 48px;
+      height: 48px;
+      transform: translate(-50%, -50%);
+      background: rgba(244, 63, 94, 0.2); /* Visualized for demo */
+      border: 1px dashed var(--color-accent);
+      border-radius: 0.375rem;
+    }
+
+    /* Diagnostic Console Output Box */
+    .console-output {
+      grid-column: 1 / -1;
+      background: #020617;
+      border: 1px solid var(--color-border);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      font-family: monospace;
+      font-size: 0.875rem;
+      color: #38bdf8;
+      max-height: 160px;
+      overflow-y: auto;
+    }
+
+    .console-entry {
+      margin-bottom: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Pointer Events & Hit-Testing Management</h1>
+  <p>Demonstration of pass-through overlays (`pointer-events: none`), continuous pointer capture (`setPointerCapture`), and hit-box expansion.</p>
+
+  <div class="app-layout">
+
+    <!-- Card 1: Fixed Pass-Through Overlay -->
+    <div class="card">
+      <div class="card-title">1. Pass-Through HUD Overlay</div>
+      <p style="font-size: 0.875rem; margin-bottom: 0.75rem;">The transparent overlay has <code>pointer-events: none</code>, allowing clicks to reach the underlying button, while the "HUD Settings" button re-enables interaction with <code>pointer-events: auto</code>.</p>
+
+      <div class="viewport-container">
+        <button type="button" class="underlying-button" id="underlyingBtn">
+          Click Underlying Canvas Button
+        </button>
+
+        <div class="hud-overlay-fixed">
+          <span style="font-size: 0.75rem; font-weight: bold; color: var(--color-muted);">HUD LAYER (Transparent)</span>
+          <button type="button" class="hud-action-btn" id="hudBtn">HUD Settings</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Pointer Capture Custom Slider -->
+    <div class="card">
+      <div class="card-title">2. Continuous Pointer Capture Slider</div>
+      <p style="font-size: 0.875rem; margin-bottom: 0.75rem;">Click and drag the thumb handle. Notice that even if your mouse/finger leaves the handle bounds, <code>setPointerCapture()</code> keeps tracking movement continuously.</p>
+
+      <div class="slider-demo-container">
+        <div class="custom-slider-track" id="sliderTrack">
+          <div class="custom-slider-fill" id="sliderFill"></div>
+          <div class="custom-slider-handle" id="sliderHandle" role="slider" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" tabindex="0"></div>
+        </div>
+        <div style="font-size: 0.875rem; color: var(--color-muted);">
+          Current Value: <strong id="sliderValueText" style="color: var(--color-text);">40%</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Touch Target Expansion -->
+    <div class="card">
+      <div class="card-title">3. Hit-Box Target Expansion</div>
+      <p style="font-size: 0.875rem; margin-bottom: 0.75rem;">A small 18px icon button expanded to 48px target size using <code>::before</code> pseudo-element hit area without changing layout flow.</p>
+
+      <div class="target-expansion-demo">
+        <div>
+          <button type="button" class="small-icon-btn expanded" id="expandedIconBtn" title="Expanded Hit Target"></button>
+        </div>
+        <span style="font-size: 0.875rem;">Dashed region shows expanded 48px hit zone.</span>
+      </div>
+    </div>
+
+    <!-- Card 4: Hit-Test Inspector Debugger -->
+    <div class="card">
+      <div class="card-title">4. Hit-Test Element Inspector</div>
+      <p style="font-size: 0.875rem; margin-bottom: 0.75rem;">Click anywhere on this card to test <code>document.elementsFromPoint()</code> and inspect the hit-test target stack.</p>
+
+      <button type="button" class="underlying-button" id="inspectTrigger" style="width: 100%;">
+        Click to Inspect Hit Stack at Cursor
+      </button>
+    </div>
+
+    <!-- Diagnostic Logger -->
+    <div class="console-output" id="logOutput">
+      <div class="console-entry">[System] Event Logger Ready. Click elements above to test interactions...</div>
+    </div>
+
+  </div>
+
+  <script>
+    const logOutput = document.getElementById('logOutput');
+
+    function logMessage(msg) {
+      const entry = document.createElement('div');
+      entry.className = 'console-entry';
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      logOutput.appendChild(entry);
+      logOutput.scrollTop = logOutput.scrollHeight;
+    }
+
+    // 1. Pass-Through Events
+    document.getElementById('underlyingBtn').addEventListener('click', () => {
+      logMessage('SUCCESS: Clicked Underlying Canvas Button beneath transparent HUD!');
+    });
+
+    document.getElementById('hudBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      logMessage('SUCCESS: Clicked HUD Settings Button (pointer-events: auto)');
+    });
+
+    // 2. Continuous Pointer Capture Slider
+    const sliderTrack = document.getElementById('sliderTrack');
+    const sliderFill = document.getElementById('sliderFill');
+    const sliderHandle = document.getElementById('sliderHandle');
+    const sliderValueText = document.getElementById('sliderValueText');
+
+    function updateSlider(clientX) {
+      const rect = sliderTrack.getBoundingClientRect();
+      let percentage = ((clientX - rect.left) / rect.width) * 100;
+      percentage = Math.max(0, Math.min(100, percentage));
+
+      sliderFill.style.width = `${percentage}%`;
+      sliderHandle.style.left = `${percentage}%`;
+      sliderValueText.textContent = `${Math.round(percentage)}%`;
+      sliderHandle.setAttribute('aria-valuenow', Math.round(percentage));
+    }
+
+    sliderHandle.addEventListener('pointerdown', (e) => {
+      // LOCK POINTER CAPTURE
+      sliderHandle.setPointerCapture(e.pointerId);
+      sliderHandle.classList.add('is-dragging');
+      logMessage(`Pointer Captured (ID: ${e.pointerId}). Continuous tracking active.`);
+    });
+
+    sliderHandle.addEventListener('pointermove', (e) => {
+      if (sliderHandle.hasPointerCapture(e.pointerId)) {
+        updateSlider(e.clientX);
+      }
+    });
+
+    sliderHandle.addEventListener('pointerup', (e) => {
+      if (sliderHandle.hasPointerCapture(e.pointerId)) {
+        sliderHandle.releasePointerCapture(e.pointerId);
+        logMessage(`Pointer Capture Released (ID: ${e.pointerId}).`);
+      }
+      sliderHandle.classList.remove('is-dragging');
+    });
+
+    // 3. Touch Target Expansion
+    document.getElementById('expandedIconBtn').addEventListener('click', () => {
+      logMessage('SUCCESS: Clicked Expanded 48px Hit Area!');
+    });
+
+    // 4. Hit-Test Stack Inspection
+    document.getElementById('inspectTrigger').addEventListener('click', (e) => {
+      const stack = document.elementsFromPoint(e.clientX, e.clientY);
+      const stackSummary = stack.map(el => `${el.tagName.toLowerCase()}${el.id ? '#'+el.id : ''}${el.className ? '.'+el.className.split(' ')[0] : ''}`).join(' > ');
+      logMessage(`Hit Stack at (${e.clientX}, ${e.clientY}): ${stackSummary}`);
+    });
+  </script>
+</body>
+</html>
