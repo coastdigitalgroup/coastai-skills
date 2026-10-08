@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Scope and Nesting Architecture - Examples</title>
+  <style>
+    /* Baseline layout styling */
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.5;
+      color: #1e293b;
+      background-color: #f8fafc;
+      padding: 2rem;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      display: grid;
+      gap: 2rem;
+    }
+
+    .demo-section {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #0f172a;
+      border-bottom: 2px solid #3b82f6;
+      padding-bottom: 0.5rem;
+    }
+
+    /* ==========================================================================
+       BEFORE: Unscoped CSS causing style leakage and specificity collisions
+       ========================================================================== */
+    /* Component A Styles */
+    .legacy-card .title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #2563eb; /* Blue title */
+      margin: 0 0 0.5rem 0;
+    }
+
+    .legacy-card .content {
+      padding: 1rem;
+      background-color: #f1f5f9;
+    }
+
+    /* Component B (Slotted inside Component A content) */
+    /* LEAKAGE BUG: .legacy-card .title overrides .nested-widget .title because of high specificity (.legacy-card .title) */
+    .nested-widget .title {
+      font-size: 0.9rem;
+      color: #059669; /* Green title - BROKEN by legacy-card style bleed */
+      text-transform: uppercase;
+    }
+
+    /* ==========================================================================
+       AFTER: Native W3C @scope with Donut Boundary & Native CSS Nesting
+       ========================================================================== */
+
+    /* 1. Scoped Card Component with Donut Scope protecting .scoped-card__content */
+    @scope (.scoped-card) to (.scoped-card__content) {
+      /* :scope targets the scoping root itself */
+      :scope {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.5rem;
+        overflow: hidden;
+
+        /* Native CSS Nesting for pseudo-classes and hover states */
+        &:hover {
+          border-color: #3b82f6;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+      }
+
+      /* Card header & title */
+      .scoped-card__header {
+        background-color: #eff6ff;
+        padding: 1rem;
+        border-bottom: 1px solid #dbeafe;
+
+        /* Native Nesting */
+        .title {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: #1d4ed8;
+          margin: 0;
+        }
+      }
+
+      .scoped-card__footer {
+        padding: 0.75rem 1rem;
+        background-color: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+      }
+    }
+
+    /* 2. Independent Nested Widget Component */
+    @scope (.nested-widget) {
+      :scope {
+        border: 1px dashed #10b981;
+        padding: 1rem;
+        background-color: #ecfdf5;
+        border-radius: 0.375rem;
+      }
+
+      /* Because of the donut scope "to (.scoped-card__content)", this .title selector
+         is completely untouched by the outer card's .title styles! */
+      .title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #047857;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: 0 0 0.25rem 0;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        background-color: #a7f3d0;
+        color: #065f46;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border-radius: 0.25rem;
+      }
+    }
+
+    /* 3. Proximity-Based Specificity Resolution Demo */
+    @scope (.dark-wrapper) {
+      :scope {
+        background-color: #0f172a;
+        color: #f8fafc;
+        padding: 1rem;
+        border-radius: 0.5rem;
+      }
+
+      .status-text {
+        color: #94a3b8; /* Dim text for dark theme */
+      }
+    }
+
+    @scope (.light-panel) {
+      :scope {
+        background-color: #ffffff;
+        color: #0f172a;
+        padding: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.375rem;
+      }
+
+      .status-text {
+        color: #2563eb; /* Vivid blue text for light panel */
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>CSS Scope and Nesting Architecture Demonstration</h1>
+
+    <!-- BEFORE SECTION -->
+    <section class="demo-section">
+      <h2>Before: Global Selector Bleed (Unscoped Legacy CSS)</h2>
+      <p>Notice how the inner widget's title inherits the blue color from <code>.legacy-card .title</code> due to selector collision and specificity bleed:</p>
+
+      <div class="legacy-card">
+        <div class="title">Legacy Outer Card Title (Should be Blue)</div>
+        <div class="content">
+          <div class="nested-widget">
+            <div class="title">Nested Widget Title (Should be Green, but leaked Blue!)</div>
+            <p>Unscoped CSS descendant selectors pollute child component slots.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AFTER SECTION -->
+    <section class="demo-section">
+      <h2>After: Native <code>@scope</code> with Donut Boundary & CSS Nesting</h2>
+      <p>Using <code>@scope (.scoped-card) to (.scoped-card__content)</code>, styles stop at the content boundary, allowing the inner widget to maintain its pristine green branding:</p>
+
+      <article class="scoped-card">
+        <header class="scoped-card__header">
+          <h3 class="title">Scoped Outer Card Title (Blue)</h3>
+        </header>
+
+        <!-- Donut Boundary Start: .scoped-card__content -->
+        <div class="scoped-card__content" style="padding: 1rem;">
+          <div class="nested-widget">
+            <h4 class="title">Nested Widget Title (Correctly Protected Green!)</h4>
+            <span class="badge">Isolated Scope</span>
+            <p style="margin: 0.5rem 0 0 0; font-size: 0.875rem;">
+              The donut scope ensures child/slotted components retain complete style autonomy.
+            </p>
+          </div>
+        </div>
+        <!-- Donut Boundary End -->
+
+        <footer class="scoped-card__footer">
+          <small>Card Footer - Still inside outer scope</small>
+        </footer>
+      </article>
+    </section>
+
+    <!-- PROXIMITY DEMO SECTION -->
+    <section class="demo-section">
+      <h2>Scope Proximity Cascade Resolution</h2>
+      <p>When scopes are nested, styles resolve by DOM proximity to the scoping root rather than declaration order or artificial specificity bumps:</p>
+
+      <div class="dark-wrapper">
+        <p class="status-text">Dark Wrapper Text (Dim Gray)</p>
+
+        <!-- Nested light panel inside dark wrapper -->
+        <div class="light-panel">
+          <p class="status-text">Light Panel Text (Blue - Wins via Proximity!)</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

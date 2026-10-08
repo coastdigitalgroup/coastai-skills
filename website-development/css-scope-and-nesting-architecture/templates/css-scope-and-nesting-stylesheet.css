@@ -1,0 +1,196 @@
+/**
+ * CSS Scope and Nesting Architecture Boilerplate Stylesheet
+ *
+ * Demonstrates native W3C CSS @scope, Donut Scoping, Native CSS Nesting (&),
+ * and progressive enhancement fallbacks.
+ */
+
+/* ==========================================================================
+   1. Progressive Enhancement & Fallback Baseline
+   ========================================================================== */
+
+/* Fallback styles for older browsers lacking native @scope support */
+.ui-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  max-width: 32rem;
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+.ui-dialog .dialog-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* ==========================================================================
+   2. Native @scope Implementation with Donut Boundary
+   ========================================================================== */
+
+@supports (scope: (.test)) {
+  /**
+   * Dialog Component Scope
+   * Scoping Root: .ui-dialog
+   * Donut Limit:  .ui-dialog__body (Slotted dynamic content area)
+   */
+  @scope (.ui-dialog) to (.ui-dialog__body) {
+    /* Target the scoping root element itself using :scope */
+    :scope {
+      position: fixed;
+      inset: 0;
+      margin: auto;
+      max-width: 32rem;
+      width: calc(100% - 2rem);
+      height: fit-content;
+      padding: 0;
+      background-color: #ffffff;
+      border-radius: 0.75rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+
+      /* Native CSS Nesting for dialog state pseudo-classes */
+      &::backdrop {
+        background-color: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(4px);
+      }
+
+      /* Native CSS Container Query nested directly inside component scope */
+      @container (max-width: 480px) {
+        max-width: 100%;
+        border-radius: 0.5rem;
+      }
+    }
+
+    /* Dialog Header */
+    .ui-dialog__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid #f1f5f9;
+
+      /* Nested Title element */
+      .dialog-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #0f172a;
+        margin: 0;
+      }
+
+      /* Nested Close Action Button */
+      .close-button {
+        appearance: none;
+        background: transparent;
+        border: none;
+        padding: 0.375rem;
+        border-radius: 0.375rem;
+        color: #64748b;
+        cursor: pointer;
+
+        /* Native Nesting for interaction states */
+        &:hover {
+          background-color: #f1f5f9;
+          color: #0f172a;
+        }
+
+        &:focus-visible {
+          outline: 2px solid #2563eb;
+          outline-offset: 2px;
+        }
+      }
+    }
+
+    /* Dialog Action Footer */
+    .ui-dialog__footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      padding: 1rem 1.5rem;
+      background-color: #f8fafc;
+      border-top: 1px solid #f1f5f9;
+
+      /* Compound class nesting */
+      .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: 0.375rem;
+        border: 1px solid transparent;
+        cursor: pointer;
+
+        &--secondary {
+          background-color: #ffffff;
+          border-color: #cbd5e1;
+          color: #334155;
+
+          &:hover {
+            background-color: #f8fafc;
+          }
+        }
+
+        &--primary {
+          background-color: #2563eb;
+          color: #ffffff;
+
+          &:hover {
+            background-color: #1d4ed8;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* ==========================================================================
+   3. Independent Child Component (Plugged into .ui-dialog__body slot)
+   ========================================================================== */
+
+@supports (scope: (.test)) {
+  /**
+   * Rich Text Form / Slotted Content Scope
+   * Fully protected from .ui-dialog internal rules by the donut limit
+   */
+  @scope (.user-content-form) {
+    :scope {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+
+      label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #334155;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.375rem;
+        font-family: inherit;
+        font-size: 0.875rem;
+
+        &:focus {
+          outline: none;
+          border-color: #2563eb;
+          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+      }
+    }
+  }
+}
