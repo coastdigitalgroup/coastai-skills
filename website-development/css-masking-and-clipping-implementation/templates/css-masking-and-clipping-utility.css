@@ -1,0 +1,189 @@
+/* ==========================================================================
+   CSS Masking & Clipping Production Utility Library
+   https://github.com/website-development/css-masking-and-clipping-implementation
+   ========================================================================== */
+
+:root {
+  /* Default Mask Fade Widths */
+  --mask-fade-size-x: 1.5rem;
+  --mask-fade-size-y: 1.5rem;
+
+  /* Focus Ring Colors */
+  --mask-focus-color: #38bdf8;
+  --mask-focus-offset: 3px;
+}
+
+/* ==========================================================================
+   1. SCROLL CONTAINER EDGE MASK FADES
+   ========================================================================== */
+
+/* Horizontal Fade (Both Left and Right Edges) */
+.mask-fade-x {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black var(--mask-fade-size-x),
+    black calc(100% - var(--mask-fade-size-x)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black var(--mask-fade-size-x),
+    black calc(100% - var(--mask-fade-size-x)),
+    transparent 100%
+  );
+}
+
+/* Horizontal Fade Start (Left Edge Only) */
+.mask-fade-start-x {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black var(--mask-fade-size-x)
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black var(--mask-fade-size-x)
+  );
+}
+
+/* Horizontal Fade End (Right Edge Only) */
+.mask-fade-end-x {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    black calc(100% - var(--mask-fade-size-x)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    black calc(100% - var(--mask-fade-size-x)),
+    transparent 100%
+  );
+}
+
+/* Vertical Fade (Both Top and Bottom Edges) */
+.mask-fade-y {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    black var(--mask-fade-size-y),
+    black calc(100% - var(--mask-fade-size-y)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    black var(--mask-fade-size-y),
+    black calc(100% - var(--mask-fade-size-y)),
+    transparent 100%
+  );
+}
+
+/* ==========================================================================
+   2. GEOMETRIC CLIP-PATH UTILITIES
+   ========================================================================== */
+
+/* Sloped Bottom Angle (e.g. Hero cards, section dividers) */
+.clip-sloped-bottom {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 2.5rem), 0 100%);
+}
+
+/* Sloped Top Angle */
+.clip-sloped-top {
+  clip-path: polygon(0 2.5rem, 100% 0, 100% 100%, 0 100%);
+}
+
+/* Octagon Frame */
+.clip-octagon {
+  clip-path: polygon(
+    30% 0%, 70% 0%,
+    100% 30%, 100% 70%,
+    70% 100%, 30% 100%,
+    0% 70%, 0% 30%
+  );
+}
+
+/* Message Bubble Tail (Bottom Right Tail) */
+.clip-speech-bubble {
+  clip-path: polygon(
+    0% 0%, 100% 0%,
+    100% calc(100% - 12px),
+    calc(100% - 12px) calc(100% - 12px),
+    100% 100%,
+    calc(100% - 24px) calc(100% - 12px),
+    0% calc(100% - 12px)
+  );
+}
+
+/* Circle Geometry */
+.clip-circle {
+  clip-path: circle(50% at 50% 50%);
+}
+
+/* Teardrop Avatar */
+.clip-teardrop {
+  clip-path: polygon(0% 50%, 50% 0%, 100% 50%, 50% 100%);
+  border-radius: 50% 50% 50% 0%;
+}
+
+/* ==========================================================================
+   3. AVATAR BADGE PUNCH-OUT MASK UTILITIES
+   ========================================================================== */
+
+/* Punch out a bottom-right circular notch from a 64x64 avatar */
+.mask-punchout-avatar-lg {
+  -webkit-mask-image: radial-gradient(circle at 52px 52px, transparent 11px, black 12px);
+  mask-image: radial-gradient(circle at 52px 52px, transparent 11px, black 12px);
+}
+
+/* Punch out a bottom-right circular notch from a 40x40 avatar */
+.mask-punchout-avatar-md {
+  -webkit-mask-image: radial-gradient(circle at 32px 32px, transparent 8px, black 9px);
+  mask-image: radial-gradient(circle at 32px 32px, transparent 8px, black 9px);
+}
+
+/* ==========================================================================
+   4. FOCUS RING & INTERACTIVE SAFETY WRAPPER
+   ========================================================================== */
+
+/* Outer Focus Wrapper (Place clip-path on inner element, focus ring on wrapper) */
+.clip-focus-wrapper {
+  position: relative;
+  display: inline-block;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 0.375rem;
+}
+
+.clip-focus-wrapper:focus-visible {
+  outline: 2px solid var(--mask-focus-color);
+  outline-offset: var(--mask-focus-offset);
+}
+
+/* ==========================================================================
+   5. HIGH CONTRAST & FORCED COLORS MODE FALLBACKS
+   ========================================================================== */
+@media (forced-colors: active) {
+  .mask-fade-x,
+  .mask-fade-start-x,
+  .mask-fade-end-x,
+  .mask-fade-y,
+  .mask-punchout-avatar-lg,
+  .mask-punchout-avatar-md {
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+
+  .clip-sloped-bottom,
+  .clip-sloped-top,
+  .clip-octagon,
+  .clip-speech-bubble,
+  .clip-circle,
+  .clip-teardrop {
+    border: 1px solid CanvasText;
+  }
+}
