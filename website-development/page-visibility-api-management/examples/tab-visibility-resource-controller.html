@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Visibility API Management - Interactive Example</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --success: #4ade80;
+      --warning: #fbbf24;
+      --danger: #f87171;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: 1.875rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+    }
+
+    .status-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 2rem;
+      transition: border-color 0.3s ease;
+    }
+
+    .status-banner.is-visible {
+      border-color: var(--success);
+    }
+
+    .status-banner.is-hidden {
+      border-color: var(--warning);
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: var(--text-muted);
+    }
+
+    .is-visible .status-dot {
+      background-color: var(--success);
+      box-shadow: 0 0 10px var(--success);
+    }
+
+    .is-hidden .status-dot {
+      background-color: var(--warning);
+      box-shadow: 0 0 10px var(--warning);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .card h2 {
+      font-size: 1.25rem;
+      color: var(--primary);
+    }
+
+    .canvas-container {
+      position: relative;
+      width: 100%;
+      height: 180px;
+      background-color: #020617;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      font-family: monospace;
+      font-size: 0.9rem;
+      padding: 0.25rem 0;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .metric-row:last-child {
+      border-bottom: none;
+    }
+
+    .metric-value {
+      font-weight: bold;
+      color: var(--text);
+    }
+
+    .log-panel {
+      background-color: #020617;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: monospace;
+      font-size: 0.85rem;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .log-entry {
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+
+    .log-entry.visible { color: var(--success); }
+    .log-entry.hidden { color: var(--warning); }
+    .log-entry.beacon { color: var(--primary); }
+
+    .instructions {
+      background: rgba(56, 189, 248, 0.1);
+      border-left: 4px solid var(--primary);
+      padding: 1rem;
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Page Visibility API Management</h1>
+      <p class="subtitle">Demonstrates active resource management, canvas animation pausing, adaptive API polling, and beacon flushing when tab visibility changes.</p>
+    </header>
+
+    <div class="instructions">
+      💡 <strong>Test Instructions:</strong> Switch to another tab or minimize this window for 5–10 seconds, then return. Notice how frame loops pause completely (preventing delta jumps and CPU drain), API polling stretches out, and telemetry beacons flush automatically upon tab hiding.
+    </div>
+
+    <div id="statusBanner" class="status-banner is-visible">
+      <div class="status-indicator">
+        <div class="status-dot"></div>
+        <div>
+          <strong id="statusText">Tab State: VISIBLE</strong>
+          <div style="font-size: 0.85rem; color: var(--text-muted);" id="statusSubtext">Document is active in frontmost window</div>
+        </div>
+      </div>
+      <div style="font-family: monospace; text-align: right;">
+        <div>Hidden Count: <span id="hiddenCount" class="metric-value">0</span></div>
+        <div>Total Background Time: <span id="bgTime" class="metric-value">0s</span></div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- Unoptimized vs Optimized Canvas Card -->
+      <div class="card">
+        <h2>1. Canvas Render Loop Management</h2>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">
+          Properly cancels <code>requestAnimationFrame</code> on hide and resets time deltas on restore to eliminate CPU load and animation physics glitches.
+        </p>
+        <div class="canvas-container">
+          <canvas id="animCanvas"></canvas>
+        </div>
+        <div>
+          <div class="metric-row">
+            <span>Render Status:</span>
+            <span id="renderStatus" class="metric-value" style="color: var(--success);">ACTIVE (60 FPS)</span>
+          </div>
+          <div class="metric-row">
+            <span>Total Frames Rendered:</span>
+            <span id="frameCount" class="metric-value">0</span>
+          </div>
+          <div class="metric-row">
+            <span>Last Frame Delta (dt):</span>
+            <span id="frameDelta" class="metric-value">16.6ms</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Adaptive Poller & Telemetry Card -->
+      <div class="card">
+        <h2>2. Adaptive Polling & Telemetry Flushing</h2>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">
+          Stretches API polling interval when hidden (2s → 30s) and flushes buffered analytics via <code>navigator.sendBeacon</code> upon tab backgrounding.
+        </p>
+        <div>
+          <div class="metric-row">
+            <span>Polling Mode:</span>
+            <span id="pollMode" class="metric-value" style="color: var(--success);">ACTIVE (2s interval)</span>
+          </div>
+          <div class="metric-row">
+            <span>Poll Requests Sent:</span>
+            <span id="pollCount" class="metric-value">0</span>
+          </div>
+          <div class="metric-row">
+            <span>Pending Analytics Events:</span>
+            <span id="analyticsCount" class="metric-value">0</span>
+          </div>
+          <div class="metric-row">
+            <span>Last Beacon Flushed:</span>
+            <span id="lastBeacon" class="metric-value">None</span>
+          </div>
+        </div>
+        <button id="addMetricBtn" style="background: var(--primary); color: #020617; border: none; padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold; cursor: pointer;">
+          + Track User Action Event
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Lifecycle Event Log</h2>
+      <div id="logPanel" class="log-panel">
+        <div class="log-entry">[System] Page Visibility Monitor Initialized. Document state: visible</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- 1. PAGE VISIBILITY CONTROLLER ---
+    class VisibilityManager {
+      constructor() {
+        this.hiddenCount = 0;
+        this.totalBackgroundMs = 0;
+        this.lastHiddenTime = null;
+
+        this.visibleCallbacks = new Set();
+        this.hiddenCallbacks = new Set();
+
+        this.init();
+      }
+
+      init() {
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'hidden') {
+            this.handleHidden();
+          } else {
+            this.handleVisible();
+          }
+        });
+      }
+
+      handleHidden() {
+        this.hiddenCount++;
+        this.lastHiddenTime = performance.now();
+        this.hiddenCallbacks.forEach(cb => cb());
+      }
+
+      handleVisible() {
+        let duration = 0;
+        if (this.lastHiddenTime) {
+          duration = performance.now() - this.lastHiddenTime;
+          this.totalBackgroundMs += duration;
+          this.lastHiddenTime = null;
+        }
+        this.visibleCallbacks.forEach(cb => cb(duration));
+      }
+
+      onVisible(cb) { this.visibleCallbacks.add(cb); }
+      onHidden(cb) { this.hiddenCallbacks.add(cb); }
+    }
+
+    const visibilityMgr = new VisibilityManager();
+
+    // --- 2. DOM UI UPDATE HANDLERS ---
+    const statusBanner = document.getElementById('statusBanner');
+    const statusText = document.getElementById('statusText');
+    const statusSubtext = document.getElementById('statusSubtext');
+    const hiddenCountEl = document.getElementById('hiddenCount');
+    const bgTimeEl = document.getElementById('bgTime');
+    const logPanel = document.getElementById('logPanel');
+
+    function addLog(msg, type = '') {
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      const time = new Date().toLocaleTimeString();
+      entry.textContent = `[${time}] ${msg}`;
+      logPanel.appendChild(entry);
+      logPanel.scrollTop = logPanel.scrollHeight;
+    }
+
+    visibilityMgr.onHidden(() => {
+      statusBanner.className = 'status-banner is-hidden';
+      statusText.textContent = 'Tab State: HIDDEN';
+      statusSubtext.textContent = 'Resource loops paused, polling throttled';
+      hiddenCountEl.textContent = visibilityMgr.hiddenCount;
+      addLog(`Tab changed to HIDDEN. Execution loops suspended.`, 'hidden');
+    });
+
+    visibilityMgr.onVisible((bgDuration) => {
+      statusBanner.className = 'status-banner is-visible';
+      statusText.textContent = 'Tab State: VISIBLE';
+      statusSubtext.textContent = 'Document is active in frontmost window';
+      bgTimeEl.textContent = `${(visibilityMgr.totalBackgroundMs / 1000).toFixed(1)}s`;
+      addLog(`Tab restored to VISIBLE. Background duration: ${(bgDuration / 1000).toFixed(2)}s`, 'visible');
+    });
+
+    // --- 3. CANVAS ANIMATION CONTROLLER (Pauses on Hide, Resets Delta on Restore) ---
+    const canvas = document.getElementById('animCanvas');
+    const ctx = canvas.getContext('2d');
+    const renderStatus = document.getElementById('renderStatus');
+    const frameCountEl = document.getElementById('frameCount');
+    const frameDeltaEl = document.getElementById('frameDelta');
+
+    let animationId = null;
+    let totalFrames = 0;
+    let lastFrameTime = performance.now();
+    let particleX = 50;
+    let particleSpeed = 120; // pixels per second
+
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function renderLoop(currentTime) {
+      // 1. Calculate delta time in seconds
+      const dt = (currentTime - lastFrameTime) / 1000;
+      lastFrameTime = currentTime;
+
+      // Update particle physics
+      particleX += particleSpeed * dt;
+      if (particleX > canvas.width - 20 || particleX < 20) {
+        particleSpeed *= -1;
+      }
+
+      // Draw canvas scene
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.arc(particleX, canvas.height / 2, 16, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Update UI metrics
+      totalFrames++;
+      frameCountEl.textContent = totalFrames;
+      frameDeltaEl.textContent = `${(dt * 1000).toFixed(1)}ms`;
+
+      if (document.visibilityState === 'visible') {
+        animationId = requestAnimationFrame(renderLoop);
+      }
+    }
+
+    function startAnimation() {
+      if (!animationId) {
+        lastFrameTime = performance.now(); // Prevent frame delta jump!
+        animationId = requestAnimationFrame(renderLoop);
+        renderStatus.textContent = 'ACTIVE (60 FPS)';
+        renderStatus.style.color = 'var(--success)';
+      }
+    }
+
+    function stopAnimation() {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+        renderStatus.textContent = 'PAUSED (0 FPS - CPU Saved)';
+        renderStatus.style.color = 'var(--warning)';
+      }
+    }
+
+    startAnimation();
+    visibilityMgr.onHidden(() => stopAnimation());
+    visibilityMgr.onVisible(() => startAnimation());
+
+    // --- 4. ADAPTIVE POLLING & TELEMETRY BEACON FLUSHING ---
+    const pollModeEl = document.getElementById('pollMode');
+    const pollCountEl = document.getElementById('pollCount');
+    const analyticsCountEl = document.getElementById('analyticsCount');
+    const lastBeaconEl = document.getElementById('lastBeacon');
+    const addMetricBtn = document.getElementById('addMetricBtn');
+
+    let pollCount = 0;
+    let pollTimer = null;
+    let analyticsQueue = [];
+
+    function schedulePoll() {
+      if (pollTimer) clearTimeout(pollTimer);
+
+      const isHidden = document.visibilityState === 'hidden';
+      const interval = isHidden ? 30000 : 2000; // 30s when hidden, 2s when visible
+
+      pollModeEl.textContent = isHidden ? 'THROTTLED (30s interval)' : 'ACTIVE (2s interval)';
+      pollModeEl.style.color = isHidden ? 'var(--warning)' : 'var(--success)';
+
+      pollTimer = setTimeout(() => {
+        pollCount++;
+        pollCountEl.textContent = pollCount;
+        addLog(`Executed background API poll #${pollCount} [${isHidden ? 'Throttled' : 'Active'}]`);
+        schedulePoll();
+      }, interval);
+    }
+
+    schedulePoll();
+    visibilityMgr.onHidden(() => schedulePoll());
+    visibilityMgr.onVisible(() => schedulePoll());
+
+    // Telemetry Buffer
+    addMetricBtn.addEventListener('click', () => {
+      const event = { type: 'USER_CLICK', timestamp: Date.now() };
+      analyticsQueue.push(event);
+      analyticsCountEl.textContent = analyticsQueue.length;
+      addLog(`Buffered user analytics action event. Total queued: ${analyticsQueue.length}`);
+    });
+
+    function flushTelemetry() {
+      if (analyticsQueue.length === 0) return;
+
+      const payload = JSON.stringify({
+        events: analyticsQueue,
+        flushTime: Date.now()
+      });
+
+      // Attempt sendBeacon
+      let success = false;
+      if (navigator.sendBeacon) {
+        const blob = new Blob([payload], { type: 'application/json' });
+        success = navigator.sendBeacon('/api/analytics-collector', blob);
+      }
+
+      addLog(`Flushed ${analyticsQueue.length} telemetry items via sendBeacon(). Success: ${success}`, 'beacon');
+      lastBeaconEl.textContent = `${analyticsQueue.length} items @ ${new Date().toLocaleTimeString()}`;
+      analyticsQueue = [];
+      analyticsCountEl.textContent = 0;
+    }
+
+    visibilityMgr.onHidden(() => flushTelemetry());
+  </script>
+</body>
+</html>
