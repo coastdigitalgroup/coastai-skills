@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Changelog & Release Notes System Spec</title>
+  <style>
+    :root {
+      --color-bg-app: #f8fafc;
+      --color-surface-card: #ffffff;
+      --color-border-subtle: #e2e8f0;
+      --color-border-strong: #cbd5e1;
+
+      --color-text-primary: #0f172a;
+      --color-text-secondary: #475569;
+      --color-text-muted: #64748b;
+
+      --color-primary-accent: #2563eb;
+      --color-primary-focus: #1d4ed8;
+
+      /* Badge Colors (Compliant with WCAG AA >= 4.5:1) */
+      --badge-added-bg: rgba(16, 185, 129, 0.12);
+      --badge-added-text: #047857;
+
+      --badge-improved-bg: rgba(59, 130, 246, 0.12);
+      --badge-improved-text: #1d4ed8;
+
+      --badge-fixed-bg: rgba(245, 158, 11, 0.12);
+      --badge-fixed-text: #b45309;
+
+      --badge-security-bg: rgba(139, 92, 246, 0.12);
+      --badge-security-text: #6d28d9;
+
+      --badge-deprecated-bg: rgba(239, 68, 68, 0.12);
+      --badge-deprecated-text: #b91c1c;
+
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-bg-app: #0f172a;
+        --color-surface-card: #1e293b;
+        --color-border-subtle: #334155;
+        --color-border-strong: #475569;
+
+        --color-text-primary: #f8fafc;
+        --color-text-secondary: #cbd5e1;
+        --color-text-muted: #94a3b8;
+
+        --color-primary-accent: #3b82f6;
+        --color-primary-focus: #60a5fa;
+
+        --badge-added-bg: rgba(16, 185, 129, 0.2);
+        --badge-added-text: #34d399;
+
+        --badge-improved-bg: rgba(59, 130, 246, 0.2);
+        --badge-improved-text: #60a5fa;
+
+        --badge-fixed-bg: rgba(245, 158, 11, 0.2);
+        --badge-fixed-text: #fbbf24;
+
+        --badge-security-bg: rgba(139, 92, 246, 0.2);
+        --badge-security-text: #a78bfa;
+
+        --badge-deprecated-bg: rgba(239, 68, 68, 0.2);
+        --badge-deprecated-text: #f87171;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--color-bg-app);
+      color: var(--color-text-primary);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+
+    .changelog-container {
+      max-width: 880px;
+      margin: 0 auto;
+    }
+
+    /* Header & Controls */
+    .changelog-header {
+      margin-bottom: 2.5rem;
+      text-align: left;
+    }
+
+    .changelog-header h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      margin-bottom: 0.5rem;
+    }
+
+    .changelog-header p {
+      color: var(--color-text-secondary);
+      font-size: 1.125rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .changelog-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+
+    .filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .filter-btn {
+      background: transparent;
+      border: 1px solid var(--color-border-strong);
+      color: var(--color-text-secondary);
+      padding: 0.375rem 0.875rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn:hover {
+      background: var(--color-border-subtle);
+      color: var(--color-text-primary);
+    }
+
+    .filter-btn[aria-pressed="true"] {
+      background: var(--color-primary-accent);
+      border-color: var(--color-primary-accent);
+      color: #ffffff;
+    }
+
+    .filter-btn:focus-visible {
+      outline: 2px solid var(--color-primary-focus);
+      outline-offset: 2px;
+    }
+
+    .search-input {
+      padding: 0.5rem 0.875rem;
+      border: 1px solid var(--color-border-strong);
+      border-radius: 6px;
+      background: var(--color-surface-card);
+      color: var(--color-text-primary);
+      font-size: 0.875rem;
+      min-width: 220px;
+    }
+
+    .search-input:focus-visible {
+      outline: 2px solid var(--color-primary-focus);
+      outline-offset: 1px;
+    }
+
+    /* Timeline Section Layout */
+    .timeline-feed {
+      position: relative;
+      padding-top: 1.5rem;
+    }
+
+    /* Vertical Timeline Spine Line */
+    .timeline-feed::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 170px;
+      width: 2px;
+      background-color: var(--color-border-subtle);
+    }
+
+    .release-entry {
+      position: relative;
+      display: grid;
+      grid-template-columns: 170px 1fr;
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .release-meta {
+      position: relative;
+      padding-right: 1.5rem;
+      text-align: right;
+    }
+
+    .release-node-dot {
+      position: absolute;
+      top: 6px;
+      right: -25px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--color-bg-app);
+      border: 3px solid var(--color-primary-accent);
+      z-index: 2;
+    }
+
+    .release-date {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+    }
+
+    .release-version {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-primary-accent);
+      background: var(--color-border-subtle);
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-top: 0.25rem;
+    }
+
+    .release-card {
+      background: var(--color-surface-card);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: 10px;
+      padding: 1.75rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .release-card-header {
+      margin-bottom: 1rem;
+    }
+
+    .release-title {
+      font-size: 1.375rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 0.5rem;
+    }
+
+    .badge-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      border: 1px solid transparent;
+    }
+
+    .badge--added {
+      background-color: var(--badge-added-bg);
+      color: var(--badge-added-text);
+    }
+
+    .badge--improved {
+      background-color: var(--badge-improved-bg);
+      color: var(--badge-improved-text);
+    }
+
+    .badge--fixed {
+      background-color: var(--badge-fixed-bg);
+      color: var(--badge-fixed-text);
+    }
+
+    .badge--security {
+      background-color: var(--badge-security-bg);
+      color: var(--badge-security-text);
+    }
+
+    .badge--deprecated {
+      background-color: var(--badge-deprecated-bg);
+      color: var(--badge-deprecated-text);
+    }
+
+    /* Content Body */
+    .release-body {
+      color: var(--color-text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .release-body p {
+      margin-bottom: 1rem;
+    }
+
+    .media-container {
+      margin: 1.25rem 0;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--color-border-subtle);
+      background: var(--color-bg-app);
+      aspect-ratio: 16 / 9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .media-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .change-group {
+      margin-top: 1.25rem;
+    }
+
+    .change-group h3 {
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .change-list {
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    .change-list li {
+      position: relative;
+      padding-left: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .change-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--color-primary-accent);
+      font-weight: bold;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--color-border-subtle);
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+    }
+
+    /* Card Footer & Actions */
+    .release-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--color-border-subtle);
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+    }
+
+    .copy-link-btn {
+      background: transparent;
+      border: none;
+      color: var(--color-primary-accent);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .copy-link-btn:focus-visible {
+      outline: 2px solid var(--color-primary-focus);
+      outline-offset: 2px;
+    }
+
+    /* Accessibility Screen Reader Only Utility */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Responsive Breakdown (< 768px) */
+    @media (max-width: 768px) {
+      .timeline-feed::before {
+        display: none;
+      }
+
+      .release-entry {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+
+      .release-meta {
+        text-align: left;
+        padding-right: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .release-node-dot {
+        display: none;
+      }
+
+      .changelog-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-input {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="changelog-container">
+
+    <!-- Header Section -->
+    <header class="changelog-header">
+      <h1>Product Updates & Release Notes</h1>
+      <p>Discover new capabilities, speed improvements, and bug fixes shipped to the platform.</p>
+
+      <!-- Interactive Controls -->
+      <div class="changelog-controls">
+        <div class="filter-group" role="group" aria-label="Filter releases by category">
+          <button type="button" class="filter-btn" aria-pressed="true">All Updates</button>
+          <button type="button" class="filter-btn" aria-pressed="false">Added</button>
+          <button type="button" class="filter-btn" aria-pressed="false">Improved</button>
+          <button type="button" class="filter-btn" aria-pressed="false">Fixed</button>
+          <button type="button" class="filter-btn" aria-pressed="false">Security</button>
+        </div>
+
+        <input
+          type="search"
+          class="search-input"
+          placeholder="Search releases..."
+          aria-label="Search release notes by keyword"
+        >
+      </div>
+
+      <!-- Live Region for Filter Announcements -->
+      <div class="sr-only" aria-live="polite" id="filter-announcement">
+        Showing all release updates.
+      </div>
+    </header>
+
+    <!-- Timeline Release Feed -->
+    <main class="timeline-feed">
+
+      <!-- Release Entry 1 -->
+      <article class="release-entry" aria-labelledby="release-title-v2-4-0">
+        <div class="release-meta">
+          <span class="release-node-dot" aria-hidden="true"></span>
+          <time datetime="2025-02-15" class="release-date">Feb 15, 2025</time>
+          <span class="release-version">v2.4.0</span>
+        </div>
+
+        <div class="release-card">
+          <header class="release-card-header">
+            <h2 id="release-title-v2-4-0" class="release-title">
+              Dark Mode Theme & Executive Custom Dashboards
+            </h2>
+            <div class="badge-wrapper">
+              <span class="badge badge--added">Added</span>
+              <span class="badge badge--improved">Improved</span>
+            </div>
+          </header>
+
+          <div class="release-body">
+            <p>
+              We are excited to introduce full dark mode support across all analytics dashboards,
+              alongside drag-and-drop customization for executive metric widgets.
+            </p>
+
+            <div class="media-container">
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450' viewBox='0 0 800 450'%3E%3Crect width='100%25' height='100%25' fill='%231e293b'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-family='sans-serif' font-size='20'%3EDark Mode Preview Screenshot (16:9)%3C/text%3E%3C/svg%3E"
+                alt="Screenshot showing dark mode analytics dashboard with revenue charts"
+                loading="lazy"
+                width="800"
+                height="450"
+              >
+            </div>
+
+            <div class="change-group">
+              <h3>Added Features</h3>
+              <ul class="change-list">
+                <li>System-aware dark theme toggle accessible in <code>Settings &gt; Appearance</code>.</li>
+                <li>12 customizable metric widget templates for ARR and cohort retention.</li>
+              </ul>
+            </div>
+
+            <div class="change-group">
+              <h3>Improvements & Fixes</h3>
+              <ul class="change-list">
+                <li>Reduced initial dashboard script bundle size by 34%.</li>
+                <li>Fixed grid alignment stutter on high-DPI retina display screens.</li>
+              </ul>
+            </div>
+          </div>
+
+          <footer class="release-footer">
+            <span>Published by Product Engineering</span>
+            <button type="button" class="copy-link-btn" aria-label="Copy direct permalink for v2.4.0 release">
+              🔗 Copy Permalink
+            </button>
+          </footer>
+        </div>
+      </article>
+
+      <!-- Release Entry 2 -->
+      <article class="release-entry" aria-labelledby="release-title-v2-3-1">
+        <div class="release-meta">
+          <span class="release-node-dot" aria-hidden="true"></span>
+          <time datetime="2025-01-20" class="release-date">Jan 20, 2025</time>
+          <span class="release-version">v2.3.1</span>
+        </div>
+
+        <div class="release-card">
+          <header class="release-card-header">
+            <h2 id="release-title-v2-3-1" class="release-title">
+              REST API Webhook Delivery Filters & Security Patch
+            </h2>
+            <div class="badge-wrapper">
+              <span class="badge badge--security">Security</span>
+              <span class="badge badge--fixed">Fixed</span>
+            </div>
+          </header>
+
+          <div class="release-body">
+            <p>
+              This maintenance update introduces HMAC SHA-256 signature enforcement on outbound webhooks
+              and patches an edge-case token expiration issue.
+            </p>
+
+            <div class="change-group">
+              <h3>Security Upgrades</h3>
+              <ul class="change-list">
+                <li>Enforced <code>X-Signature-SHA256</code> header validation on all webhooks.</li>
+                <li>Patched auth token cache invalidation logic during API key rotation.</li>
+              </ul>
+            </div>
+          </div>
+
+          <footer class="release-footer">
+            <span>Published by Tech Ops</span>
+            <button type="button" class="copy-link-btn" aria-label="Copy direct permalink for v2.3.1 release">
+              🔗 Copy Permalink
+            </button>
+          </footer>
+        </div>
+      </article>
+
+    </main>
+  </div>
+
+</body>
+</html>
