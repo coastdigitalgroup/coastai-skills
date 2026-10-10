@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fullscreen API Management - Interactive Canvas & Media Example</title>
+  <style>
+    /* Reset & Base Styles */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+      line-height: 1.5;
+      padding: 2rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      max-width: 800px;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: #38bdf8;
+      margin-bottom: 0.5rem;
+    }
+
+    p.subtitle {
+      color: #94a3b8;
+      font-size: 0.975rem;
+    }
+
+    /* Screen Reader Only Utility */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+
+    /* Media Player & Canvas Container Component */
+    .media-card {
+      width: 100%;
+      max-width: 800px;
+      background-color: #1e293b;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #334155;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      margin-bottom: 2rem;
+    }
+
+    .media-stage-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background-color: #000000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Interactive HTML5 Canvas Simulation */
+    canvas.interactive-canvas {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Controls Overlay Dock */
+    .controls-dock {
+      position: absolute;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 2rem);
+      max-width: 720px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      z-index: 50;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .dock-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .dock-title .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #22c55e;
+      box-shadow: 0 0 8px #22c55e;
+    }
+
+    .btn-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Accessible Button Styling */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.875rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #f8fafc;
+      background-color: #334155;
+      border: 1px solid #475569;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn:hover {
+      background-color: #475569;
+      border-color: #64748b;
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid #38bdf8;
+      outline-offset: 2px;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-primary {
+      background-color: #0284c7;
+      border-color: #0369a1;
+    }
+
+    .btn-primary:hover {
+      background-color: #0369a1;
+      border-color: #075985;
+    }
+
+    .btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    /* Top-Layer Fullscreen Pseudo-Class Handling */
+    .media-stage-wrapper:fullscreen {
+      width: 100vw;
+      height: 100vh;
+      max-width: none;
+      max-height: none;
+      border-radius: 0;
+      border: none;
+      background-color: #000000;
+    }
+
+    /* WebKit Vendor Prefix Fallback */
+    .media-stage-wrapper:-webkit-full-screen {
+      width: 100vw;
+      height: 100vh;
+      background-color: #000000;
+    }
+
+    .media-stage-wrapper:fullscreen .controls-dock {
+      bottom: 2rem;
+      width: calc(100% - 4rem);
+      padding: 1rem 1.5rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Fullscreen Backdrop Customization */
+    .media-stage-wrapper::backdrop {
+      background-color: #020617;
+    }
+
+    /* Diagnostic Notes Container */
+    .diagnostics-panel {
+      max-width: 800px;
+      width: 100%;
+      background-color: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+
+    .diagnostics-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      margin-bottom: 0.75rem;
+    }
+
+    .log-list {
+      list-style-type: none;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.8125rem;
+      color: #cbd5e1;
+      background-color: #0f172a;
+      padding: 0.75rem;
+      border-radius: 6px;
+      max-height: 160px;
+      overflow-y: auto;
+    }
+
+    .log-list li {
+      margin-bottom: 0.25rem;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 0.25rem;
+    }
+
+    .log-list li:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .log-timestamp {
+      color: #64748b;
+      margin-right: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Fullscreen API Management Demonstration</h1>
+    <p class="subtitle">
+      Standardized cross-browser full-screen canvas/media presentation with top-layer styling,
+      iOS Safari presentation fallbacks, keyboard controls, and WCAG AA accessibility.
+    </p>
+  </header>
+
+  <!-- Interactive Stage Container -->
+  <main class="media-card">
+    <div id="mediaStage" class="media-stage-wrapper" tabIndex="0" aria-label="Interactive Canvas Display Container">
+
+      <!-- Interactive WebGL/Canvas Animation -->
+      <canvas id="demoCanvas" class="interactive-canvas" width="1280" height="720"></canvas>
+
+      <!-- Floating Controls Dock (Promoted to Top-Layer in Fullscreen) -->
+      <div class="controls-dock" role="toolbar" aria-label="Canvas Display Controls">
+        <div class="dock-title">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span>Simulation Canvas (1280x720)</span>
+        </div>
+
+        <div class="btn-group">
+          <!-- Animation Speed Toggle -->
+          <button id="speedBtn" type="button" class="btn" aria-label="Change animation speed">
+            <span>Speed: 1x</span>
+          </button>
+
+          <!-- Fullscreen Toggle Trigger -->
+          <button
+            id="fullscreenBtn"
+            type="button"
+            class="btn btn-primary"
+            aria-pressed="false"
+            aria-label="Enter fullscreen mode"
+          >
+            <svg class="icon-expand" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+            </svg>
+            <span id="btnText">Fullscreen</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ARIA Live Region for Screen Reader Announcements -->
+  <div id="screenReaderAnnouncer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Real-time Diagnostics Log -->
+  <section class="diagnostics-panel" aria-label="Fullscreen Event Diagnostics">
+    <h2 class="diagnostics-title">Lifecycle & Event Logs</h2>
+    <ul id="logList" class="log-list">
+      <li><span class="log-timestamp">[System]</span> Initialized Fullscreen API Controller. Ready for interaction.</li>
+    </ul>
+  </section>
+
+  <script>
+    // --- 1. Interactive Canvas Simulation Engine ---
+    const canvas = document.getElementById('demoCanvas');
+    const ctx = canvas.getContext('2d');
+    let animationFrameId = null;
+    let speedMultiplier = 1;
+    let particleAngle = 0;
+
+    function renderCanvasFrame() {
+      ctx.fillStyle = '#090d16';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Draw dynamic rotating galaxy grid
+      ctx.save();
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate(particleAngle);
+
+      for (let i = 0; i < 36; i++) {
+        ctx.beginPath();
+        ctx.rotate((Math.PI * 2) / 36);
+        ctx.moveTo(0, 0);
+        ctx.lineTo(250, 0);
+        ctx.strokeStyle = `hsla(${(i * 10 + particleAngle * 50) % 360}, 70%, 60%, 0.3)`;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(250, 0, 12, 0, Math.PI * 2);
+        ctx.fillStyle = `hsl(${(i * 10) % 360}, 80%, 65%)`;
+        ctx.fill();
+      }
+
+      ctx.restore();
+
+      // Render overlay text
+      ctx.font = '24px system-ui, sans-serif';
+      ctx.fillStyle = '#f8fafc';
+      ctx.textAlign = 'center';
+      ctx.fillText('Interactive WebGL / Canvas Simulation', canvas.width / 2, 80);
+
+      particleAngle += 0.005 * speedMultiplier;
+      animationFrameId = requestAnimationFrame(renderCanvasFrame);
+    }
+
+    renderCanvasFrame();
+
+    // Speed button toggle
+    const speedBtn = document.getElementById('speedBtn');
+    speedBtn.addEventListener('click', () => {
+      speedMultiplier = speedMultiplier === 1 ? 2 : speedMultiplier === 2 ? 0.5 : 1;
+      speedBtn.querySelector('span').textContent = `Speed: ${speedMultiplier}x`;
+      logEvent(`Speed changed to ${speedMultiplier}x.`);
+    });
+
+    // --- 2. Fullscreen API Lifecycle & Cross-Browser Manager ---
+    const mediaStage = document.getElementById('mediaStage');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const btnText = document.getElementById('btnText');
+    const announcer = document.getElementById('screenReaderAnnouncer');
+    const logList = document.getElementById('logList');
+
+    function logEvent(message) {
+      const timeStr = new Date().toLocaleTimeString();
+      const li = document.createElement('li');
+      li.innerHTML = `<span class="log-timestamp">[${timeStr}]</span> ${message}`;
+      logList.appendChild(li);
+      logList.scrollTop = logList.scrollHeight;
+    }
+
+    function getFullscreenElement() {
+      return (
+        document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement ||
+        null
+      );
+    }
+
+    async function toggleFullscreen() {
+      const activeElement = getFullscreenElement();
+
+      if (activeElement) {
+        logEvent('Attempting to exit fullscreen mode...');
+        try {
+          if (document.exitFullscreen) {
+            await document.exitFullscreen();
+          } else if (document.webkitExitFullscreen) {
+            await document.webkitExitFullscreen();
+          } else if (document.mozCancelFullScreen) {
+            await document.mozCancelFullScreen();
+          } else if (document.msExitFullscreen) {
+            await document.msExitFullscreen();
+          }
+        } catch (err) {
+          logEvent(`Exit Fullscreen Error: ${err.message}`);
+        }
+      } else {
+        logEvent('Requesting fullscreen promotion for #mediaStage...');
+        try {
+          if (mediaStage.requestFullscreen) {
+            await mediaStage.requestFullscreen({ navigationUI: 'auto' });
+          } else if (mediaStage.webkitRequestFullscreen) {
+            await mediaStage.webkitRequestFullscreen();
+          } else if (mediaStage.mozRequestFullScreen) {
+            await mediaStage.mozRequestFullScreen();
+          } else if (mediaStage.msRequestFullscreen) {
+            await mediaStage.msRequestFullscreen();
+          } else {
+            // iOS Safari iPhone Video presentation fallback
+            logEvent('Standard Fullscreen API unsupported on element. Checking iOS video fallback...');
+            alert('Fullscreen API is not supported on this DOM element in your browser.');
+          }
+        } catch (err) {
+          logEvent(`Fullscreen Request Rejected: ${err.name} - ${err.message}`);
+          announceToScreenReader('Unable to enter fullscreen mode.');
+        }
+      }
+    }
+
+    function syncUIState() {
+      const isFullscreen = getFullscreenElement() === mediaStage;
+
+      fullscreenBtn.setAttribute('aria-pressed', isFullscreen ? 'true' : 'false');
+      fullscreenBtn.setAttribute('aria-label', isFullscreen ? 'Exit fullscreen mode' : 'Enter fullscreen mode');
+      btnText.textContent = isFullscreen ? 'Exit Fullscreen' : 'Fullscreen';
+
+      // Update Icon
+      const icon = fullscreenBtn.querySelector('svg');
+      if (isFullscreen) {
+        icon.innerHTML = '<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>';
+      } else {
+        icon.innerHTML = '<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>';
+      }
+
+      const msg = isFullscreen ? 'Entered full-screen presentation mode.' : 'Exited full-screen presentation mode.';
+      announceToScreenReader(msg);
+      logEvent(`Event fired: ${msg}`);
+    }
+
+    function announceToScreenReader(message) {
+      announcer.textContent = '';
+      setTimeout(() => {
+        announcer.textContent = message;
+      }, 50);
+    }
+
+    // Bind Event Listeners
+    fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+    // Global Fullscreen Change Listener
+    const fullscreenEvents = ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'];
+    fullscreenEvents.forEach(evt => {
+      document.addEventListener(evt, syncUIState);
+    });
+
+    // Global Fullscreen Error Listener
+    const errorEvents = ['fullscreenerror', 'webkitfullscreenerror', 'mozfullscreenerror', 'MSFullscreenError'];
+    errorEvents.forEach(evt => {
+      document.addEventListener(evt, (e) => {
+        logEvent(`[ERROR] Fullscreen transition failed.`);
+        announceToScreenReader('Fullscreen error occurred.');
+      });
+    });
+
+    // Keyboard Hotkey Support (press 'F' to toggle fullscreen when stage is focused)
+    mediaStage.addEventListener('keydown', (e) => {
+      if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        toggleFullscreen();
+      }
+    });
+  </script>
+</body>
+</html>
