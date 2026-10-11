@@ -1,0 +1,112 @@
+/**
+ * CSS Registered Custom Properties Template
+ * W3C CSS Properties and Values API (@property) Standard Definitions
+ *
+ * Provides type-safe custom property declarations for smooth CSS transitions,
+ * gradient animations, conic timer rings, and component scope isolation.
+ */
+
+/* ==========================================================================
+   1. Registered Property Declarations
+   ========================================================================== */
+
+/* Typed Angle Token: Smooth linear/conic gradient rotations */
+@property --ui-gradient-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+/* Typed Color Token 1: Background & border glow color transitions */
+@property --ui-glow-color-start {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: rgba(59, 130, 246, 0);
+}
+
+/* Typed Color Token 2: Secondary gradient color stop transition */
+@property --ui-glow-color-end {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: rgba(139, 92, 246, 1);
+}
+
+/* Typed Percentage Token: Conic radial progress & clip-path masks */
+@property --ui-progress-percent {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+/* Typed Length Token: Animated border-widths, offsets, and shadows */
+@property --ui-shadow-spread {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+/* Typed Number Token: Counter badges & opacity scale factors */
+@property --ui-scale-factor {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+/* ==========================================================================
+   2. Component Pattern Bindings
+   ========================================================================== */
+
+/* Pattern A: Animated Gradient Border & Background Button/Card */
+.ui-registered-card {
+  --ui-gradient-angle: 0deg;
+  --ui-glow-color-start: rgba(59, 130, 246, 0.3);
+  --ui-glow-color-end: rgba(236, 72, 153, 0.8);
+  --ui-shadow-spread: 4px;
+
+  position: relative;
+  background: linear-gradient(
+    var(--ui-gradient-angle),
+    var(--ui-glow-color-start),
+    var(--ui-glow-color-end)
+  );
+  box-shadow: 0 0 var(--ui-shadow-spread) var(--ui-glow-color-start);
+
+  /* Transition on registered variables */
+  transition:
+    --ui-gradient-angle 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+    --ui-glow-color-start 0.4s ease,
+    --ui-glow-color-end 0.4s ease,
+    --ui-shadow-spread 0.4s ease;
+}
+
+.ui-registered-card:hover,
+.ui-registered-card:focus-visible {
+  --ui-gradient-angle: 180deg;
+  --ui-glow-color-start: rgba(236, 72, 153, 0.8);
+  --ui-glow-color-end: rgba(59, 130, 246, 1);
+  --ui-shadow-spread: 16px;
+}
+
+/* Pattern B: Animated Conic Progress Ring */
+.ui-conic-progress {
+  --ui-progress-percent: 0%;
+
+  background: conic-gradient(
+    var(--ui-glow-color-end) 0%,
+    var(--ui-glow-color-start) var(--ui-progress-percent),
+    transparent var(--ui-progress-percent)
+  );
+
+  transition: --ui-progress-percent 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ==========================================================================
+   3. Reduced Motion & Accessibility Overrides
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .ui-registered-card,
+  .ui-conic-progress {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
