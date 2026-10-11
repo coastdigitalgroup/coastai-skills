@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Status - Platform Health Monitor</title>
+  <style>
+    /* CSS Custom Properties & Design Tokens */
+    :root {
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --color-bg: #F8FAFC;
+      --color-surface: #FFFFFF;
+      --color-border: #E2E8F0;
+      --color-border-subtle: #F1F5F9;
+      --color-text-main: #0F172A;
+      --color-text-muted: #64748B;
+      --color-text-subtle: #94A3B8;
+
+      /* Status Indicator Colors & Badges */
+      --color-operational-bg: #F0FDF4;
+      --color-operational-border: #86EFAC;
+      --color-operational-text: #166534;
+      --color-operational-dot: #16A34A;
+
+      --color-degraded-bg: #FFFBEB;
+      --color-degraded-border: #FDE68A;
+      --color-degraded-text: #92400E;
+      --color-degraded-dot: #D97706;
+
+      --color-outage-bg: #FEF2F2;
+      --color-outage-border: #FCA5A5;
+      --color-outage-text: #991B1B;
+      --color-outage-dot: #DC2626;
+
+      --color-maintenance-bg: #EFF6FF;
+      --color-maintenance-border: #BFDBFE;
+      --color-maintenance-text: #1E40AF;
+      --color-maintenance-dot: #2563EB;
+
+      --focus-ring: 2px solid #2563EB;
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Reset & Base Layout */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--color-bg);
+      color: var(--color-text-main);
+      line-height: 1.5;
+      padding: 2rem 1rem;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .status-page-container {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    /* Header & Navigation Bar */
+    .status-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .status-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .status-brand__logo {
+      width: 32px;
+      height: 32px;
+      background: #0F172A;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      font-weight: 700;
+      font-size: 0.875rem;
+    }
+
+    .status-brand__title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-text-main);
+    }
+
+    .status-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+      min-height: 44px;
+      border: 1px solid transparent;
+    }
+
+    .btn:focus-visible {
+      outline: var(--focus-ring);
+      outline-offset: 2px;
+    }
+
+    .btn--primary {
+      background-color: #2563EB;
+      color: #FFFFFF;
+    }
+
+    .btn--primary:hover {
+      background-color: #1D4ED8;
+    }
+
+    .btn--secondary {
+      background-color: var(--color-surface);
+      border-color: var(--color-border);
+      color: var(--color-text-main);
+    }
+
+    .btn--secondary:hover {
+      background-color: var(--color-border-subtle);
+    }
+
+    /* Global Health Hero Banner */
+    .hero-banner {
+      border-radius: var(--radius-md);
+      padding: 1.5rem 1.75rem;
+      border: 1px solid;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .hero-banner--degraded {
+      background-color: var(--color-degraded-bg);
+      border-color: var(--color-degraded-border);
+      color: var(--color-degraded-text);
+    }
+
+    .hero-banner--operational {
+      background-color: var(--color-operational-bg);
+      border-color: var(--color-operational-border);
+      color: var(--color-operational-text);
+    }
+
+    .hero-banner__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .hero-banner__title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+    }
+
+    .hero-banner__meta {
+      font-size: 0.8125rem;
+      opacity: 0.85;
+    }
+
+    .hero-banner__description {
+      font-size: 0.9375rem;
+      line-height: 1.5;
+    }
+
+    /* Active Incident Progression Feed */
+    .card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .card__header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card__title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--color-text-main);
+    }
+
+    .incident-feed {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .incident-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+
+    .incident-item:last-child {
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .incident-item__head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .incident-item__title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--color-text-main);
+    }
+
+    .badge-group {
+      display: flex;
+      gap: 0.375rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.25rem 0.625rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 9999px;
+      line-height: 1;
+    }
+
+    .badge--degraded {
+      background: #FEF3C7;
+      color: #92400E;
+      border: 1px solid #FCD34D;
+    }
+
+    .badge--service {
+      background: #F1F5F9;
+      color: #334155;
+      border: 1px solid #E2E8F0;
+    }
+
+    .timeline-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding-left: 1rem;
+      border-left: 2px solid var(--color-border);
+      margin-top: 0.5rem;
+    }
+
+    .timeline-step {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      position: relative;
+    }
+
+    .timeline-step::before {
+      content: "";
+      position: absolute;
+      left: -1.3125rem;
+      top: 0.375rem;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #2563EB;
+    }
+
+    .timeline-step__head {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8125rem;
+    }
+
+    .timeline-step__phase {
+      font-weight: 700;
+      color: #1E40AF;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .timeline-step__time {
+      color: var(--color-text-muted);
+    }
+
+    .timeline-step__body {
+      font-size: 0.875rem;
+      color: var(--color-text-main);
+    }
+
+    /* Component List & 90-Day Heatmap */
+    .component-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .component-row {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--color-border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .component-row:last-child {
+      border-bottom: none;
+    }
+
+    .component-row__main {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .component-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .component-toggle {
+      background: none;
+      border: none;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      font-size: 0.875rem;
+      padding: 0.25rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .component-name {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--color-text-main);
+    }
+
+    .component-status-wrap {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .uptime-pct {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+    }
+
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      font-size: 0.8125rem;
+      font-weight: 600;
+    }
+
+    .status-indicator--operational { color: var(--color-operational-text); }
+    .status-indicator--degraded { color: var(--color-degraded-text); }
+
+    /* 90-Day Heatmap Grid */
+    .heatmap-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+    }
+
+    .heatmap-grid {
+      display: grid;
+      grid-template-columns: repeat(90, 1fr);
+      gap: 2px;
+      height: 28px;
+    }
+
+    .heatmap-bar {
+      background-color: var(--color-operational-dot);
+      border-radius: 1px;
+      cursor: pointer;
+      position: relative;
+      transition: opacity 0.15s ease;
+    }
+
+    .heatmap-bar:hover, .heatmap-bar:focus-visible {
+      opacity: 0.75;
+      outline: 2px solid #0F172A;
+      outline-offset: 1px;
+    }
+
+    .heatmap-bar--degraded {
+      background-color: var(--color-degraded-dot);
+    }
+
+    .heatmap-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--color-text-subtle);
+    }
+
+    /* Modal Overlay (Subscriber Dialog) */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-backdrop.is-active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      max-width: 520px;
+      width: 100%;
+      padding: 1.75rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      position: relative;
+    }
+
+    .modal__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal__title {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .modal__close {
+      background: none;
+      border: none;
+      font-size: 1.25rem;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      padding: 0.25rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+    }
+
+    .form-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-text-main);
+    }
+
+    .form-input {
+      padding: 0.625rem 0.875rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-family: inherit;
+    }
+
+    .form-input:focus-visible {
+      outline: var(--focus-ring);
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .status-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .status-actions {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .heatmap-grid {
+        grid-template-columns: repeat(30, 1fr);
+      }
+
+      .component-row__main {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="status-page-container">
+
+    <!-- Header & Navigation Bar -->
+    <header class="status-header">
+      <div class="status-brand">
+        <div class="status-brand__logo">CS</div>
+        <h1 class="status-brand__title">CloudScale System Status</h1>
+      </div>
+      <div class="status-actions">
+        <button type="button" class="btn btn--primary" id="open-subscribe-modal">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Subscribe to Updates
+        </button>
+      </div>
+    </header>
+
+    <!-- Global Health Hero Banner (ARIA Live Region) -->
+    <section aria-live="polite" aria-atomic="true">
+      <div class="hero-banner hero-banner--degraded" role="region" aria-label="Current System Health Status">
+        <div class="hero-banner__header">
+          <h2 class="hero-banner__title">
+            <span aria-hidden="true">▲</span>
+            PARTIAL SYSTEM OUTAGE
+          </h2>
+          <span class="hero-banner__meta">Refreshed: 1 minute ago</span>
+        </div>
+        <p class="hero-banner__description">
+          We are currently experiencing elevated latency on US-East REST API endpoints. Engineering teams are actively monitoring a recovery fix.
+        </p>
+      </div>
+    </section>
+
+    <!-- Active Incident Timeline Feed -->
+    <section class="card" aria-labelledby="active-incidents-title">
+      <div class="card__header">
+        <h2 id="active-incidents-title" class="card__title">Active Incident Timeline</h2>
+        <span class="badge badge--degraded">1 Active Incident</span>
+      </div>
+      <div class="incident-feed">
+        <article class="incident-item">
+          <div class="incident-item__head">
+            <h3 class="incident-item__title">Elevated Latency on US-East REST API Endpoints</h3>
+            <div class="badge-group">
+              <span class="badge badge--degraded">Partial Outage</span>
+              <span class="badge badge--service">Core API Platform</span>
+            </div>
+          </div>
+
+          <!-- Vertical Timeline Progression -->
+          <div class="timeline-list">
+            <div class="timeline-step">
+              <div class="timeline-step__head">
+                <span class="timeline-step__phase">Monitoring</span>
+                <span class="timeline-step__time">Oct 24, 15:05 UTC</span>
+              </div>
+              <p class="timeline-step__body">
+                A database connection pool configuration fix was deployed. API latency metrics have stabilized and we are observing system telemetry.
+              </p>
+            </div>
+
+            <div class="timeline-step">
+              <div class="timeline-step__head">
+                <span class="timeline-step__phase" style="color: #D97706;">Identified</span>
+                <span class="timeline-step__time">Oct 24, 14:40 UTC</span>
+              </div>
+              <p class="timeline-step__body">
+                The root cause was identified as connection pool contention in the primary US-East database cluster following a traffic spike.
+              </p>
+            </div>
+
+            <div class="timeline-step">
+              <div class="timeline-step__head">
+                <span class="timeline-step__phase" style="color: #9333EA;">Investigating</span>
+                <span class="timeline-step__time">Oct 24, 14:22 UTC</span>
+              </div>
+              <p class="timeline-step__body">
+                Our engineering team is triaging reports of elevated 504 gateway timeouts on REST API endpoints in US-East.
+              </p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Component Availability & 90-Day Heatmap Grid -->
+    <section class="card" aria-labelledby="components-title">
+      <div class="card__header">
+        <h2 id="components-title" class="card__title">System Services & Availability</h2>
+        <span class="uptime-pct">Overall Uptime (90 Days): 99.96%</span>
+      </div>
+
+      <div class="component-list">
+
+        <!-- Component Group 1 -->
+        <div class="component-row">
+          <div class="component-row__main">
+            <div class="component-info">
+              <button type="button" class="component-toggle" aria-expanded="true" aria-label="Toggle Core API Platform sub-services">▼</button>
+              <span class="component-name">Core API Platform</span>
+            </div>
+            <div class="component-status-wrap">
+              <span class="uptime-pct">99.88%</span>
+              <span class="status-indicator status-indicator--degraded">
+                <span aria-hidden="true">▲</span> Degraded Performance
+              </span>
+            </div>
+          </div>
+
+          <!-- 90-Day Heatmap Track -->
+          <div class="heatmap-wrap">
+            <div class="heatmap-grid" role="region" aria-label="Core API Platform 90-day availability history grid">
+              <!-- 89 Operational Bars -->
+              <div class="heatmap-bar" tabindex="0" role="img" aria-label="Day 1: 100% Operational"></div>
+              <div class="heatmap-bar" tabindex="0" role="img" aria-label="Day 2: 100% Operational"></div>
+              <!-- Simulated Degraded Day -->
+              <div class="heatmap-bar heatmap-bar--degraded" tabindex="0" role="img" aria-label="Today: Degraded Performance, 42 minutes disruption"></div>
+            </div>
+            <div class="heatmap-meta">
+              <span>90 days ago</span>
+              <span>100% Operational</span>
+              <span>Today</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Component Group 2 -->
+        <div class="component-row">
+          <div class="component-row__main">
+            <div class="component-info">
+              <button type="button" class="component-toggle" aria-expanded="false" aria-label="Toggle Storage Services sub-services">►</button>
+              <span class="component-name">Storage & Database Clusters</span>
+            </div>
+            <div class="component-status-wrap">
+              <span class="uptime-pct">100.00%</span>
+              <span class="status-indicator status-indicator--operational">
+                <span aria-hidden="true">●</span> Operational
+              </span>
+            </div>
+          </div>
+
+          <div class="heatmap-wrap">
+            <div class="heatmap-grid">
+              <div class="heatmap-bar" tabindex="0" role="img" aria-label="Storage 90-day operational"></div>
+            </div>
+            <div class="heatmap-meta">
+              <span>90 days ago</span>
+              <span>100% Operational</span>
+              <span>Today</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Subscriber Modal Overlay Dialog -->
+  <div class="modal-backdrop" id="subscribe-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+      <div class="modal__header">
+        <h2 id="modal-title" class="modal__title">Subscribe to Incident Updates</h2>
+        <button type="button" class="modal__close" id="close-subscribe-modal" aria-label="Close dialog">✕</button>
+      </div>
+
+      <p style="font-size: 0.875rem; color: var(--color-text-muted);">
+        Receive real-time email notifications whenever CloudScale experiences an incident or schedules system maintenance.
+      </p>
+
+      <form class="form-group" onsubmit="event.preventDefault(); alert('Subscribed successfully!');">
+        <label for="subscriber-email" class="form-label">Email Address</label>
+        <input type="email" id="subscriber-email" class="form-input" placeholder="you@company.com" required>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem;">
+          <button type="button" class="btn btn--secondary" id="cancel-subscribe-modal">Cancel</button>
+          <button type="submit" class="btn btn--primary">Subscribe</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Simple Modal Toggle Script for Accessibility Verification
+    const modal = document.getElementById('subscribe-modal');
+    const openBtn = document.getElementById('open-subscribe-modal');
+    const closeBtn = document.getElementById('close-subscribe-modal');
+    const cancelBtn = document.getElementById('cancel-subscribe-modal');
+
+    function openModal() {
+      modal.classList.add('is-active');
+      document.getElementById('subscriber-email').focus();
+    }
+
+    function closeModal() {
+      modal.classList.remove('is-active');
+      openBtn.focus();
+    }
+
+    openBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+  </script>
+</body>
+</html>
