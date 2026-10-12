@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Status Specification Template</title>
+  <style>
+    :root {
+      /* Color Palette & Tokens */
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-border: #e2e8f0;
+      --color-text-main: #0f172a;
+      --color-text-muted: #64748b;
+
+      /* Status State Colors */
+      --color-operational-bg: #ecfdf5;
+      --color-operational-border: #a7f3d0;
+      --color-operational-text: #065f46;
+
+      --color-degraded-bg: #fffbeb;
+      --color-degraded-border: #fde68a;
+      --color-degraded-text: #92400e;
+
+      --color-outage-bg: #fef2f2;
+      --color-outage-border: #fecaca;
+      --color-outage-text: #991b1b;
+
+      --color-maintenance-bg: #eff6ff;
+      --color-maintenance-border: #bfdbfe;
+      --color-maintenance-text: #1e40af;
+
+      /* Focus & Radius */
+      --focus-ring: 2px solid #2563eb;
+      --focus-offset: 2px;
+      --radius-s: 4px;
+      --radius-m: 8px;
+      --radius-l: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--color-bg);
+      color: var(--color-text-main);
+      line-height: 1.5;
+      padding: 1.5rem;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    /* Header & Navigation */
+    .status-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .status-header__brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .status-header__title {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .btn-subscribe {
+      background-color: var(--color-text-main);
+      color: #ffffff;
+      border: none;
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius-m);
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-subscribe:focus-visible {
+      outline: var(--focus-ring);
+      outline-offset: var(--focus-offset);
+    }
+
+    /* Global Status Hero Banner */
+    .status-hero {
+      padding: 1.5rem;
+      border-radius: var(--radius-l);
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      border: 1px solid transparent;
+    }
+
+    .status-hero--operational {
+      background-color: var(--color-operational-bg);
+      border-color: var(--color-operational-border);
+      color: var(--color-operational-text);
+    }
+
+    .status-hero--degraded {
+      background-color: var(--color-degraded-bg);
+      border-color: var(--color-degraded-border);
+      color: var(--color-degraded-text);
+    }
+
+    .status-hero__icon {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+    }
+
+    .status-hero__title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .status-hero__timestamp {
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+      opacity: 0.9;
+    }
+
+    /* Active Incidents Section */
+    .section-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .incident-card {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-m);
+      padding: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .incident-card__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .incident-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.25rem 0.625rem;
+      border-radius: var(--radius-s);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .incident-badge--degraded {
+      background-color: var(--color-degraded-bg);
+      color: var(--color-degraded-text);
+      border: 1px solid var(--color-degraded-border);
+    }
+
+    /* Timeline Progression */
+    .timeline {
+      position: relative;
+      padding-left: 1.5rem;
+      margin-top: 1rem;
+      border-left: 2px solid var(--color-border);
+    }
+
+    .timeline__item {
+      position: relative;
+      margin-bottom: 1.25rem;
+    }
+
+    .timeline__item:last-child {
+      margin-bottom: 0;
+    }
+
+    .timeline__bullet {
+      position: absolute;
+      left: calc(-1.5rem - 5px);
+      top: 0.25rem;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--color-text-muted);
+    }
+
+    .timeline__meta {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-text-main);
+      margin-bottom: 0.25rem;
+    }
+
+    .timeline__body {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+
+    /* Services Grid & 90-Day Uptime Bars */
+    .services-group {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-m);
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+
+    .service-row {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .service-row:last-child {
+      border-bottom: none;
+    }
+
+    .service-row__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .service-row__name {
+      font-weight: 600;
+      font-size: 0.9375rem;
+    }
+
+    .service-row__status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      font-size: 0.8125rem;
+      font-weight: 600;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .status-dot--operational { background-color: #10b981; }
+    .status-dot--degraded { background-color: #f59e0b; }
+
+    /* Uptime Bar Component */
+    .uptime-bar {
+      display: flex;
+      gap: 2px;
+      height: 24px;
+      align-items: center;
+    }
+
+    .uptime-bar__day {
+      flex: 1;
+      height: 100%;
+      background-color: #10b981;
+      border-radius: 1px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .uptime-bar__day--degraded {
+      background-color: #f59e0b;
+    }
+
+    .uptime-bar__day:focus-visible {
+      outline: var(--focus-ring);
+      z-index: 10;
+    }
+
+    .uptime-bar__footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      margin-top: 0.375rem;
+    }
+
+    @media (max-width: 640px) {
+      .status-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .btn-subscribe {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header Navigation -->
+    <header class="status-header">
+      <div class="status-header__brand">
+        <h1 class="status-header__title">Acme Cloud Operational Health</h1>
+      </div>
+      <button type="button" class="btn-subscribe" aria-haspopup="dialog">
+        Subscribe to Updates
+      </button>
+    </header>
+
+    <main id="main-content">
+      <!-- Global Live Status Banner -->
+      <section role="region" aria-live="polite" aria-atomic="true" class="status-hero status-hero--degraded">
+        <svg class="status-hero__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4m0 4h.01"></path>
+        </svg>
+        <div>
+          <h2 class="status-hero__title">Partial System Degradation</h2>
+          <p class="status-hero__timestamp">Active Incident on US-East REST API • Updated 2 mins ago</p>
+        </div>
+      </section>
+
+      <!-- Active Incidents Section -->
+      <section aria-labelledby="incidents-heading">
+        <h2 id="incidents-heading" class="section-title">Active Incidents</h2>
+
+        <article class="incident-card">
+          <div class="incident-card__header">
+            <div>
+              <span class="incident-badge incident-badge--degraded">
+                <span class="status-dot status-dot--degraded" aria-hidden="true"></span>
+                Degraded Performance
+              </span>
+              <h3 style="margin-top: 0.5rem; font-size: 1.125rem;">High API Latency on US-East Region</h3>
+            </div>
+          </div>
+
+          <p style="font-size: 0.875rem; color: var(--color-text-muted);">
+            <strong>Impacted Services:</strong> REST API (US-East), Authentication Gateway
+          </p>
+
+          <!-- Chronological Timeline -->
+          <div class="timeline" role="feed" aria-label="Incident update timeline">
+            <div class="timeline__item" role="article">
+              <span class="timeline__bullet" aria-hidden="true"></span>
+              <div class="timeline__meta">Monitoring — 14:20 UTC</div>
+              <div class="timeline__body">
+                Database replication queues have cleared. Latency on API calls has returned to baseline (<100ms). Monitoring for stability.
+              </div>
+            </div>
+
+            <div class="timeline__item" role="article">
+              <span class="timeline__bullet" aria-hidden="true"></span>
+              <div class="timeline__meta">Identified — 13:45 UTC</div>
+              <div class="timeline__body">
+                Engineers identified database lock contention on read replicas. Additional replica node provisioned.
+              </div>
+            </div>
+
+            <div class="timeline__item" role="article">
+              <span class="timeline__bullet" aria-hidden="true"></span>
+              <div class="timeline__meta">Investigating — 13:15 UTC</div>
+              <div class="timeline__body">
+                We are investigating reports of elevated response times on the US-East REST API endpoint.
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- Component Uptime Grid Section -->
+      <section aria-labelledby="services-heading">
+        <h2 id="services-heading" class="section-title">System Component Status (Past 90 Days)</h2>
+
+        <div class="services-group">
+          <!-- Service 1: Operational -->
+          <div class="service-row">
+            <div class="service-row__header">
+              <span class="service-row__name">Web Dashboard & Authentication</span>
+              <span class="service-row__status" style="color: var(--color-operational-text);">
+                <span class="status-dot status-dot--operational" aria-hidden="true"></span>
+                Operational (99.99%)
+              </span>
+            </div>
+            <div class="uptime-bar" role="group" aria-label="90 day status history for Web Dashboard">
+              <!-- Render 90 bar segments -->
+              <span tabindex="0" class="uptime-bar__day" aria-label="Oct 12: 100% Operational"></span>
+              <span tabindex="0" class="uptime-bar__day" aria-label="Oct 11: 100% Operational"></span>
+              <span tabindex="0" class="uptime-bar__day" aria-label="Oct 10: 100% Operational"></span>
+            </div>
+            <div class="uptime-bar__footer">
+              <span>90 days ago</span>
+              <span>100% Uptime</span>
+              <span>Today</span>
+            </div>
+          </div>
+
+          <!-- Service 2: Degraded -->
+          <div class="service-row">
+            <div class="service-row__header">
+              <span class="service-row__name">REST API (US-East)</span>
+              <span class="service-row__status" style="color: var(--color-degraded-text);">
+                <span class="status-dot status-dot--degraded" aria-hidden="true"></span>
+                Degraded Performance (98.42%)
+              </span>
+            </div>
+            <div class="uptime-bar" role="group" aria-label="90 day status history for REST API US-East">
+              <span tabindex="0" class="uptime-bar__day" aria-label="Day 1: Operational"></span>
+              <span tabindex="0" class="uptime-bar__day uptime-bar__day--degraded" aria-label="Today: Degraded Performance"></span>
+            </div>
+            <div class="uptime-bar__footer">
+              <span>90 days ago</span>
+              <span>98.42% Uptime</span>
+              <span>Today</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+</body>
+</html>
