@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Navigation API Client-Side Routing & Navigation Guard</title>
+  <style>
+    :root {
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --bg-primary: #0f172a;
+      --bg-card: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --danger: #f43f5e;
+      --border: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background-color: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    nav {
+      display: flex;
+      gap: 1rem;
+    }
+
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.375rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    nav a:hover,
+    nav a[aria-current="page"] {
+      color: var(--text-main);
+      background-color: rgba(56, 189, 248, 0.1);
+    }
+
+    nav a[aria-current="page"] {
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .progress-bar {
+      height: 3px;
+      width: 100%;
+      background-color: transparent;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar.loading::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 40%;
+      background-color: var(--accent);
+      animation: loading-slide 1.2s infinite ease-in-out;
+    }
+
+    @keyframes loading-slide {
+      0% { left: -40%; width: 30%; }
+      50% { left: 40%; width: 60%; }
+      100% { left: 100%; width: 30%; }
+    }
+
+    main {
+      flex: 1;
+      max-width: 900px;
+      width: 100%;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      outline: none;
+    }
+
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      padding: 2rem;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+      color: var(--text-main);
+    }
+
+    p {
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: 0.375rem;
+      color: var(--text-main);
+      font-family: inherit;
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: 2px solid var(--accent);
+      border-color: transparent;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .status-badge.clean {
+      background-color: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+    }
+
+    .status-badge.dirty {
+      background-color: rgba(244, 63, 94, 0.15);
+      color: #fb7185;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+    }
+
+    button {
+      background-color: var(--accent);
+      color: #0f172a;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.375rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <span>🌐</span> Navigation API Router
+    </div>
+    <nav id="main-nav">
+      <a href="/" aria-current="page">Home</a>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/settings">Settings (Guarded Form)</a>
+      <a href="/about">About</a>
+    </nav>
+  </header>
+
+  <div id="loading-bar" class="progress-bar" aria-hidden="true"></div>
+
+  <!-- Screen reader live announcement region -->
+  <div id="route-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+  <main id="main-content" tabindex="-1">
+    <!-- Dynamic View Content Injected Here -->
+  </main>
+
+  <script>
+    /**
+     * W3C Navigation API Modern SPA Controller with Graceful History Fallback
+     */
+    class SPARouter {
+      constructor() {
+        this.mainContent = document.getElementById('main-content');
+        this.loadingBar = document.getElementById('loading-bar');
+        this.announcer = document.getElementById('route-announcer');
+        this.navLinks = document.querySelectorAll('#main-nav a');
+        this.isFormDirty = false;
+
+        this.routes = {
+          '/': this.renderHome.bind(this),
+          '/dashboard': this.renderDashboard.bind(this),
+          '/settings': this.renderSettings.bind(this),
+          '/about': this.renderAbout.bind(this)
+        };
+
+        this.init();
+      }
+
+      init() {
+        if ('navigation' in window) {
+          console.log('[Router] Modern W3C Navigation API detected.');
+          this.setupNavigationAPI();
+        } else {
+          console.warn('[Router] W3C Navigation API missing. Falling back to History API.');
+          this.setupHistoryFallback();
+        }
+
+        // Render initial path
+        this.routeTo(location.pathname, false);
+      }
+
+      /**
+       * Modern Navigation API Interceptor Setup
+       */
+      setupNavigationAPI() {
+        navigation.addEventListener('navigate', (e) => {
+          // 1. Skip non-interceptable or external navigations
+          if (!e.canIntercept || e.hashChange || e.downloadRequest) {
+            return;
+          }
+
+          const url = new URL(e.destination.url);
+
+          if (url.origin !== location.origin) {
+            return;
+          }
+
+          // 2. Navigation Guard Check for Unsaved Changes
+          if (this.isFormDirty) {
+            const confirmLeave = window.confirm('You have unsaved changes in Settings! Are you sure you want to leave?');
+            if (!confirmLeave) {
+              e.preventDefault(); // Cancel navigation entirely
+              return;
+            }
+            this.isFormDirty = false; // Reset flag if user agreed
+          }
+
+          // 3. Intercept navigation and supply async handler
+          e.intercept({
+            handler: async () => {
+              await this.handleRouteTransition(url.pathname, e.signal);
+            },
+            focusReset: 'after-transition',
+            scroll: 'after-transition'
+          });
+        });
+
+        navigation.addEventListener('navigatesuccess', () => {
+          console.log('[Navigation Success] Route fully updated.');
+        });
+
+        navigation.addEventListener('navigateerror', (e) => {
+          console.error('[Navigation Error]', e.error);
+        });
+      }
+
+      /**
+       * Legacy Fallback for Browsers without Navigation API
+       */
+      setupHistoryFallback() {
+        document.addEventListener('click', (e) => {
+          const anchor = e.target.closest('a');
+          if (!anchor || !anchor.href) return;
+
+          const url = new URL(anchor.href);
+          if (url.origin === location.origin && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+            e.preventDefault();
+
+            if (this.isFormDirty) {
+              const confirmLeave = window.confirm('You have unsaved changes! Leave anyway?');
+              if (!confirmLeave) return;
+              this.isFormDirty = false;
+            }
+
+            history.pushState({}, '', url.pathname);
+            this.handleRouteTransition(url.pathname);
+          }
+        });
+
+        window.addEventListener('popstate', () => {
+          this.routeTo(location.pathname, false);
+        });
+      }
+
+      /**
+       * Async Route Resolution with AbortSignal Handling
+       */
+      async handleRouteTransition(pathname, signal) {
+        this.loadingBar.classList.add('loading');
+
+        try {
+          // Simulate network delay for dynamic data fetch
+          await new Promise((resolve, reject) => {
+            const timer = setTimeout(resolve, 400);
+
+            if (signal) {
+              signal.addEventListener('abort', () => {
+                clearTimeout(timer);
+                reject(new DOMException('Route fetch aborted', 'AbortError'));
+              });
+            }
+          });
+
+          this.routeTo(pathname);
+        } catch (err) {
+          if (err.name === 'AbortError') {
+            console.log('[Router] Superseded navigation cancelled previous transition.');
+          } else {
+            this.renderError(err);
+          }
+        } finally {
+          this.loadingBar.classList.remove('loading');
+        }
+      }
+
+      routeTo(pathname) {
+        const renderFn = this.routes[pathname] || this.renderNotFound.bind(this);
+        renderFn();
+        this.updateNavHighlight(pathname);
+
+        // Accessibility: Shift focus to main container & announce route change
+        this.mainContent.focus();
+        const pageTitle = document.querySelector('h1')?.textContent || 'Page';
+        this.announcer.textContent = `Navigated to ${pageTitle}`;
+      }
+
+      updateNavHighlight(pathname) {
+        this.navLinks.forEach((link) => {
+          if (link.getAttribute('href') === pathname) {
+            link.setAttribute('aria-current', 'page');
+          } else {
+            link.removeAttribute('aria-current');
+          }
+        });
+      }
+
+      // --- View Renderers ---
+
+      renderHome() {
+        document.title = 'Home - Navigation API Demo';
+        this.mainContent.innerHTML = `
+          <div class="card">
+            <h1>Welcome Home</h1>
+            <p>This SPA demonstrates modern client-side routing managed via the W3C <code>window.navigation</code> API.</p>
+            <p>Try clicking between navigation links above. Notice smooth async loading states and built-in accessibility focus management.</p>
+          </div>
+        `;
+      }
+
+      renderDashboard() {
+        document.title = 'Dashboard - Navigation API Demo';
+        this.mainContent.innerHTML = `
+          <div class="card">
+            <h1>Analytics Dashboard</h1>
+            <p>Real-time metrics loaded asynchronously without full page refreshes.</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+              <div style="background:#0f172a; padding:1rem; border-radius:0.375rem;">
+                <p style="margin:0; font-size:0.875rem;">Total Views</p>
+                <h2 style="color:var(--accent);">124,590</h2>
+              </div>
+              <div style="background:#0f172a; padding:1rem; border-radius:0.375rem;">
+                <p style="margin:0; font-size:0.875rem;">Conversion Rate</p>
+                <h2 style="color:#34d399;">3.84%</h2>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      renderSettings() {
+        document.title = 'Settings - Navigation Guard Demo';
+        this.mainContent.innerHTML = `
+          <div class="card">
+            <h1>User Settings (Guarded Form)</h1>
+            <p>Type into the field below to mark the form as <strong>dirty</strong>. Once dirty, attempting to navigate away will trigger an intercepted navigation guard!</p>
+
+            <span id="form-status" class="status-badge clean">Status: Clean (Unmodified)</span>
+
+            <form id="settings-form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="username">Display Name</label>
+                <input type="text" id="username" placeholder="Type something to edit form..." value="">
+              </div>
+              <div class="button-group">
+                <button type="button" id="save-btn">Save Changes</button>
+              </div>
+            </form>
+          </div>
+        `;
+
+        const input = document.getElementById('username');
+        const statusBadge = document.getElementById('form-status');
+        const saveBtn = document.getElementById('save-btn');
+
+        input.addEventListener('input', () => {
+          if (input.value.trim() !== '') {
+            this.isFormDirty = true;
+            statusBadge.className = 'status-badge dirty';
+            statusBadge.textContent = 'Status: Dirty (Unsaved Changes)';
+          } else {
+            this.isFormDirty = false;
+            statusBadge.className = 'status-badge clean';
+            statusBadge.textContent = 'Status: Clean (Unmodified)';
+          }
+        });
+
+        saveBtn.addEventListener('click', () => {
+          this.isFormDirty = false;
+          statusBadge.className = 'status-badge clean';
+          statusBadge.textContent = 'Status: Saved Successfully!';
+        });
+      }
+
+      renderAbout() {
+        document.title = 'About - Navigation API Demo';
+        this.mainContent.innerHTML = `
+          <div class="card">
+            <h1>About W3C Navigation API</h1>
+            <p>The Navigation API eliminates legacy <code>pushState</code> bugs by providing a unified event pipeline for link clicks, form submissions, and browser history buttons.</p>
+          </div>
+        `;
+      }
+
+      renderNotFound() {
+        document.title = '404 - Page Not Found';
+        this.mainContent.innerHTML = `
+          <div class="card">
+            <h1 style="color: var(--danger);">404 - View Not Found</h1>
+            <p>The requested route does not exist.</p>
+          </div>
+        `;
+      }
+
+      renderError(err) {
+        this.mainContent.innerHTML = `
+          <div class="card">
+            <h1 style="color: var(--danger);">Navigation Error</h1>
+            <p>${err.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    // Initialize Router on DOM ready
+    document.addEventListener('DOMContentLoaded', () => {
+      window.router = new SPARouter();
+    });
+  </script>
+</body>
+</html>
