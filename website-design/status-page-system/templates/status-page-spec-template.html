@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Status Dashboard Template</title>
+  <style>
+    /* Status Page Token Architecture */
+    :root {
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-surface-border: #e2e8f0;
+      --color-text-primary: #0f172a;
+      --color-text-secondary: #475569;
+      --color-text-muted: #64748b;
+
+      /* Status Colors */
+      --status-operational-bg: #ecfdf5;
+      --status-operational-border: #a7f3d0;
+      --status-operational-text: #065f46;
+      --status-operational-icon: #059669;
+
+      --status-degraded-bg: #fffbeb;
+      --status-degraded-border: #fde68a;
+      --status-degraded-text: #92400e;
+      --status-degraded-icon: #d97706;
+
+      --status-outage-partial-bg: #fff7ed;
+      --status-outage-partial-border: #fdba74;
+      --status-outage-partial-text: #9a3412;
+      --status-outage-partial-icon: #ea580c;
+
+      --status-outage-major-bg: #fef2f2;
+      --status-outage-major-border: #fca5a5;
+      --status-outage-major-text: #991b1b;
+      --status-outage-major-icon: #dc2626;
+
+      --status-maintenance-bg: #eff6ff;
+      --status-maintenance-border: #bfdbfe;
+      --status-maintenance-text: #1e40af;
+      --status-maintenance-icon: #2563eb;
+
+      --focus-ring: #2563eb;
+      --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--color-bg);
+      color: var(--color-text-primary);
+      font-family: var(--font-family);
+      line-height: 1.5;
+      padding: 2rem 1rem;
+    }
+
+    .status-container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .status-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      gap: 1rem;
+    }
+
+    .status-header__brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .status-header__logo {
+      width: 32px;
+      height: 32px;
+      background: #0f172a;
+      border-radius: 8px;
+    }
+
+    .status-header__title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+
+    .btn-subscribe {
+      background: #0f172a;
+      color: #ffffff;
+      border: none;
+      padding: 0.625rem 1.25rem;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: background-color 0.2s;
+    }
+
+    .btn-subscribe:hover, .btn-subscribe:focus-visible {
+      background: #1e293b;
+      outline: 2px solid var(--focus-ring);
+      outline-offset: 2px;
+    }
+
+    /* Hero Banner */
+    .status-banner {
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      border: 1px solid transparent;
+    }
+
+    .status-banner--partial-outage {
+      background-color: var(--status-outage-partial-bg);
+      border-color: var(--status-outage-partial-border);
+      color: var(--status-outage-partial-text);
+    }
+
+    .status-banner__icon {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+
+    .status-banner__content {
+      flex: 1;
+    }
+
+    .status-banner__headline {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    .status-banner__timestamp {
+      font-size: 0.875rem;
+      opacity: 0.9;
+    }
+
+    /* Card Panels */
+    .status-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-surface-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .status-card__title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--color-text-primary);
+    }
+
+    /* Active Incident Timeline */
+    .incident-item {
+      border-left: 3px solid var(--status-outage-partial-icon);
+      padding-left: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .incident-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .incident-update {
+      margin-bottom: 1rem;
+    }
+
+    .incident-update__header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.375rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.25rem 0.625rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+
+    .badge--monitoring {
+      background: #eff6ff;
+      color: #1e40af;
+    }
+
+    .badge--investigating {
+      background: #fff7ed;
+      color: #9a3412;
+    }
+
+    .incident-update__time {
+      font-size: 0.8125rem;
+      color: var(--color-text-muted);
+    }
+
+    .incident-update__body {
+      font-size: 0.9375rem;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Component Health Matrix */
+    .service-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .service-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .service-group__header {
+      font-size: 0.875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .service-row {
+      display: grid;
+      grid-template-columns: 200px 160px 1fr 60px;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .service-row:last-child {
+      border-bottom: none;
+    }
+
+    .service-row__name {
+      font-weight: 600;
+      font-size: 0.9375rem;
+      color: var(--color-text-primary);
+    }
+
+    .status-badge-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      font-size: 0.8125rem;
+      font-weight: 600;
+    }
+
+    .status-badge-inline--operational {
+      color: var(--status-operational-text);
+    }
+
+    .status-badge-inline--partial-outage {
+      color: var(--status-outage-partial-text);
+    }
+
+    /* 90-Day Uptime Bars */
+    .uptime-bars {
+      display: flex;
+      gap: 2px;
+      height: 28px;
+      align-items: center;
+    }
+
+    .uptime-bar {
+      flex: 1;
+      height: 100%;
+      background-color: var(--status-operational-icon);
+      border-radius: 2px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .uptime-bar--degraded {
+      background-color: var(--status-degraded-icon);
+    }
+
+    .uptime-bar--outage {
+      background-color: var(--status-outage-partial-icon);
+    }
+
+    .uptime-bar:focus-visible {
+      outline: 2px solid var(--focus-ring);
+      outline-offset: 1px;
+      z-index: 10;
+    }
+
+    .uptime-percentage {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      text-align: right;
+    }
+
+    /* Responsive Adaptation */
+    @media (max-width: 768px) {
+      .service-row {
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+          "name status"
+          "bars percentage";
+        row-gap: 0.5rem;
+      }
+
+      .service-row__name { grid-area: name; }
+      .status-badge-inline { grid-area: status; }
+      .uptime-bars { grid-area: bars; }
+      .uptime-percentage { grid-area: percentage; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="status-container">
+
+    <!-- Header -->
+    <header class="status-header">
+      <div class="status-header__brand">
+        <div class="status-header__logo" aria-hidden="true"></div>
+        <h1 class="status-header__title">Cloud platform System Status</h1>
+      </div>
+      <button type="button" class="btn-subscribe" id="subscribe-btn" aria-haspopup="dialog" aria-expanded="false">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+        <span>Subscribe to Updates</span>
+      </button>
+    </header>
+
+    <!-- Hero Global Status Banner -->
+    <section class="status-banner status-banner--partial-outage" role="region" aria-live="polite" aria-label="Global System Status">
+      <svg class="status-banner__icon" viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3" y="3" width="18" height="18" rx="2" fill="currentColor" />
+      </svg>
+      <div class="status-banner__content">
+        <h2 class="status-banner__headline">Active Incident: Partial System Outage</h2>
+        <p class="status-banner__timestamp">Updated 3 minutes ago — Oct 24, 2024, 15:42 UTC</p>
+      </div>
+    </section>
+
+    <!-- Active Incident Section -->
+    <section class="status-card" aria-labelledby="active-incidents-heading">
+      <h2 id="active-incidents-heading" class="status-card__title">Active Incidents</h2>
+
+      <article class="incident-item">
+        <div class="incident-update">
+          <div class="incident-update__header">
+            <span class="badge badge--monitoring">Monitoring</span>
+            <time class="incident-update__time" datetime="2024-10-24T15:39:00Z">Oct 24, 15:39 UTC</time>
+          </div>
+          <p class="incident-update__body">
+            A fix has been deployed to affected US-East storage nodes. Latency metrics have stabilized to normal baseline levels.
+            We are monitoring system stability before resolving this incident.
+          </p>
+        </div>
+
+        <div class="incident-update">
+          <div class="incident-update__header">
+            <span class="badge badge--investigating">Investigating</span>
+            <time class="incident-update__time" datetime="2024-10-24T14:10:00Z">Oct 24, 14:10 UTC</time>
+          </div>
+          <p class="incident-update__body">
+            We are investigating elevated response latency and API timeouts affecting US-East object storage services.
+          </p>
+        </div>
+      </article>
+    </section>
+
+    <!-- Component Health Matrix & 90-Day Uptime -->
+    <section class="status-card" aria-labelledby="system-services-heading">
+      <h2 id="system-services-heading" class="status-card__title">Service Availability & 90-Day History</h2>
+
+      <div class="service-group">
+        <h3 class="service-group__header">Core Infrastructure</h3>
+
+        <!-- Service Row 1 -->
+        <div class="service-row">
+          <span class="service-row__name">REST API Gateway</span>
+          <span class="status-badge-inline status-badge-inline--operational">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="10"/></svg>
+            Operational
+          </span>
+          <div class="uptime-bars" role="group" aria-label="REST API Gateway 90 day uptime history">
+            <!-- Simplified representative bar sample -->
+            <div class="uptime-bar" tabindex="0" title="Oct 24: 100% Operational"></div>
+            <div class="uptime-bar" tabindex="0" title="Oct 23: 100% Operational"></div>
+            <div class="uptime-bar" tabindex="0" title="Oct 22: 100% Operational"></div>
+            <div class="uptime-bar" tabindex="0" title="Oct 21: 100% Operational"></div>
+          </div>
+          <span class="uptime-percentage">99.99%</span>
+        </div>
+
+        <!-- Service Row 2 -->
+        <div class="service-row">
+          <span class="service-row__name">US-East Storage</span>
+          <span class="status-badge-inline status-badge-inline--partial-outage">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="2"/></svg>
+            Partial Outage
+          </span>
+          <div class="uptime-bars" role="group" aria-label="US-East Storage 90 day uptime history">
+            <div class="uptime-bar uptime-bar--outage" tabindex="0" title="Oct 24: Active Partial Outage (45 mins)"></div>
+            <div class="uptime-bar" tabindex="0" title="Oct 23: 100% Operational"></div>
+            <div class="uptime-bar" tabindex="0" title="Oct 22: 100% Operational"></div>
+            <div class="uptime-bar" tabindex="0" title="Oct 21: 100% Operational"></div>
+          </div>
+          <span class="uptime-percentage">99.82%</span>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+</body>
+</html>
