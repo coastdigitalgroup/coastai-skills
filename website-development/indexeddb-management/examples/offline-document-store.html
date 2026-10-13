@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IndexedDB Management - Offline Document Store</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --border-color: #334155;
+      --text-color: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary-color: #38bdf8;
+      --primary-hover: #0284c7;
+      --danger-color: #f43f5e;
+      --success-color: #34d399;
+      --warning-color: #fbbf24;
+      --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: var(--font-family);
+      line-height: 1.5;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .grid-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .grid-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .card h2 {
+      font-size: 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    input, select, textarea {
+      background-color: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 0.375rem;
+      color: var(--text-color);
+      padding: 0.5rem 0.75rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: 2px solid var(--primary-color);
+      outline-offset: -1px;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background-color: var(--primary-color);
+      color: #0284c7;
+      color: #0f172a;
+      font-weight: 600;
+      border: none;
+      border-radius: 0.375rem;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: background-color 0.15s ease;
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+      color: #ffffff;
+    }
+
+    button.secondary {
+      background-color: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+    }
+
+    button.secondary:hover {
+      background-color: var(--border-color);
+    }
+
+    button.danger {
+      background-color: var(--danger-color);
+      color: #ffffff;
+    }
+
+    button.danger:hover {
+      background-color: #e11d48;
+    }
+
+    .status-badge {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.25rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge-draft { background-color: #334155; color: #cbd5e1; }
+    .badge-published { background-color: #064e3b; color: #6ee7b7; }
+    .badge-archived { background-color: #78350f; color: #fde68a; }
+
+    .doc-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .doc-item {
+      background-color: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 0.375rem;
+      padding: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .doc-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .doc-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .doc-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .doc-tags {
+      display: flex;
+      gap: 0.25rem;
+      margin-top: 0.25rem;
+    }
+
+    .tag {
+      background-color: var(--border-color);
+      color: var(--text-color);
+      font-size: 0.7rem;
+      padding: 0.1rem 0.35rem;
+      border-radius: 0.2rem;
+    }
+
+    .log-panel {
+      background-color: #020617;
+      border: 1px solid var(--border-color);
+      border-radius: 0.375rem;
+      padding: 0.75rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.8rem;
+      color: #a7f3d0;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    .storage-info {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      text-align: center;
+    }
+
+    .stat-box {
+      background-color: var(--bg-color);
+      border: 1px solid var(--border-color);
+      padding: 0.5rem;
+      border-radius: 0.375rem;
+    }
+
+    .stat-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>IndexedDB Offline Document Store</h1>
+      <p class="subtitle">Demonstrating promise wrappers, schema migrations, compound index queries, cursor pagination, and storage quota management.</p>
+    </header>
+
+    <div class="storage-info">
+      <div class="stat-box">
+        <div id="statUsage" class="stat-value">0 MB</div>
+        <div class="stat-label">Used Storage</div>
+      </div>
+      <div class="stat-box">
+        <div id="statQuota" class="stat-value">0 MB</div>
+        <div class="stat-label">Total Quota</div>
+      </div>
+      <div class="stat-box">
+        <div id="statPersisted" class="stat-value">Checking...</div>
+        <div class="stat-label">Persisted Status</div>
+      </div>
+    </div>
+
+    <div class="grid-layout">
+      <!-- Create / Edit Document Card -->
+      <div class="card">
+        <h2>Document Editor</h2>
+        <form id="docForm">
+          <input type="hidden" id="docId">
+          <div class="form-group">
+            <label for="docTitle">Title</label>
+            <input type="text" id="docTitle" placeholder="e.g. Q3 Architecture Plan" required>
+          </div>
+
+          <div class="form-group">
+            <label for="docStatus">Status</label>
+            <select id="docStatus">
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="docTags">Tags (comma-separated)</label>
+            <input type="text" id="docTags" placeholder="e.g. architecture, web, performance">
+          </div>
+
+          <div class="form-group">
+            <label for="docContent">Content</label>
+            <textarea id="docContent" rows="4" placeholder="Document body text..."></textarea>
+          </div>
+
+          <div class="button-group">
+            <button type="submit">Save Document</button>
+            <button type="button" id="btnReset" class="secondary">Reset</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Filter & List Card -->
+      <div class="card">
+        <h2>
+          <span>Documents</span>
+          <button id="btnBumpVersion" class="secondary" title="Simulate database schema version upgrade">Bump DB Version</button>
+        </h2>
+
+        <div class="button-group">
+          <button id="btnFilterAll" class="secondary">All</button>
+          <button id="btnFilterDraft" class="secondary">Drafts</button>
+          <button id="btnFilterPublished" class="secondary">Published</button>
+          <button id="btnFilterArchived" class="secondary">Archived</button>
+          <button id="btnClearAll" class="danger">Clear Store</button>
+        </div>
+
+        <ul id="docList" class="doc-list">
+          <li style="color: var(--text-muted); text-align: center; padding: 1rem;">No documents stored yet.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Telemetry & Event Log -->
+    <div class="card">
+      <h2>IndexedDB Event & Transaction Log</h2>
+      <div id="logConsole" class="log-panel">Initializing IndexedDB manager...</div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * Promise-Wrapped IndexedDB Manager Class
+     */
+    class IndexedDBManager {
+      constructor(dbName, version) {
+        this.dbName = dbName;
+        this.version = version;
+        this.db = null;
+      }
+
+      log(msg) {
+        const consoleEl = document.getElementById('logConsole');
+        const timestamp = new Date().toISOString().split('T')[1].slice(0, 8);
+        consoleEl.textContent = `[${timestamp}] ${msg}\n` + consoleEl.textContent;
+      }
+
+      async open(migrationCallback) {
+        return new Promise((resolve, reject) => {
+          this.log(`Opening database "${this.dbName}" (v${this.version})...`);
+          const request = indexedDB.open(this.dbName, this.version);
+
+          request.onupgradeneeded = (event) => {
+            const db = request.result;
+            const transaction = request.transaction;
+            this.log(`Schema migration triggered: v${event.oldVersion} -> v${event.newVersion}`);
+            if (migrationCallback) {
+              migrationCallback(db, transaction, event.oldVersion, event.newVersion);
+            }
+          };
+
+          request.onblocked = () => {
+            this.log('WARNING: Opening DB blocked by stale connections in other tabs.');
+          };
+
+          request.onsuccess = () => {
+            this.db = request.result;
+            this.log(`Successfully connected to IndexedDB database "${this.dbName}" v${this.db.version}.`);
+
+            // Listen for schema upgrade requests from other tabs
+            this.db.onversionchange = () => {
+              this.log('NOTICE: Another tab initiated a database schema upgrade. Closing connection...');
+              this.db.close();
+              this.db = null;
+            };
+
+            resolve(this.db);
+          };
+
+          request.onerror = () => {
+            this.log(`ERROR opening database: ${request.error?.message}`);
+            reject(request.error);
+          };
+        });
+      }
+
+      async executeTx(storeNames, mode, callback) {
+        if (!this.db) {
+          throw new Error('Database is not initialized. Call open() first.');
+        }
+
+        return new Promise((resolve, reject) => {
+          const tx = this.db.transaction(storeNames, mode);
+          let resultValue = null;
+
+          tx.oncomplete = () => resolve(resultValue);
+          tx.onerror = () => reject(tx.error || new Error('Transaction error'));
+          tx.onabort = () => reject(tx.error || new Error('Transaction aborted'));
+
+          try {
+            resultValue = callback(tx);
+          } catch (err) {
+            tx.abort();
+            reject(err);
+          }
+        });
+      }
+
+      async put(storeName, item) {
+        return this.executeTx([storeName], 'readwrite', (tx) => {
+          const store = tx.objectStore(storeName);
+          const req = store.put(item);
+          return new Promise((resolve, reject) => {
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+          });
+        });
+      }
+
+      async get(storeName, key) {
+        return this.executeTx([storeName], 'readonly', (tx) => {
+          const store = tx.objectStore(storeName);
+          const req = store.get(key);
+          return new Promise((resolve, reject) => {
+            req.onsuccess = () => resolve(req.result || null);
+            req.onerror = () => reject(req.error);
+          });
+        });
+      }
+
+      async getAll(storeName) {
+        return this.executeTx([storeName], 'readonly', (tx) => {
+          const store = tx.objectStore(storeName);
+          const req = store.getAll();
+          return new Promise((resolve, reject) => {
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+          });
+        });
+      }
+
+      async queryByIndex(storeName, indexName, range = null, limit = 100) {
+        return this.executeTx([storeName], 'readonly', (tx) => {
+          const store = tx.objectStore(storeName);
+          const index = store.index(indexName);
+          const req = index.openCursor(range, 'next');
+          const results = [];
+
+          return new Promise((resolve, reject) => {
+            req.onsuccess = (event) => {
+              const cursor = event.target.result;
+              if (cursor && results.length < limit) {
+                results.push(cursor.value);
+                cursor.continue();
+              } else {
+                resolve(results);
+              }
+            };
+            req.onerror = () => reject(req.error);
+          });
+        });
+      }
+
+      async delete(storeName, key) {
+        return this.executeTx([storeName], 'readwrite', (tx) => {
+          const store = tx.objectStore(storeName);
+          const req = store.delete(key);
+          return new Promise((resolve, reject) => {
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+          });
+        });
+      }
+
+      async clear(storeName) {
+        return this.executeTx([storeName], 'readwrite', (tx) => {
+          const store = tx.objectStore(storeName);
+          const req = store.clear();
+          return new Promise((resolve, reject) => {
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+          });
+        });
+      }
+    }
+
+    // Application Setup & Event Binding
+    const DB_NAME = 'OfflineDocStoreDB';
+    let currentDbVersion = 1;
+    let dbManager = new IndexedDBManager(DB_NAME, currentDbVersion);
+
+    function migrationHandler(db, tx, oldVer, newVer) {
+      if (oldVer < 1) {
+        const store = db.createObjectStore('documents', { keyPath: 'id' });
+        store.createIndex('by_updated_at', 'updatedAt', { unique: false });
+        store.createIndex('by_status', 'status', { unique: false });
+        store.createIndex('by_tags', 'tags', { unique: false, multiEntry: true });
+        dbManager.log('Created "documents" store with index "by_status" & multi-entry "by_tags".');
+      }
+
+      if (oldVer < 2) {
+        const store = tx.objectStore('documents');
+        store.createIndex('by_status_updated', ['status', 'updatedAt'], { unique: false });
+        dbManager.log('Added compound index "by_status_updated" for multi-column sort/filter.');
+      }
+    }
+
+    async function updateStorageStats() {
+      if (navigator.storage && navigator.storage.estimate) {
+        const est = await navigator.storage.estimate();
+        const usageMB = (est.usage / (1024 * 1024)).toFixed(2);
+        const quotaMB = (est.quota / (1024 * 1024)).toFixed(2);
+        document.getElementById('statUsage').textContent = `${usageMB} MB`;
+        document.getElementById('statQuota').textContent = `${quotaMB} MB`;
+      }
+
+      if (navigator.storage && navigator.storage.persist) {
+        const isPersisted = await navigator.storage.persisted();
+        document.getElementById('statPersisted').textContent = isPersisted ? 'Granted' : 'Prompt/Denied';
+      }
+    }
+
+    async function renderDocuments(filterStatus = null) {
+      let docs = [];
+      if (filterStatus) {
+        const range = IDBKeyRange.only(filterStatus);
+        docs = await dbManager.queryByIndex('documents', 'by_status', range);
+        dbManager.log(`Queried index "by_status" with value "${filterStatus}" -> ${docs.length} found.`);
+      } else {
+        docs = await dbManager.getAll('documents');
+      }
+
+      const listEl = document.getElementById('docList');
+      if (docs.length === 0) {
+        listEl.innerHTML = `<li style="color: var(--text-muted); text-align: center; padding: 1rem;">No documents stored.</li>`;
+        return;
+      }
+
+      listEl.innerHTML = docs.map(doc => `
+        <li class="doc-item">
+          <div class="doc-info">
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <span class="doc-title">${escapeHtml(doc.title)}</span>
+              <span class="status-badge badge-${doc.status}">${doc.status}</span>
+            </div>
+            <div class="doc-meta">Updated: ${new Date(doc.updatedAt).toLocaleString()}</div>
+            <div class="doc-tags">
+              ${(doc.tags || []).map(tag => `<span class="tag">#${escapeHtml(tag)}</span>`).join('')}
+            </div>
+          </div>
+          <div class="button-group">
+            <button onclick="editDoc('${doc.id}')" class="secondary">Edit</button>
+            <button onclick="deleteDoc('${doc.id}')" class="danger">Delete</button>
+          </div>
+        </li>
+      `).join('');
+
+      await updateStorageStats();
+    }
+
+    function escapeHtml(str) {
+      return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // Form Submissions
+    document.getElementById('docForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('docId').value || `doc_${Date.now()}`;
+      const title = document.getElementById('docTitle').value;
+      const status = document.getElementById('docStatus').value;
+      const tagsRaw = document.getElementById('docTags').value;
+      const content = document.getElementById('docContent').value;
+
+      const tags = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
+
+      const docObj = {
+        id,
+        title,
+        status,
+        tags,
+        content,
+        updatedAt: Date.now()
+      };
+
+      await dbManager.put('documents', docObj);
+      dbManager.log(`Saved document ID "${id}" ("${title}").`);
+      document.getElementById('docForm').reset();
+      document.getElementById('docId').value = '';
+      await renderDocuments();
+    });
+
+    document.getElementById('btnReset').addEventListener('click', () => {
+      document.getElementById('docForm').reset();
+      document.getElementById('docId').value = '';
+    });
+
+    window.editDoc = async function(id) {
+      const doc = await dbManager.get('documents', id);
+      if (doc) {
+        document.getElementById('docId').value = doc.id;
+        document.getElementById('docTitle').value = doc.title;
+        document.getElementById('docStatus').value = doc.status;
+        document.getElementById('docTags').value = (doc.tags || []).join(', ');
+        document.getElementById('docContent').value = doc.content || '';
+      }
+    };
+
+    window.deleteDoc = async function(id) {
+      await dbManager.delete('documents', id);
+      dbManager.log(`Deleted document ID "${id}".`);
+      await renderDocuments();
+    };
+
+    // Filters
+    document.getElementById('btnFilterAll').addEventListener('click', () => renderDocuments());
+    document.getElementById('btnFilterDraft').addEventListener('click', () => renderDocuments('draft'));
+    document.getElementById('btnFilterPublished').addEventListener('click', () => renderDocuments('published'));
+    document.getElementById('btnFilterArchived').addEventListener('click', () => renderDocuments('archived'));
+
+    document.getElementById('btnClearAll').addEventListener('click', async () => {
+      if (confirm('Clear all documents from IndexedDB?')) {
+        await dbManager.clear('documents');
+        dbManager.log('Cleared all entries in "documents" store.');
+        await renderDocuments();
+      }
+    });
+
+    // Version Upgrade Simulation
+    document.getElementById('btnBumpVersion').addEventListener('click', async () => {
+      currentDbVersion += 1;
+      dbManager.log(`Simulating schema upgrade to version ${currentDbVersion}...`);
+      if (dbManager.db) {
+        dbManager.db.close();
+      }
+      dbManager = new IndexedDBManager(DB_NAME, currentDbVersion);
+      await dbManager.open(migrationHandler);
+      await renderDocuments();
+    });
+
+    // Boot App
+    (async () => {
+      await dbManager.open(migrationHandler);
+      await renderDocuments();
+      await updateStorageStats();
+    })();
+  </script>
+</body>
+</html>
