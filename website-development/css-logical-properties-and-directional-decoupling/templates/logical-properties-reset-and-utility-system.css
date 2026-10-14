@@ -1,0 +1,205 @@
+/* ==========================================================================
+   CSS Logical Properties Reset & Utility System
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Logical Box Model Reset
+   -------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Ensure root document containers handle inline/block bounds */
+html {
+  block-size: 100%;
+}
+
+body {
+  min-block-size: 100%;
+  margin-block: 0;
+  margin-inline: 0;
+}
+
+/* --------------------------------------------------------------------------
+   2. Logical Dimension Utilities
+   -------------------------------------------------------------------------- */
+
+/* Inline Size (Width in Horizontal Mode, Height in Vertical Mode) */
+.is-full    { inline-size: 100%; }
+.is-auto    { inline-size: auto; }
+.is-screen  { inline-size: 100vi; } /* Viewport Inline Size */
+.is-min     { inline-size: min-content; }
+.is-max     { inline-size: max-content; }
+.is-fit     { inline-size: fit-content; }
+
+/* Block Size (Height in Horizontal Mode, Width in Vertical Mode) */
+.bs-full    { block-size: 100%; }
+.bs-auto    { block-size: auto; }
+.bs-screen  { block-size: 100vb; } /* Viewport Block Size */
+.bs-min     { block-size: min-content; }
+.bs-max     { block-size: max-content; }
+.bs-fit     { block-size: fit-content; }
+
+/* Maximum Dimensions */
+.max-is-full { max-inline-size: 100%; }
+.max-bs-full { max-block-size: 100%; }
+
+/* --------------------------------------------------------------------------
+   3. Logical Margin Utilities
+   -------------------------------------------------------------------------- */
+
+/* Margin Inline (Start & End) */
+.mis-auto { margin-inline-start: auto; }
+.mie-auto { margin-inline-end: auto; }
+.mi-auto  { margin-inline: auto; }
+
+.mis-1 { margin-inline-start: 0.25rem; }
+.mis-2 { margin-inline-start: 0.5rem; }
+.mis-3 { margin-inline-start: 0.75rem; }
+.mis-4 { margin-inline-start: 1rem; }
+.mis-6 { margin-inline-start: 1.5rem; }
+.mis-8 { margin-inline-start: 2rem; }
+
+.mie-1 { margin-inline-end: 0.25rem; }
+.mie-2 { margin-inline-end: 0.5rem; }
+.mie-3 { margin-inline-end: 0.75rem; }
+.mie-4 { margin-inline-end: 1rem; }
+.mie-6 { margin-inline-end: 1.5rem; }
+.mie-8 { margin-inline-end: 2rem; }
+
+.mi-1 { margin-inline: 0.25rem; }
+.mi-2 { margin-inline: 0.5rem; }
+.mi-3 { margin-inline: 0.75rem; }
+.mi-4 { margin-inline: 1rem; }
+.mi-6 { margin-inline: 1.5rem; }
+.mi-8 { margin-inline: 2rem; }
+
+/* Margin Block (Start & End) */
+.mbs-1 { margin-block-start: 0.25rem; }
+.mbs-2 { margin-block-start: 0.5rem; }
+.mbs-3 { margin-block-start: 0.75rem; }
+.mbs-4 { margin-block-start: 1rem; }
+.mbs-6 { margin-block-start: 1.5rem; }
+.mbs-8 { margin-block-start: 2rem; }
+
+.mbe-1 { margin-block-end: 0.25rem; }
+.mbe-2 { margin-block-end: 0.5rem; }
+.mbe-3 { margin-block-end: 0.75rem; }
+.mbe-4 { margin-block-end: 1rem; }
+.mbe-6 { margin-block-end: 1.5rem; }
+.mbe-8 { margin-block-end: 2rem; }
+
+.mb-1 { margin-block: 0.25rem; }
+.mb-2 { margin-block: 0.5rem; }
+.mb-3 { margin-block: 0.75rem; }
+.mb-4 { margin-block: 1rem; }
+.mb-6 { margin-block: 1.5rem; }
+.mb-8 { margin-block: 2rem; }
+
+/* --------------------------------------------------------------------------
+   4. Logical Padding Utilities
+   -------------------------------------------------------------------------- */
+
+/* Padding Inline */
+.pis-1 { padding-inline-start: 0.25rem; }
+.pis-2 { padding-inline-start: 0.5rem; }
+.pis-3 { padding-inline-start: 0.75rem; }
+.pis-4 { padding-inline-start: 1rem; }
+.pis-6 { padding-inline-start: 1.5rem; }
+.pis-8 { padding-inline-start: 2rem; }
+
+.pie-1 { padding-inline-end: 0.25rem; }
+.pie-2 { padding-inline-end: 0.5rem; }
+.pie-3 { padding-inline-end: 0.75rem; }
+.pie-4 { padding-inline-end: 1rem; }
+.pie-6 { padding-inline-end: 1.5rem; }
+.pie-8 { padding-inline-end: 2rem; }
+
+.pi-1 { padding-inline: 0.25rem; }
+.pi-2 { padding-inline: 0.5rem; }
+.pi-3 { padding-inline: 0.75rem; }
+.pi-4 { padding-inline: 1rem; }
+.pi-6 { padding-inline: 1.5rem; }
+.pi-8 { padding-inline: 2rem; }
+
+/* Padding Block */
+.pbs-1 { padding-block-start: 0.25rem; }
+.pbs-2 { padding-block-start: 0.5rem; }
+.pbs-3 { padding-block-start: 0.75rem; }
+.pbs-4 { padding-block-start: 1rem; }
+.pbs-6 { padding-block-start: 1.5rem; }
+.pbs-8 { padding-block-start: 2rem; }
+
+.pbe-1 { padding-block-end: 0.25rem; }
+.pbe-2 { padding-block-end: 0.5rem; }
+.pbe-3 { padding-block-end: 0.75rem; }
+.pbe-4 { padding-block-end: 1rem; }
+.pbe-6 { padding-block-end: 1.5rem; }
+.pbe-8 { padding-block-end: 2rem; }
+
+.pb-1 { padding-block: 0.25rem; }
+.pb-2 { padding-block: 0.5rem; }
+.pb-3 { padding-block: 0.75rem; }
+.pb-4 { padding-block: 1rem; }
+.pb-6 { padding-block: 1.5rem; }
+.pb-8 { padding-block: 2rem; }
+
+/* --------------------------------------------------------------------------
+   5. Logical Inset & Absolute Positioning Utilities
+   -------------------------------------------------------------------------- */
+
+.inset-0 { inset: 0; }
+.inset-inline-0 { inset-inline: 0; }
+.inset-block-0  { inset-block: 0; }
+
+.inset-is-0 { inset-inline-start: 0; }
+.inset-ie-0 { inset-inline-end: 0; }
+.inset-bs-0 { inset-block-start: 0; }
+.inset-be-0 { inset-block-end: 0; }
+
+/* --------------------------------------------------------------------------
+   6. Logical Border & Border Radius Utilities
+   -------------------------------------------------------------------------- */
+
+.border-is-1 { border-inline-start-width: 1px; border-inline-start-style: solid; }
+.border-ie-1 { border-inline-end-width: 1px; border-inline-end-style: solid; }
+.border-bs-1 { border-block-start-width: 1px; border-block-start-style: solid; }
+.border-be-1 { border-block-end-width: 1px; border-block-end-style: solid; }
+
+/* Logical Corner Border Radius */
+.rounded-ss-md { border-start-start-radius: 0.375rem; }
+.rounded-se-md { border-start-end-radius: 0.375rem; }
+.rounded-es-md { border-end-start-radius: 0.375rem; }
+.rounded-ee-md { border-end-end-radius: 0.375rem; }
+
+.rounded-s-md {
+  border-start-start-radius: 0.375rem;
+  border-end-start-radius: 0.375rem;
+}
+
+.rounded-e-md {
+  border-start-end-radius: 0.375rem;
+  border-end-end-radius: 0.375rem;
+}
+
+/* --------------------------------------------------------------------------
+   7. Logical Text Alignment & Flow Helpers
+   -------------------------------------------------------------------------- */
+
+.text-start { text-align: start; }
+.text-end   { text-align: end; }
+
+.float-is { float: inline-start; }
+.float-ie { float: inline-end; }
+.clear-is { clear: inline-start; }
+.clear-ie { clear: inline-end; }
+
+.overflow-i-auto { overflow-inline: auto; }
+.overflow-b-auto { overflow-block: auto; }
+
+/* Directional Icon Flip Utility for RTL contexts */
+[dir="rtl"] .icon-flip-rtl {
+  transform: scaleX(-1);
+}
