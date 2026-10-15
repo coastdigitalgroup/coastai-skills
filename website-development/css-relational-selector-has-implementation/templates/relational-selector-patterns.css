@@ -1,0 +1,132 @@
+/**
+ * CSS Relational Selector (:has()) Pattern Library
+ * Reusable, high-performance pure-CSS relational styling templates.
+ */
+
+/* ==========================================================================
+   1. PARENT CARD & SELECTION CONTAINER STYLING
+   ========================================================================== */
+
+/* Style card container when nested radio or checkbox is checked */
+.has-card-selection:has(input[type="checkbox"]:checked),
+.has-card-selection:has(input[type="radio"]:checked) {
+  border-color: var(--card-selected-border, #2563eb);
+  background-color: var(--card-selected-bg, #eff6ff);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+}
+
+/* Elevate focus ring to card container when internal input receives keyboard focus */
+.has-card-selection:has(input:focus-visible) {
+  outline: 3px solid var(--card-focus-ring, #2563eb);
+  outline-offset: 2px;
+}
+
+/* Mute container when nested input is disabled */
+.has-card-selection:has(input:disabled) {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   2. FORM FIELD GROUP CONTAINER VALIDATION & FLOATING LABELS
+   ========================================================================== */
+
+/* Parent field wrapper focus highlight */
+.form-field-group:has(.form-control:focus-visible) {
+  border-color: var(--field-focus-border, #2563eb);
+  box-shadow: 0 0 0 3px var(--field-focus-glow, rgba(37, 99, 235, 0.15));
+}
+
+/* Parent field wrapper error state for invalid input after blur */
+.form-field-group:has(.form-control:user-invalid) {
+  border-color: var(--field-error-border, #dc2626);
+  background-color: var(--field-error-bg, #fef2f2);
+}
+
+/* Automatically display error text inside parent field wrapper */
+.form-field-group:has(.form-control:user-invalid) .field-error-message {
+  display: block;
+  color: var(--field-error-text, #dc2626);
+}
+
+/* Floating label position when input is focused or contains text */
+.floating-label-group:has(.floating-input:focus),
+.floating-label-group:has(.floating-input:not(:placeholder-shown)) .floating-label-text {
+  transform: translateY(-1.25rem) scale(0.85);
+  color: var(--field-focus-border, #2563eb);
+}
+
+/* ==========================================================================
+   3. PRECEDING SIBLING & TRAILING STATE STYLING
+   ========================================================================== */
+
+/* Style label preceding a checked radio or checkbox input */
+.sibling-label:has(+ .sibling-input:checked) {
+  font-weight: 600;
+  color: var(--color-primary, #2563eb);
+}
+
+/* Trailing fill effect for natural DOM order ratings or steppers */
+.step-item:has(~ .step-item.is-active),
+.step-item:has(+ .step-item.is-active) {
+  border-color: var(--step-completed-color, #16a34a);
+  background-color: var(--step-completed-bg, #f0fdf4);
+  color: var(--step-completed-color, #16a34a);
+}
+
+/* ==========================================================================
+   4. NAVIGATION & SUBMENU ACTIVE STATE CHAINING
+   ========================================================================== */
+
+/* Highlight top-level nav tab if any child link in dropdown is active */
+.nav-item:has(.dropdown-menu [aria-current="page"]),
+.nav-item:has(.dropdown-menu .is-active) {
+  border-bottom-color: var(--nav-active-indicator, #2563eb);
+  color: var(--nav-active-text, #2563eb);
+  font-weight: 600;
+}
+
+/* Expand mobile navigation parent dropdown container when toggled open */
+.nav-dropdown:has(.dropdown-toggle[aria-expanded="true"]) .dropdown-panel {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ==========================================================================
+   5. DYNAMIC STRUCTURAL LAYOUT ADAPTATION
+   ========================================================================== */
+
+/* Switch container from 1-column to 2-column grid when optional slot contains children */
+.content-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.content-layout:has(.sidebar-slot:not(:empty)) {
+  grid-template-columns: 1fr 320px;
+}
+
+/* Hide empty wrapper element completely without JS DOM checks */
+.component-wrapper:not(:has(*)),
+.slot-container:has(> :empty) {
+  display: none !important;
+}
+
+/* ==========================================================================
+   6. GLOBAL PAGE STATE & OVERLAY LOCKS
+   ========================================================================== */
+
+/* Dim/blur main content when a modal dialog is active in the DOM */
+body:has(dialog[open]) .main-app-content {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Prevent body scrolling when an expanded full-screen drawer is active */
+body:has(.fullscreen-drawer[aria-expanded="true"]) {
+  overflow: hidden;
+}
