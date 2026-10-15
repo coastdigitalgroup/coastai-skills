@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Process & Workflow System - Reusable Component Spec</title>
+  <style>
+    /* CSS Custom Properties & Tokens */
+    :root {
+      --color-primary: #2563eb;
+      --color-primary-subtle: #eff6ff;
+      --color-text-main: #0f172a;
+      --color-text-muted: #475569;
+      --color-border: #cbd5e1;
+      --color-border-subtle: #e2e8f0;
+      --color-surface: #ffffff;
+      --color-surface-muted: #f8fafc;
+      --focus-ring: #2563eb;
+      --radius-m: 8px;
+      --radius-l: 16px;
+      --space-s: 0.5rem;
+      --space-m: 1rem;
+      --space-l: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+    }
+
+    /* Global Reset & Container */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--color-text-main);
+      background-color: #f1f5f9;
+      line-height: 1.5;
+      padding: var(--space-xl) var(--space-m);
+    }
+
+    .process-section {
+      max-width: 1200px;
+      margin: 0 auto var(--space-2xl);
+      background: var(--color-surface);
+      border-radius: var(--radius-l);
+      padding: var(--space-2xl) var(--space-xl);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .process-header {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto var(--space-2xl);
+    }
+
+    .process-header__eyebrow {
+      font-size: 0.875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-primary);
+      margin-bottom: var(--space-s);
+    }
+
+    .process-header__title {
+      font-size: clamp(1.75rem, 3vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--color-text-main);
+      margin-bottom: var(--space-m);
+    }
+
+    .process-header__subtitle {
+      font-size: 1.125rem;
+      color: var(--color-text-muted);
+    }
+
+    /* ==========================================================================
+       PATTERN A: Horizontal Node Chain (3-4 Steps)
+       ========================================================================== */
+    .process-chain {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-xl);
+      position: relative;
+    }
+
+    .process-chain__item {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    /* Connector line connecting steps */
+    .process-chain__item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 22px;
+      left: calc(44px + var(--space-m));
+      width: calc(100% + var(--space-xl) - 44px - (var(--space-m) * 2));
+      height: 2px;
+      border-top: 2px dashed var(--color-border);
+      z-index: 1;
+    }
+
+    .process-chain__node {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background-color: var(--color-primary-subtle);
+      border: 2px solid var(--color-primary);
+      color: var(--color-primary);
+      font-weight: 700;
+      font-size: 1.125rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-m);
+      position: relative;
+      z-index: 2;
+    }
+
+    .process-chain__badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      background: var(--color-primary-subtle);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      margin-bottom: var(--space-s);
+    }
+
+    .process-chain__title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--color-text-main);
+      margin-bottom: var(--space-s);
+    }
+
+    .process-chain__description {
+      font-size: 0.9375rem;
+      color: var(--color-text-muted);
+      line-height: 1.6;
+      max-width: 38ch;
+    }
+
+    /* Responsive Adaptation for Horizontal Chain */
+    @media (max-width: 868px) {
+      .process-chain {
+        grid-template-columns: 1fr;
+        gap: var(--space-xl);
+      }
+
+      .process-chain__item {
+        padding-left: 60px;
+      }
+
+      .process-chain__node {
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+
+      .process-chain__item:not(:last-child)::after {
+        top: 44px;
+        left: 21px;
+        width: 2px;
+        height: calc(100% + var(--space-xl) - 44px);
+        border-top: none;
+        border-left: 2px dashed var(--color-border);
+      }
+    }
+
+    /* ==========================================================================
+       PATTERN B: Split Tabbed Interactive Workflow
+       ========================================================================== */
+    .process-tabbed {
+      display: grid;
+      grid-template-columns: 40% 1fr;
+      gap: var(--space-xl);
+      align-items: start;
+    }
+
+    .process-tablist {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-m);
+    }
+
+    .process-tab {
+      appearance: none;
+      background: var(--color-surface-muted);
+      border: 1px solid var(--color-border-subtle);
+      border-left: 4px solid transparent;
+      border-radius: var(--radius-m);
+      padding: var(--space-m) var(--space-l);
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .process-tab:hover {
+      background: var(--color-surface);
+      border-color: var(--color-border);
+    }
+
+    .process-tab:focus-visible {
+      outline: 2px solid var(--focus-ring);
+      outline-offset: 2px;
+    }
+
+    .process-tab[aria-selected="true"] {
+      background: var(--color-surface);
+      border-color: var(--color-border);
+      border-left-color: var(--color-primary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .process-tab__header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-s);
+      margin-bottom: var(--space-s);
+    }
+
+    .process-tab__num {
+      font-weight: 700;
+      color: var(--color-primary);
+      font-size: 0.875rem;
+    }
+
+    .process-tab__title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--color-text-main);
+    }
+
+    .process-tab__desc {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+
+    .process-panel {
+      background: var(--color-surface-muted);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-l);
+      padding: var(--space-xl);
+      min-height: 380px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .process-panel[hidden] {
+      display: none;
+    }
+
+    .process-panel__mockup {
+      width: 100%;
+      max-width: 500px;
+      height: 240px;
+      background: #0f172a;
+      border-radius: var(--radius-m);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      font-family: monospace;
+      font-size: 0.875rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+    }
+
+    @media (max-width: 868px) {
+      .process-tabbed {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       SECTION 1: Horizontal Step Chain
+       ========================================================================== -->
+  <section class="process-section" aria-labelledby="chain-title">
+    <header class="process-header">
+      <p class="process-header__eyebrow">Seamless Onboarding</p>
+      <h2 id="chain-title" class="process-header__title">How DataStream Integrates</h2>
+      <p class="process-header__subtitle">Connect your existing data stack and start streaming insights in under 10 minutes.</p>
+    </header>
+
+    <ol class="process-chain">
+      <li class="process-chain__item">
+        <div class="process-chain__node" aria-hidden="true">1</div>
+        <span class="process-chain__badge">&lt; 2 Minutes</span>
+        <h3 class="process-chain__title">Connect Sources</h3>
+        <p class="process-chain__description">Authenticate your database or API endpoints using our 50+ pre-built native connectors.</p>
+      </li>
+
+      <li class="process-chain__item">
+        <div class="process-chain__node" aria-hidden="true">2</div>
+        <span class="process-chain__badge">&lt; 5 Minutes</span>
+        <h3 class="process-chain__title">Configure Rules</h3>
+        <p class="process-chain__description">Set up automated schema mapping, data transformations, and real-time anomaly alerts.</p>
+      </li>
+
+      <li class="process-chain__item">
+        <div class="process-chain__node" aria-hidden="true">3</div>
+        <span class="process-chain__badge">Instant</span>
+        <h3 class="process-chain__title">Stream Analytics</h3>
+        <p class="process-chain__description">Query live data via SQL or stream clean event feeds directly into your BI dashboards.</p>
+      </li>
+    </ol>
+  </section>
+
+
+  <!-- ==========================================================================
+       SECTION 2: Interactive Split-Media Tabbed Workflow
+       ========================================================================== -->
+  <section class="process-section" aria-labelledby="tabbed-title">
+    <header class="process-header">
+      <p class="process-header__eyebrow">Interactive Product Tour</p>
+      <h2 id="tabbed-title" class="process-header__title">Automate Security in 3 Steps</h2>
+      <p class="process-header__subtitle">Explore how GuardRail enforces code security across your repositories.</p>
+    </header>
+
+    <div class="process-tabbed">
+      <!-- Step Tab Triggers -->
+      <div class="process-tablist" role="tablist" aria-label="Security Workflow Steps">
+        <button type="button" class="process-tab" role="tab" id="tab-1" aria-selected="true" aria-controls="panel-1">
+          <div class="process-tab__header">
+            <span class="process-tab__num">STEP 01</span>
+            <span class="process-tab__title">Repository Scan</span>
+          </div>
+          <p class="process-tab__desc">Automated static analysis detects secrets and vulnerabilities on every pull request.</p>
+        </button>
+
+        <button type="button" class="process-tab" role="tab" id="tab-2" aria-selected="false" aria-controls="panel-2" tabindex="-1">
+          <div class="process-tab__header">
+            <span class="process-tab__num">STEP 02</span>
+            <span class="process-tab__title">Policy Enforcement</span>
+          </div>
+          <p class="process-tab__desc">Custom security guardrails block unsafe merges before code enters production.</p>
+        </button>
+
+        <button type="button" class="process-tab" role="tab" id="tab-3" aria-selected="false" aria-controls="panel-3" tabindex="-1">
+          <div class="process-tab__header">
+            <span class="process-tab__num">STEP 03</span>
+            <span class="process-tab__title">Auto-Remediation</span>
+          </div>
+          <p class="process-tab__desc">Generate 1-click fix pull requests with upgraded dependencies and patches.</p>
+        </button>
+      </div>
+
+      <!-- Tab Preview Panels -->
+      <div class="process-tabpanels">
+        <div id="panel-1" role="tabpanel" aria-labelledby="tab-1" class="process-panel">
+          <div class="process-panel__mockup">
+            [ UI MOCKUP: PR Scan - 0 Secrets Found ]
+          </div>
+        </div>
+
+        <div id="panel-2" role="tabpanel" aria-labelledby="tab-2" class="process-panel" hidden>
+          <div class="process-panel__mockup">
+            [ UI MOCKUP: Custom Security Policy Rules ]
+          </div>
+        </div>
+
+        <div id="panel-3" role="tabpanel" aria-labelledby="tab-3" class="process-panel" hidden>
+          <div class="process-panel__mockup">
+            [ UI MOCKUP: Automated Remediation PR ]
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive JavaScript for Tabbed Workflow -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabs = document.querySelectorAll('.process-tab');
+      const panels = document.querySelectorAll('.process-panel');
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          // Deactivate all tabs
+          tabs.forEach(t => {
+            t.setAttribute('aria-selected', 'false');
+            t.setAttribute('tabindex', '-1');
+          });
+
+          // Hide all panels
+          panels.forEach(p => p.hidden = true);
+
+          // Activate clicked tab
+          tab.setAttribute('aria-selected', 'true');
+          tab.removeAttribute('tabindex');
+
+          // Show corresponding panel
+          const targetPanel = document.getElementById(tab.getAttribute('aria-controls'));
+          if (targetPanel) {
+            targetPanel.hidden = false;
+          }
+        });
+
+        // Arrow key navigation
+        tab.addEventListener('keydown', (e) => {
+          let targetTab = null;
+          const tabArray = Array.from(tabs);
+          const index = tabArray.indexOf(tab);
+
+          if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+            targetTab = tabArray[(index + 1) % tabArray.length];
+          } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+            targetTab = tabArray[(index - 1 + tabArray.length) % tabArray.length];
+          }
+
+          if (targetTab) {
+            targetTab.focus();
+            targetTab.click();
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
