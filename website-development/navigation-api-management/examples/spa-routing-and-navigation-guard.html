@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Navigation API SPA & Navigation Guard Example</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --danger: #dc2626;
+      --success: #16a34a;
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 3rem;
+    }
+
+    header {
+      background-color: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .nav-container {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    nav {
+      display: flex;
+      gap: 1rem;
+    }
+
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    nav a:hover {
+      color: var(--primary);
+      background-color: #eff6ff;
+    }
+
+    nav a.active {
+      color: var(--primary);
+      background-color: #dbeafe;
+      font-weight: 600;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+      outline: none;
+    }
+
+    h1:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 4px;
+      border-radius: 4px;
+    }
+
+    p {
+      margin-bottom: 1rem;
+      color: #334155;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      background-color: #f1f5f9;
+      color: var(--text-muted);
+    }
+
+    .status-badge.supported {
+      background-color: #dcfce7;
+      color: var(--success);
+    }
+
+    .status-badge.fallback {
+      background-color: #fef3c7;
+      color: #d97706;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 1rem;
+    }
+
+    input[type="text"]:focus, textarea:focus {
+      outline: 2px solid var(--primary);
+      border-color: transparent;
+    }
+
+    .dirty-indicator {
+      display: inline-block;
+      font-size: 0.85rem;
+      color: var(--danger);
+      font-weight: 600;
+      margin-top: 0.25rem;
+    }
+
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.65rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+    }
+
+    button.secondary {
+      background-color: #e2e8f0;
+      color: var(--text);
+    }
+
+    button.secondary:hover {
+      background-color: #cbd5e1;
+    }
+
+    .history-inspector {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.85rem;
+      background-color: #0f172a;
+      color: #38bdf8;
+      padding: 1rem;
+      border-radius: var(--radius);
+      overflow-x: auto;
+      max-height: 200px;
+    }
+
+    .loading-bar {
+      height: 3px;
+      width: 100%;
+      background-color: #e2e8f0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      overflow: hidden;
+      display: none;
+      z-index: 100;
+    }
+
+    .loading-bar .progress {
+      height: 100%;
+      background-color: var(--primary);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .loading-bar.active {
+      display: block;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loading-bar" class="loading-bar">
+    <div id="progress" class="progress"></div>
+  </div>
+
+  <header>
+    <div class="nav-container">
+      <a href="/home" class="brand">AppStudio</a>
+      <nav id="app-nav">
+        <a href="/home" class="nav-link active" data-path="/home">Home</a>
+        <a href="/editor" class="nav-link" data-path="/editor">Editor</a>
+        <a href="/history" class="nav-link" data-path="/history">History Inspector</a>
+        <a href="https://example.com" class="nav-link" target="_blank" rel="noopener">External Link</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="app-view">
+    <!-- Dynamic Content Rendered Here -->
+  </main>
+
+  <!-- WCAG Live Region for Screen Reader Route Announcements -->
+  <div id="a11y-announcer" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+
+  <script>
+    // --- Application State ---
+    let isFormDirty = false;
+    let isNavigating = false;
+
+    // --- Feature Detection ---
+    const isNavigationApiSupported = 'navigation' in window;
+
+    // --- View Templates ---
+    const routes = {
+      '/home': () => `
+        <div class="card">
+          <div class="status-badge ${isNavigationApiSupported ? 'supported' : 'fallback'}">
+            ● ${isNavigationApiSupported ? 'W3C Navigation API Active (window.navigation)' : 'Fallback Router Active (History API)'}
+          </div>
+          <h1 id="view-title" tabindex="-1">Welcome to Navigation API Demo</h1>
+          <p>This application demonstrates modern client-side routing using the W3C Navigation API (<code>window.navigation</code>) with interception, async view loading, focus management, and navigation guards.</p>
+          <p>Try clicking between pages or test the Navigation Guard in the Editor tab.</p>
+          <button onclick="navigateProgrammatically('/editor')">Go to Editor</button>
+        </div>
+      `,
+      '/editor': () => `
+        <div class="card">
+          <h1 id="view-title" tabindex="-1">Content Editor</h1>
+          <p>Type into the form below to mark the state as "dirty". Then attempt to click another nav link or go back to test the Navigation Guard interception.</p>
+          <form id="editor-form" onsubmit="event.preventDefault(); saveForm();">
+            <div class="form-group">
+              <label for="doc-title">Document Title</label>
+              <input type="text" id="doc-title" value="Untitled Document" oninput="markDirty()">
+            </div>
+            <div class="form-group">
+              <label for="doc-body">Document Content</label>
+              <textarea id="doc-body" rows="4" oninput="markDirty()">Lorem ipsum dolor sit amet...</textarea>
+            </div>
+            <div id="dirty-status" style="margin-bottom: 1rem;">
+              ${isFormDirty ? '<span class="dirty-indicator">⚠️ Unsaved changes present! Navigation will be guarded.</span>' : '<span style="color: var(--success); font-weight: 500;">✓ Form clean.</span>'}
+            </div>
+            <button type="submit">Save Changes</button>
+            <button type="button" class="secondary" onclick="resetForm()">Reset Form</button>
+          </form>
+        </div>
+      `,
+      '/history': () => `
+        <div class="card">
+          <h1 id="view-title" tabindex="-1">Browser History Inspector</h1>
+          <p>Below is a real-time inspection of browser history entries accessible via <code>navigation.entries()</code>.</p>
+          <div class="history-inspector" id="history-log">
+            Loading history stack...
+          </div>
+          <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted);">
+            Current Entry Key: <code id="current-entry-key">${isNavigationApiSupported ? navigation.currentEntry?.key : 'N/A'}</code>
+          </p>
+        </div>
+      `
+    };
+
+    // --- Helper Functions ---
+    function markDirty() {
+      if (!isFormDirty) {
+        isFormDirty = true;
+        const statusEl = document.getElementById('dirty-status');
+        if (statusEl) {
+          statusEl.innerHTML = '<span class="dirty-indicator">⚠️ Unsaved changes present! Navigation will be guarded.</span>';
+        }
+      }
+    }
+
+    function resetForm() {
+      isFormDirty = false;
+      const statusEl = document.getElementById('dirty-status');
+      if (statusEl) {
+        statusEl.innerHTML = '<span style="color: var(--success); font-weight: 500;">✓ Form clean.</span>';
+      }
+    }
+
+    function saveForm() {
+      isFormDirty = false;
+      alert('Form saved successfully!');
+      resetForm();
+    }
+
+    function announceForScreenReader(message) {
+      const announcer = document.getElementById('a11y-announcer');
+      if (announcer) {
+        announcer.textContent = message;
+      }
+    }
+
+    function updateNavHighlight(pathname) {
+      document.querySelectorAll('#app-nav a').forEach(link => {
+        const linkPath = link.getAttribute('data-path') || link.getAttribute('href');
+        if (linkPath === pathname) {
+          link.classList.add('active');
+          link.setAttribute('aria-current', 'page');
+        } else {
+          link.classList.remove('active');
+          link.removeAttribute('aria-current');
+        }
+      });
+    }
+
+    function updateHistoryInspectorLog() {
+      const logEl = document.getElementById('history-log');
+      if (!logEl) return;
+
+      if (isNavigationApiSupported) {
+        const entries = navigation.entries().map((entry, index) => ({
+          index,
+          key: entry.key,
+          id: entry.id,
+          url: entry.url,
+          isCurrent: entry.key === navigation.currentEntry?.key
+        }));
+        logEl.textContent = JSON.stringify(entries, null, 2);
+      } else {
+        logEl.textContent = '// Navigation API not supported in this browser.\n// Showing window.location:\n' + JSON.stringify({
+          pathname: window.location.pathname,
+          href: window.location.href,
+          historyLength: window.history.length
+        }, null, 2);
+      }
+    }
+
+    async function simulateAsyncPageLoad(pathname, signal) {
+      const loadingBar = document.getElementById('loading-bar');
+      const progressBar = document.getElementById('progress');
+
+      loadingBar.classList.add('active');
+      progressBar.style.width = '30%';
+
+      // Simulate 200ms network fetch latency
+      await new Promise((resolve, reject) => {
+        const timer = setTimeout(resolve, 200);
+        if (signal) {
+          signal.addEventListener('abort', () => {
+            clearTimeout(timer);
+            reject(new DOMException('Navigation aborted by user', 'AbortError'));
+          });
+        }
+      });
+
+      progressBar.style.width = '100%';
+      setTimeout(() => {
+        loadingBar.classList.remove('active');
+        progressBar.style.width = '0%';
+      }, 150);
+
+      const renderFn = routes[pathname] || routes['/home'];
+      const appView = document.getElementById('app-view');
+      appView.innerHTML = renderFn();
+
+      if (pathname === '/history') {
+        updateHistoryInspectorLog();
+      }
+    }
+
+    function navigateProgrammatically(url) {
+      if (isNavigationApiSupported) {
+        navigation.navigate(url);
+      } else {
+        window.history.pushState({}, '', url);
+        handleFallbackRoute(url);
+      }
+    }
+
+    // --- Core Navigation API Setup ---
+    if (isNavigationApiSupported) {
+      navigation.addEventListener('navigate', (navigateEvent) => {
+        // 1. Check if event can be intercepted
+        if (!navigateEvent.canIntercept || navigateEvent.hashChange || navigateEvent.downloadRequest) {
+          return; // Allow browser default handling
+        }
+
+        const url = new URL(navigateEvent.destination.url);
+
+        // 2. Reject cross-origin navigations
+        if (url.origin !== window.location.origin) {
+          return;
+        }
+
+        // 3. Navigation Guard (Unsaved Changes)
+        if (isFormDirty && navigateEvent.userInitiated) {
+          const confirmDiscard = confirm('You have unsaved changes in the Editor! Discard and navigate away?');
+          if (!confirmDiscard) {
+            navigateEvent.preventDefault(); // Block navigation
+            return;
+          }
+          isFormDirty = false; // Reset guard if confirmed
+        }
+
+        // 4. Intercept the navigation
+        navigateEvent.intercept({
+          scroll: 'manual', // Control scroll restoration manually
+          async handler() {
+            try {
+              const signal = navigateEvent.signal;
+
+              // Perform async page transition with abort signal protection
+              await simulateAsyncPageLoad(url.pathname, signal);
+
+              // Update navigation visual state
+              updateNavHighlight(url.pathname);
+
+              // Update document title
+              const formattedTitle = url.pathname.slice(1) || 'home';
+              document.title = `AppStudio - ${formattedTitle.charAt(0).toUpperCase() + formattedTitle.slice(1)}`;
+
+              // Accessibility: Announce route change to screen readers
+              announceForScreenReader(`Navigated to ${document.title}`);
+
+              // Focus management: Shift focus to main heading
+              const heading = document.getElementById('view-title');
+              if (heading) {
+                heading.focus();
+              }
+
+              // Scroll restoration handling
+              if (navigateEvent.navigationType === 'push' || navigateEvent.navigationType === 'replace') {
+                window.scrollTo(0, 0);
+              }
+
+            } catch (err) {
+              if (err.name === 'AbortError') {
+                console.log('Navigation aborted by newer request.');
+              } else {
+                console.error('Page render error:', err);
+                document.getElementById('app-view').innerHTML = `
+                  <div class="card">
+                    <h1 style="color: var(--danger)">Navigation Error</h1>
+                    <p>Failed to load requested page.</p>
+                  </div>
+                `;
+              }
+            }
+          }
+        });
+      });
+    } else {
+      // --- Fallback Router for Legacy Browsers ---
+      function handleFallbackRoute(pathname) {
+        if (isFormDirty) {
+          const confirmDiscard = confirm('You have unsaved changes! Discard and navigate?');
+          if (!confirmDiscard) return;
+          isFormDirty = false;
+        }
+
+        simulateAsyncPageLoad(pathname).then(() => {
+          updateNavHighlight(pathname);
+          const heading = document.getElementById('view-title');
+          if (heading) heading.focus();
+          window.scrollTo(0, 0);
+        });
+      }
+
+      document.addEventListener('click', (e) => {
+        const link = e.target.closest('a');
+        if (!link) return;
+
+        const href = link.getAttribute('href');
+        const target = link.getAttribute('target');
+
+        if (href && href.startsWith('/') && target !== '_blank') {
+          e.preventDefault();
+          window.history.pushState({}, '', href);
+          handleFallbackRoute(href);
+        }
+      });
+
+      window.addEventListener('popstate', () => {
+        handleFallbackRoute(window.location.pathname);
+      });
+    }
+
+    // --- Initial Page Load ---
+    const initialPath = window.location.pathname === '/' ? '/home' : window.location.pathname;
+    simulateAsyncPageLoad(initialPath).then(() => {
+      updateNavHighlight(initialPath);
+    });
+  </script>
+</body>
+</html>
