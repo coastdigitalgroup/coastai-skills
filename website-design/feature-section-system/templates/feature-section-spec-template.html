@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feature Section System - Component Template</title>
+  <style>
+    /* CSS CUSTOM PROPERTIES / DESIGN TOKENS */
+    :root {
+      /* Colors */
+      --color-bg-primary: #ffffff;
+      --color-bg-secondary: #f8fafc;
+      --color-surface-card: #ffffff;
+      --color-text-primary: #0f172a;
+      --color-text-secondary: #334155;
+      --color-text-muted: #64748b;
+      --color-brand-primary: #0284c7;
+      --color-brand-hover: #0369a1;
+      --color-brand-subtle: #e0f2fe;
+      --color-border-subtle: #e2e8f0;
+      --color-border-strong: #cbd5e1;
+      --color-focus-ring: #0284c7;
+
+      /* Spacing Scale */
+      --space-xs: 0.5rem;   /* 8px */
+      --space-s: 1rem;      /* 16px */
+      --space-m: 1.5rem;    /* 24px */
+      --space-l: 2rem;      /* 32px */
+      --space-xl: 3rem;     /* 48px */
+      --section-padding-v: clamp(3.5rem, 8vw, 6rem);
+
+      /* Typography Scale */
+      --font-family-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --text-eyebrow: 0.875rem;
+      --text-body: 1.125rem;
+      --text-h2: clamp(1.875rem, 4vw, 2.75rem);
+      --text-h3: clamp(1.375rem, 2.5vw, 1.875rem);
+
+      /* Elevation & Radii */
+      --radius-s: 8px;
+      --radius-m: 12px;
+      --radius-l: 16px;
+      --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-media: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+    }
+
+    /* GLOBAL RESET & BASE STYLES */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family-sans);
+      background-color: var(--color-bg-primary);
+      color: var(--color-text-primary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1280px;
+      margin-inline: auto;
+      padding-inline: var(--space-m);
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 720px;
+      margin-inline: auto;
+      margin-bottom: var(--space-xl);
+    }
+
+    .eyebrow {
+      display: inline-block;
+      font-size: var(--text-eyebrow);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-brand-primary);
+      margin-bottom: var(--space-xs);
+    }
+
+    .section-title {
+      font-size: var(--text-h2);
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-s);
+    }
+
+    .section-subtitle {
+      font-size: var(--text-body);
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ==========================================================================
+       PATTERN A: ZIGZAG ALTERNATING FEATURE ROWS
+       ========================================================================== */
+    .feature-zigzag-section {
+      padding-block: var(--section-padding-v);
+      background-color: var(--color-bg-primary);
+    }
+
+    .zigzag-stack {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(3rem, 6vw, 5.5rem);
+    }
+
+    /* Row Layout: Default Mobile Order is Text-First, Media-Second */
+    .zigzag-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-l);
+      align-items: center;
+    }
+
+    @media (min-width: 1024px) {
+      .zigzag-row {
+        grid-template-columns: repeat(12, 1fr);
+        gap: var(--space-xl);
+      }
+
+      /* Odd Rows: Text (Cols 1-5), Media (Cols 6-12) */
+      .zigzag-row:nth-child(odd) .zigzag-text {
+        grid-column: 1 / span 5;
+      }
+      .zigzag-row:nth-child(odd) .zigzag-media {
+        grid-column: 6 / span 7;
+      }
+
+      /* Even Rows (Desktop Flip): Media (Cols 1-7), Text (Cols 8-12) */
+      .zigzag-row:nth-child(even) .zigzag-text {
+        grid-column: 8 / span 5;
+      }
+      .zigzag-row:nth-child(even) .zigzag-media {
+        grid-column: 1 / span 7;
+        grid-row: 1; /* Keep media on left visually without breaking DOM order */
+      }
+    }
+
+    .zigzag-text .feature-title {
+      font-size: var(--text-h3);
+      font-weight: 700;
+      line-height: 1.25;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-s);
+    }
+
+    .zigzag-text .feature-body {
+      font-size: var(--text-body);
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      max-width: 55ch;
+      margin-bottom: var(--space-m);
+    }
+
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-s);
+    }
+
+    .feature-list-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-xs);
+      font-size: 1rem;
+      color: var(--color-text-secondary);
+    }
+
+    .feature-list-icon {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      color: var(--color-brand-primary);
+      margin-top: 2px;
+    }
+
+    /* Media Frame Styling */
+    .media-frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      background-color: var(--color-bg-secondary);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-m);
+      box-shadow: var(--shadow-media);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .media-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .media-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      color: var(--color-text-muted);
+      font-weight: 600;
+      padding: var(--space-m);
+      text-align: center;
+    }
+
+    /* ==========================================================================
+       PATTERN B: INTERACTIVE TABBED FEATURE SWITCHER
+       ========================================================================== */
+    .feature-tab-section {
+      padding-block: var(--section-padding-v);
+      background-color: var(--color-bg-secondary);
+      border-block: 1px solid var(--color-border-subtle);
+    }
+
+    .tab-nav {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-xs);
+      border-bottom: 2px solid var(--color-border-subtle);
+      margin-bottom: var(--space-xl);
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .tab-button {
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      padding: var(--space-s) var(--space-m);
+      cursor: pointer;
+      position: relative;
+      white-space: nowrap;
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      transition: color 0.2s ease;
+    }
+
+    .tab-button:hover {
+      color: var(--color-text-primary);
+    }
+
+    .tab-button:focus-visible {
+      outline: 2px solid var(--color-focus-ring);
+      outline-offset: -2px;
+      border-radius: var(--radius-s);
+    }
+
+    .tab-button[aria-selected="true"] {
+      color: var(--color-brand-primary);
+    }
+
+    .tab-button[aria-selected="true"]::after {
+      content: "";
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background-color: var(--color-brand-primary);
+      border-radius: 3px 3px 0 0;
+    }
+
+    .tab-panel {
+      display: none;
+      grid-template-columns: 1fr;
+      gap: var(--space-l);
+      align-items: center;
+      background-color: var(--color-surface-card);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-l);
+      padding: var(--space-l);
+      box-shadow: var(--shadow-card);
+    }
+
+    .tab-panel[tabindex="0"]:focus-visible {
+      outline: 2px solid var(--color-focus-ring);
+      outline-offset: 2px;
+    }
+
+    .tab-panel.is-active {
+      display: grid;
+    }
+
+    @media (min-width: 1024px) {
+      .tab-panel {
+        grid-template-columns: repeat(12, 1fr);
+        padding: var(--space-xl);
+      }
+      .tab-panel-media {
+        grid-column: 1 / span 7;
+      }
+      .tab-panel-content {
+        grid-column: 8 / span 5;
+      }
+    }
+
+    /* ==========================================================================
+       PATTERN C: 3-COLUMN FEATURE CARD GRID
+       ========================================================================== */
+    .feature-grid-section {
+      padding-block: var(--section-padding-v);
+      background-color: var(--color-bg-primary);
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-m);
+    }
+
+    @media (min-width: 768px) {
+      .card-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .card-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-l);
+      }
+    }
+
+    .feature-card {
+      background-color: var(--color-surface-card);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-m);
+      padding: var(--space-l);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-s);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-media);
+    }
+
+    .card-icon-badge {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-s);
+      background-color: var(--color-brand-subtle);
+      color: var(--color-brand-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+
+    .card-body {
+      font-size: 1rem;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+
+    /* REDUCED MOTION SAFEGUARD */
+    @media (prefers-reduced-motion: reduce) {
+      .feature-card,
+      .tab-button {
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ======================================================================
+       PATTERN A: ZIGZAG ALTERNATING FEATURE ROWS
+       ====================================================================== -->
+  <section class="feature-zigzag-section" aria-labelledby="zigzag-heading">
+    <div class="container">
+      <header class="section-header">
+        <span class="eyebrow">Core Platform Capabilities</span>
+        <h2 id="zigzag-heading" class="section-title">Engineered for High-Scale Engineering Teams</h2>
+        <p class="section-subtitle">Discover how FlowMetrics simplifies data observability with real-time stream monitoring and automated anomaly detection.</p>
+      </header>
+
+      <div class="zigzag-stack">
+        <!-- ROW 1: Real-Time Stream Monitoring -->
+        <article class="zigzag-row">
+          <div class="zigzag-text">
+            <span class="eyebrow">01 / Observability</span>
+            <h3 class="feature-title">Real-Time Pipeline Monitoring</h3>
+            <p class="feature-body">Gain end-to-end visibility into streaming data throughput. Identify bottlenecks instantly with sub-second latency tracking across all event nodes.</p>
+            <ul class="feature-list">
+              <li class="feature-list-item">
+                <svg class="feature-list-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <span>Native Kafka, Snowflake, and Postgres stream integrations.</span>
+              </li>
+              <li class="feature-list-item">
+                <svg class="feature-list-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <span>Automated throughput rate & error threshold alerting.</span>
+              </li>
+            </ul>
+          </div>
+          <div class="zigzag-media">
+            <div class="media-frame">
+              <div class="media-placeholder">
+                <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
+                <span>Real-Time Stream Dashboard UI Media</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- ROW 2: Automated Anomaly Detection (Flipped on Desktop) -->
+        <article class="zigzag-row">
+          <div class="zigzag-text">
+            <span class="eyebrow">02 / Intelligence</span>
+            <h3 class="feature-title">Automated Anomaly Detection</h3>
+            <p class="feature-body">Stop data downtime before it hits downstream dashboards. ML-powered monitors learn normal schema behavior and alert on field nulls or distribution drift.</p>
+            <ul class="feature-list">
+              <li class="feature-list-item">
+                <svg class="feature-list-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <span>Zero-configuration baseline training in under 24 hours.</span>
+              </li>
+              <li class="feature-list-item">
+                <svg class="feature-list-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <span>PagerDuty, Slack, and Microsoft Teams integration.</span>
+              </li>
+            </ul>
+          </div>
+          <div class="zigzag-media">
+            <div class="media-frame">
+              <div class="media-placeholder">
+                <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/></svg>
+                <span>Anomaly Detection AI Media Frame</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       PATTERN B: INTERACTIVE TABBED FEATURE SWITCHER
+       ====================================================================== -->
+  <section class="feature-tab-section" aria-labelledby="switcher-heading">
+    <div class="container">
+      <header class="section-header">
+        <span class="eyebrow">Interactive Workflow</span>
+        <h2 id="switcher-heading" class="section-title">Explore the Pipeline Lifecycle</h2>
+        <p class="section-subtitle">Select a pipeline phase below to see how FlowMetrics processes high-volume data streams.</p>
+      </header>
+
+      <!-- TAB BUTTONS (ARIA TABLIST) -->
+      <div class="tab-nav" role="tablist" aria-label="Pipeline Lifecycle Stages">
+        <button type="button" role="tab" aria-selected="true" aria-controls="panel-ingest" id="tab-ingest" class="tab-button">
+          01. Stream Ingestion
+        </button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="panel-transform" id="tab-transform" class="tab-button" tabindex="-1">
+          02. Transformation
+        </button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="panel-govern" id="tab-govern" class="tab-button" tabindex="-1">
+          03. Data Governance
+        </button>
+      </div>
+
+      <!-- TAB PANEL 1: INGESTION -->
+      <div id="panel-ingest" role="tabpanel" aria-labelledby="tab-ingest" class="tab-panel is-active" tabindex="0">
+        <div class="tab-panel-media">
+          <div class="media-frame">
+            <div class="media-placeholder">
+              <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+              <span>Ingestion Engine Media Preview</span>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel-content">
+          <span class="eyebrow">Phase 01</span>
+          <h3 class="feature-title" style="font-size: 1.75rem; margin-bottom: 0.75rem;">Sub-Millisecond Event Ingestion</h3>
+          <p class="feature-body">Ingest millions of records per second without loss or schema degradation. Support for raw JSON, Avro, and Protobuf payloads out of the box.</p>
+        </div>
+      </div>
+
+      <!-- TAB PANEL 2: TRANSFORMATION -->
+      <div id="panel-transform" role="tabpanel" aria-labelledby="tab-transform" class="tab-panel" tabindex="0">
+        <div class="tab-panel-media">
+          <div class="media-frame">
+            <div class="media-placeholder">
+              <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
+              <span>SQL & dbt Transformation Media</span>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel-content">
+          <span class="eyebrow">Phase 02</span>
+          <h3 class="feature-title" style="font-size: 1.75rem; margin-bottom: 0.75rem;">In-Flight SQL Transformations</h3>
+          <p class="feature-body">Transform streaming events using standard ANSI SQL or dbt models before persisting to cold storage.</p>
+        </div>
+      </div>
+
+      <!-- TAB PANEL 3: GOVERNANCE -->
+      <div id="panel-govern" role="tabpanel" aria-labelledby="tab-govern" class="tab-panel" tabindex="0">
+        <div class="tab-panel-media">
+          <div class="media-frame">
+            <div class="media-placeholder">
+              <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751A11.959 11.959 0 0 1 12 2.714Z"/></svg>
+              <span>Data Lineage & Governance Media</span>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel-content">
+          <span class="eyebrow">Phase 03</span>
+          <h3 class="feature-title" style="font-size: 1.75rem; margin-bottom: 0.75rem;">Automated Schema Lineage</h3>
+          <p class="feature-body">Maintain GDPR & HIPAA compliance automatically with PII masking and end-to-end data lineage tracking.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       PATTERN C: 3-COLUMN FEATURE CARD GRID
+       ====================================================================== -->
+  <section class="feature-grid-section" aria-labelledby="grid-heading">
+    <div class="container">
+      <header class="section-header">
+        <span class="eyebrow">Enterprise Security & Performance</span>
+        <h2 id="grid-heading" class="section-title">Built for Production Reliability</h2>
+        <p class="section-subtitle">Everything you need to run mission-critical data pipelines at enterprise scale.</p>
+      </header>
+
+      <div class="card-grid">
+        <!-- CARD 1 -->
+        <article class="feature-card">
+          <div class="card-icon-badge" aria-hidden="true">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg>
+          </div>
+          <h3 class="card-title">SOC2 Type II Certified</h3>
+          <p class="card-body">All customer data is encrypted in transit using TLS 1.3 and at rest with AES-256 enterprise keys.</p>
+        </article>
+
+        <!-- CARD 2 -->
+        <article class="feature-card">
+          <div class="card-icon-badge" aria-hidden="true">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z"/></svg>
+          </div>
+          <h3 class="card-title">Sub-10ms Global API</h3>
+          <p class="card-body">Deploy query endpoints across 35 multi-region edge locations for instantaneous REST & GraphQL access.</p>
+        </article>
+
+        <!-- CARD 3 -->
+        <article class="feature-card">
+          <div class="card-icon-badge" aria-hidden="true">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/></svg>
+          </div>
+          <h3 class="card-title">Instant Incident Escalation</h3>
+          <p class="card-body">Route high-priority data drift notifications directly to PagerDuty, OpsGenie, or dedicated Slack channels.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- JAVASCRIPT FOR ACCESSIBLE TABBED SWITCHER -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabList = document.querySelector('[role="tablist"]');
+      if (!tabList) return;
+
+      const tabs = Array.from(tabList.querySelectorAll('[role="tab"]'));
+      const panels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
+
+      tabs.forEach((tab) => {
+        tab.addEventListener('click', () => switchTab(tab));
+        tab.addEventListener('keydown', (e) => handleKeyDown(e, tab));
+      });
+
+      function switchTab(selectedTab) {
+        tabs.forEach((t) => {
+          t.setAttribute('aria-selected', 'false');
+          t.setAttribute('tabindex', '-1');
+        });
+
+        panels.forEach((p) => {
+          p.classList.remove('is-active');
+        });
+
+        selectedTab.setAttribute('aria-selected', 'true');
+        selectedTab.removeAttribute('tabindex');
+
+        const targetPanelId = selectedTab.getAttribute('aria-controls');
+        const targetPanel = document.getElementById(targetPanelId);
+        if (targetPanel) {
+          targetPanel.classList.add('is-active');
+        }
+      }
+
+      function handleKeyDown(e, currentTab) {
+        const index = tabs.indexOf(currentTab);
+        let targetTab = null;
+
+        if (e.key === 'ArrowRight') {
+          targetTab = tabs[(index + 1) % tabs.length];
+        } else if (e.key === 'ArrowLeft') {
+          targetTab = tabs[(index - 1 + tabs.length) % tabs.length];
+        } else if (e.key === 'Home') {
+          targetTab = tabs[0];
+        } else if (e.key === 'End') {
+          targetTab = tabs[tabs.length - 1];
+        }
+
+        if (targetTab) {
+          e.preventDefault();
+          targetTab.focus();
+          switchTab(targetTab);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
