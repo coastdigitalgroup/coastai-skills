@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feature Section System Template Specification</title>
+  <style>
+    /* ==========================================================================
+       1. CSS DESIGN TOKENS & SYSTEM VARIABLES
+       ========================================================================== */
+    :root {
+      /* Color Palette Tokens (WCAG AA Compliant) */
+      --color-bg-surface: #ffffff;
+      --color-bg-surface-subtle: #f8fafc;
+      --color-text-primary: #0f172a;    /* 15.8:1 contrast on white */
+      --color-text-secondary: #334155;  /* 9.1:1 contrast on white */
+      --color-text-muted: #64748b;      /* 4.6:1 contrast on white */
+      --color-brand-primary: #2563eb;  /* 4.5:1 contrast on white */
+      --color-brand-light: #eff6ff;
+      --color-border-subtle: #e2e8f0;
+      --color-focus-ring: #2563eb;
+
+      /* Typography Scale Tokens */
+      --font-family-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-size-eyebrow: 0.875rem;     /* 14px */
+      --font-size-h2: clamp(2rem, 4vw, 2.75rem); /* 32px - 44px */
+      --font-size-h3: clamp(1.35rem, 2.5vw, 1.75rem); /* 21px - 28px */
+      --font-size-body: 1rem;            /* 16px */
+      --line-height-heading: 1.25;
+      --line-height-body: 1.6;
+
+      /* Fluid Spacing Tokens */
+      --space-xs: 0.5rem;   /* 8px */
+      --space-sm: 0.75rem;  /* 12px */
+      --space-md: 1.25rem;  /* 20px */
+      --space-lg: 2rem;     /* 32px */
+      --space-xl: clamp(2.5rem, 5vw, 4.5rem);
+      --space-section-padding: clamp(3.5rem, 7vw, 7rem);
+
+      /* Layout Measures */
+      --container-max-width: 1280px;
+      --text-max-width: 55ch;
+      --border-radius-card: 12px;
+      --border-radius-pill: 9999px;
+      --shadow-elevation: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Reset & Base Setup */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family-base);
+      background-color: var(--color-bg-surface);
+      color: var(--color-text-primary);
+      line-height: var(--line-height-body);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ==========================================================================
+       2. FEATURE SECTION MACRO LAYOUT
+       ========================================================================== */
+    .feature-section {
+      width: 100%;
+      padding-block: var(--space-section-padding);
+      padding-inline: var(--space-md);
+      background-color: var(--color-bg-surface);
+    }
+
+    .feature-container {
+      max-width: var(--container-max-width);
+      margin-inline: auto;
+    }
+
+    /* Section Header Block */
+    .section-header {
+      text-align: center;
+      max-width: 720px;
+      margin-inline: auto;
+      margin-bottom: var(--space-xl);
+    }
+
+    .eyebrow-badge {
+      display: inline-block;
+      font-size: var(--font-size-eyebrow);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-brand-primary);
+      background-color: var(--color-brand-light);
+      padding: 0.35rem 0.85rem;
+      border-radius: var(--border-radius-pill);
+      margin-bottom: var(--space-xs);
+    }
+
+    .section-title {
+      font-size: var(--font-size-h2);
+      font-weight: 700;
+      line-height: var(--line-height-heading);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-xs);
+    }
+
+    .section-subtitle {
+      font-size: 1.125rem;
+      color: var(--color-text-secondary);
+      line-height: var(--line-height-body);
+    }
+
+    /* ==========================================================================
+       3. SUB-PATTERN A: TABBED FEATURE SWITCHER
+       ========================================================================== */
+    .feature-tabbed-switcher {
+      margin-bottom: calc(var(--space-xl) * 1.5);
+    }
+
+    .tablist-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: var(--space-lg);
+      border-bottom: 1px solid var(--color-border-subtle);
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .tablist {
+      display: flex;
+      gap: var(--space-xs);
+      list-style: none;
+    }
+
+    .tab-trigger {
+      font-family: inherit;
+      font-size: var(--font-size-body);
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      padding: var(--space-sm) var(--space-md);
+      cursor: pointer;
+      white-space: nowrap;
+      min-height: 48px; /* Touch target requirement */
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .tab-trigger:hover {
+      color: var(--color-brand-primary);
+    }
+
+    .tab-trigger[aria-selected="true"] {
+      color: var(--color-brand-primary);
+      border-bottom-color: var(--color-brand-primary);
+    }
+
+    .tab-trigger:focus-visible {
+      outline: 2px solid var(--color-focus-ring);
+      outline-offset: -2px;
+      border-radius: 4px;
+    }
+
+    .tab-panel {
+      background-color: var(--color-bg-surface-subtle);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--border-radius-card);
+      padding: var(--space-lg);
+      box-shadow: var(--shadow-elevation);
+    }
+
+    .tab-panel[hidden] {
+      display: none;
+    }
+
+    .tab-panel-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-lg);
+      align-items: center;
+    }
+
+    @media (min-width: 768px) {
+      .tab-panel-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-xl);
+      }
+
+      .tab-panel {
+        padding: clamp(2rem, 4vw, 3rem);
+      }
+    }
+
+    .feature-content__title {
+      font-size: var(--font-size-h3);
+      font-weight: 600;
+      line-height: var(--line-height-heading);
+      margin-bottom: var(--space-xs);
+    }
+
+    .feature-content__body {
+      font-size: var(--font-size-body);
+      color: var(--color-text-secondary);
+      max-width: var(--text-max-width);
+      margin-bottom: var(--space-md);
+    }
+
+    .feature-checklist {
+      list-style: none;
+      margin-bottom: var(--space-lg);
+    }
+
+    .feature-checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      font-size: 0.95rem;
+      color: var(--color-text-secondary);
+      margin-bottom: 0.5rem;
+    }
+
+    .checklist-icon {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      fill: var(--color-brand-primary);
+      margin-top: 2px;
+    }
+
+    .btn-action-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      color: var(--color-brand-primary);
+      text-decoration: none;
+      min-height: 48px;
+    }
+
+    .btn-action-link:hover {
+      text-decoration: underline;
+    }
+
+    .btn-action-link:focus-visible {
+      outline: 2px solid var(--color-focus-ring);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+
+    /* Media Frame Component */
+    .media-frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 8px;
+      overflow: hidden;
+      background-color: #0f172a;
+      border: 1px solid var(--color-border-subtle);
+    }
+
+    .media-frame img, .media-frame video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* ==========================================================================
+       4. SUB-PATTERN B: ALTERNATING ZIG-ZAG FEATURE ROWS
+       ========================================================================== */
+    .feature-zigzag-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xl);
+    }
+
+    .feature-row {
+      display: flex;
+      flex-direction: column; /* Mobile stack text first */
+      gap: var(--space-lg);
+    }
+
+    @media (min-width: 768px) {
+      .feature-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(2.5rem, 5vw, 4.5rem);
+        align-items: center;
+      }
+
+      .feature-row--reverse .feature-row__content {
+        grid-column: 2;
+      }
+
+      .feature-row--reverse .feature-row__media {
+        grid-column: 1;
+        grid-row: 1;
+      }
+    }
+
+    /* ==========================================================================
+       5. REDUCED MOTION SAFEGUARDS
+       ========================================================================== */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       FEATURE SECTION MARKUP SPECIFICATION
+       ========================================================================== -->
+  <section class="feature-section" aria-labelledby="feature-main-heading">
+    <div class="feature-container">
+
+      <!-- Section Header -->
+      <header class="section-header">
+        <span class="eyebrow-badge">Intelligent Data Platform</span>
+        <h2 id="feature-main-heading" class="section-title">Turn Raw Metrics into Predictive Revenue</h2>
+        <p class="section-subtitle">
+          Unify customer data streams, automate cohort analysis, and deliver real-time retention triggers in one workspace.
+        </p>
+      </header>
+
+      <!-- Sub-Pattern A: Interactive Tabbed Switcher -->
+      <div class="feature-tabbed-switcher">
+        <div class="tablist-wrapper">
+          <div role="tablist" class="tablist" aria-label="Core platform feature workflows">
+            <button
+              type="button"
+              role="tab"
+              aria-selected="true"
+              aria-controls="panel-cohorts"
+              id="tab-cohorts"
+              class="tab-trigger">
+              Predictive Cohorts
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="panel-retention"
+              id="tab-retention"
+              tabindex="-1"
+              class="tab-trigger">
+              Smart Retention
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="panel-executive"
+              id="tab-executive"
+              tabindex="-1"
+              class="tab-trigger">
+              Executive Hub
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab Panel 1 (Active) -->
+        <div
+          id="panel-cohorts"
+          role="tabpanel"
+          tabindex="0"
+          aria-labelledby="tab-cohorts"
+          class="tab-panel">
+          <div class="tab-panel-grid">
+            <div class="feature-content">
+              <span class="eyebrow-badge">AI Modeling</span>
+              <h3 class="feature-content__title">Predictive Cohort Analysis</h3>
+              <p class="feature-content__body">
+                Forecast revenue health and identify churn risks 90 days before they happen using machine learning models trained on your user events.
+              </p>
+              <ul class="feature-checklist">
+                <li>
+                  <svg class="checklist-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                  <span>Automated churn risk scoring across user cohorts</span>
+                </li>
+                <li>
+                  <svg class="checklist-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                  <span>1-click sync with Salesforce, HubSpot, and Marketo</span>
+                </li>
+              </ul>
+              <a href="#cohorts-demo" class="btn-action-link">
+                <span>Explore Cohort Modeling</span>
+                <span aria-hidden="true">&rarr;</span>
+              </a>
+            </div>
+            <div class="media-frame">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450' viewBox='0 0 800 450'%3E%3Crect width='800' height='450' fill='%230f172a'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='20'%3EPredictive Cohorts UI Screenshot%3C/text%3E%3C/svg%3E" alt="Predictive Cohort Dashboard showing churn risk scores and revenue forecast graphs">
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Panel 2 (Hidden) -->
+        <div
+          id="panel-retention"
+          role="tabpanel"
+          tabindex="0"
+          aria-labelledby="tab-retention"
+          hidden
+          class="tab-panel">
+          <div class="tab-panel-grid">
+            <div class="feature-content">
+              <span class="eyebrow-badge">Automation</span>
+              <h3 class="feature-content__title">Automated Winback Workflows</h3>
+              <p class="feature-content__body">
+                Trigger targeted re-engagement campaigns directly inside your product or via email as soon as account activity drops.
+              </p>
+              <a href="#retention-demo" class="btn-action-link">
+                <span>View Retention Automations</span>
+                <span aria-hidden="true">&rarr;</span>
+              </a>
+            </div>
+            <div class="media-frame">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450' viewBox='0 0 800 450'%3E%3Crect width='800' height='450' fill='%230f172a'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='20'%3EAutomated Winback Workflow UI%3C/text%3E%3C/svg%3E" alt="Automated winback workflow builder UI">
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Panel 3 (Hidden) -->
+        <div
+          id="panel-executive"
+          role="tabpanel"
+          tabindex="0"
+          aria-labelledby="tab-executive"
+          hidden
+          class="tab-panel">
+          <div class="tab-panel-grid">
+            <div class="feature-content">
+              <span class="eyebrow-badge">Reporting</span>
+              <h3 class="feature-content__title">Executive KPI Dashboards</h3>
+              <p class="feature-content__body">
+                Share board-ready reports on Net Revenue Retention (NRR), LTV/CAC ratios, and gross margin health in seconds.
+              </p>
+              <a href="#executive-demo" class="btn-action-link">
+                <span>See Executive Reports</span>
+                <span aria-hidden="true">&rarr;</span>
+              </a>
+            </div>
+            <div class="media-frame">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450' viewBox='0 0 800 450'%3E%3Crect width='800' height='450' fill='%230f172a'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='20'%3EExecutive KPI Dashboard UI%3C/text%3E%3C/svg%3E" alt="Executive summary board showing NRR and ARR metrics">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-Pattern B: Alternating Zig-Zag Detail Rows -->
+      <div class="feature-zigzag-group">
+        <!-- Row 1: Text Left / Media Right -->
+        <article class="feature-row">
+          <div class="feature-row__content">
+            <span class="eyebrow-badge">Event Ingestion</span>
+            <h3 class="feature-content__title">Zero-Code Event Tracking</h3>
+            <p class="feature-content__body">
+              Capture user interactions out of the box without waiting for engineering sprint allocations. Automatically scrub sensitive PII.
+            </p>
+            <a href="#event-tracking" class="btn-action-link">
+              <span>Learn about Zero-Code Ingestion</span>
+              <span aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
+          <div class="feature-row__media media-frame">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450' viewBox='0 0 800 450'%3E%3Crect width='800' height='450' fill='%230f172a'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='20'%3EZero-Code Event Tracking Setup%3C/text%3E%3C/svg%3E" alt="Event tracking setup screen showing zero-code autocapture options">
+          </div>
+        </article>
+
+        <!-- Row 2: Media Left / Text Right (Reversed on Desktop) -->
+        <article class="feature-row feature-row--reverse">
+          <div class="feature-row__content">
+            <span class="eyebrow-badge">Real-Time Alerts</span>
+            <h3 class="feature-content__title">Instant Multi-Channel Alerts</h3>
+            <p class="feature-content__body">
+              Notify customer success managers in Slack or Microsoft Teams the moment an enterprise account health score drops below threshold.
+            </p>
+            <a href="#alerts" class="btn-action-link">
+              <span>Setup Alert Channels</span>
+              <span aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
+          <div class="feature-row__media media-frame">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450' viewBox='0 0 800 450'%3E%3Crect width='800' height='450' fill='%230f172a'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='20'%3ESlack Alert Integration Preview%3C/text%3E%3C/svg%3E" alt="Slack alert notification message showing customer health drop alert">
+          </div>
+        </article>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       JAVASCRIPT TAB INTERACTIVITY & KEYBOARD CONTROLS
+       ========================================================================== -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabList = document.querySelector('[role="tablist"]');
+      const tabs = Array.from(tabList.querySelectorAll('[role="tab"]'));
+      const panels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => switchTab(tab));
+        tab.addEventListener('keydown', handleKeyDown);
+      });
+
+      function switchTab(selectedTab) {
+        tabs.forEach(tab => {
+          const isSelected = tab === selectedTab;
+          tab.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+          tab.setAttribute('tabindex', isSelected ? '0' : '-1');
+        });
+
+        const targetPanelId = selectedTab.getAttribute('aria-controls');
+        panels.forEach(panel => {
+          if (panel.id === targetPanelId) {
+            panel.removeAttribute('hidden');
+          } else {
+            panel.setAttribute('hidden', 'true');
+          }
+        });
+      }
+
+      function handleKeyDown(e) {
+        const index = tabs.indexOf(e.currentTarget);
+        let nextIndex = null;
+
+        if (e.key === 'ArrowRight') {
+          nextIndex = (index + 1) % tabs.length;
+        } else if (e.key === 'ArrowLeft') {
+          nextIndex = (index - 1 + tabs.length) % tabs.length;
+        } else if (e.key === 'Home') {
+          nextIndex = 0;
+        } else if (e.key === 'End') {
+          nextIndex = tabs.length - 1;
+        }
+
+        if (nextIndex !== null) {
+          e.preventDefault();
+          tabs[nextIndex].focus();
+          switchTab(tabs[nextIndex]);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
