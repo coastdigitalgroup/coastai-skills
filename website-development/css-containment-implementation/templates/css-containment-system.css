@@ -1,0 +1,137 @@
+/**
+ * CSS Containment Utilities & Component Architecture System
+ *
+ * Modular CSS classes for isolating layout, paint, size, and off-screen rendering
+ * across web applications, design systems, and dashboard components.
+ */
+
+/* ==========================================================================
+   1. Individual Containment Utilities
+   ========================================================================== */
+
+/**
+ * Layout Containment
+ * Decouples element internal layout calculations from ancestor and sibling nodes.
+ * Creates a containing block for position: absolute and position: fixed children.
+ */
+.contain-layout {
+  contain: layout;
+}
+
+/**
+ * Paint Containment
+ * Clips overflow to padding box and ensures off-screen/invisible children are not painted.
+ * Creates a stacking context and a containing block for absolute/fixed children.
+ */
+.contain-paint {
+  contain: paint;
+}
+
+/**
+ * Size Containment
+ * Ignores child elements when calculating element's intrinsic size.
+ * REQUIRES explicit dimensions (height + width / aspect-ratio) to prevent collapsing to 0px.
+ */
+.contain-size {
+  contain: size;
+}
+
+/**
+ * Inline-Size Containment
+ * Ignores child elements when computing intrinsic width (inline axis only).
+ * Ideal for responsive 1D flex/grid components where height remains dynamic.
+ */
+.contain-inline-size {
+  contain: inline-size;
+}
+
+/**
+ * Style Containment
+ * Scopes CSS counters (counter-increment, counter-reset) to this subtree.
+ */
+.contain-style {
+  contain: style;
+}
+
+/* ==========================================================================
+   2. Shorthand & Composite Containment Utilities
+   ========================================================================== */
+
+/**
+ * Content Containment (Layout + Paint + Style)
+ * Recommended for standard UI components with dynamic heights (cards, feed items, widgets).
+ */
+.contain-content {
+  contain: content;
+}
+
+/**
+ * Strict Containment (Size + Layout + Paint + Style)
+ * Maximum rendering isolation. REQUIRES explicit dimensions or aspect-ratio.
+ */
+.contain-strict {
+  contain: strict;
+}
+
+/**
+ * Composite Layout & Paint (Common for flexible grid cards)
+ */
+.contain-layout-paint {
+  contain: layout paint;
+}
+
+/**
+ * Composite Inline-Size, Layout & Paint (Responsive Card Container)
+ */
+.contain-responsive-card {
+  contain: inline-size layout paint;
+}
+
+/* ==========================================================================
+   3. Off-Screen Rendering Optimization (content-visibility)
+   ========================================================================== */
+
+/**
+ * Deferred Off-Screen Rendering Item
+ * Automatically skips layout and paint phases for off-screen items.
+ * MUST include contain-intrinsic-size to prevent scrollbar jumping during scroll.
+ */
+.content-visibility-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 240px; /* Default estimated height fallback */
+  contain: layout paint;
+}
+
+/**
+ * Preset Intrinsic Size Utility Classes
+ */
+.intrinsic-size-sm {
+  contain-intrinsic-size: auto 120px;
+}
+
+.intrinsic-size-md {
+  contain-intrinsic-size: auto 280px;
+}
+
+.intrinsic-size-lg {
+  contain-intrinsic-size: auto 450px;
+}
+
+/* ==========================================================================
+   4. Stacking Context & Containing Block Safety Presets
+   ========================================================================== */
+
+/**
+ * Explicit Position Anchor / Containment Boundary Container
+ * Prepares a contained element for internal positioning while allowing top-layer breakout.
+ */
+.containment-boundary {
+  position: relative;
+  contain: layout paint;
+}
+
+/* Top-layer escape for child modals/popovers inside contained boundaries */
+.containment-boundary [popover] {
+  position: fixed;
+  inset: auto;
+}
