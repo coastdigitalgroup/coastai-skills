@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feature Section System Specification & Template</title>
+  <style>
+    :root {
+      /* Fluid Spacing Scale */
+      --space-xs: clamp(0.5rem, 1vw, 0.75rem);
+      --space-s: clamp(0.75rem, 1.5vw, 1rem);
+      --space-m: clamp(1rem, 2vw, 1.5rem);
+      --space-l: clamp(1.5rem, 3vw, 2.5rem);
+      --space-xl: clamp(2.5rem, 5vw, 4rem);
+      --space-2xl: clamp(4rem, 8vw, 6rem);
+
+      /* Typography Scale */
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-size-kicker: clamp(0.75rem, 1.2vw, 0.875rem);
+      --font-size-body: clamp(1rem, 1.25vw, 1.125rem);
+      --font-size-h3: clamp(1.375rem, 2.2vw, 1.875rem);
+      --font-size-h2: clamp(2rem, 3.8vw, 2.75rem);
+
+      /* Color Tokens (WCAG AA Compliant Light Theme) */
+      --color-bg-surface: #ffffff;
+      --color-bg-subtle: #f8fafc;
+      --color-bg-card: #ffffff;
+      --color-border: #e2e8f0;
+      --color-border-hover: #cbd5e1;
+      --color-text-main: #0f172a;
+      --color-text-muted: #475569;
+      --color-accent: #2563eb;
+      --color-accent-hover: #1d4ed8;
+      --color-accent-bg: #eff6ff;
+      --color-focus-ring: #2563eb;
+
+      /* Radii & Shadows */
+      --radius-s: 8px;
+      --radius-m: 12px;
+      --radius-l: 16px;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
+      --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.12);
+    }
+
+    /* Base Reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--color-bg-surface);
+      color: var(--color-text-main);
+      line-height: 1.5;
+      padding: var(--space-xl) var(--space-m);
+    }
+
+    /* Section Container */
+    .feature-section {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2xl);
+    }
+
+    /* Section Header Block */
+    .feature-section__header {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .feature-section__kicker {
+      align-self: center;
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.75rem;
+      background-color: var(--color-accent-bg);
+      color: var(--color-accent);
+      font-size: var(--font-size-kicker);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-radius: 9999px;
+    }
+
+    .feature-section__title {
+      font-size: var(--font-size-h2);
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--color-text-main);
+      letter-spacing: -0.02em;
+    }
+
+    .feature-section__subhead {
+      font-size: var(--font-size-body);
+      color: var(--color-text-muted);
+      line-height: 1.6;
+    }
+
+    /* Tier 1: Alternating Feature Rows */
+    .feature-row-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xl);
+    }
+
+    .feature-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-l);
+      align-items: center;
+    }
+
+    @media (min-width: 1024px) {
+      .feature-row {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-xl);
+      }
+
+      /* Desktop visual reversal using order without breaking HTML source reading order */
+      .feature-row--media-first .feature-row__media {
+        order: -1;
+      }
+    }
+
+    .feature-row__content {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-s);
+      max-width: 560px;
+    }
+
+    .feature-row__badge {
+      font-size: var(--font-size-kicker);
+      font-weight: 700;
+      color: var(--color-accent);
+    }
+
+    .feature-row__title {
+      font-size: var(--font-size-h3);
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--color-text-main);
+    }
+
+    .feature-row__description {
+      font-size: var(--font-size-body);
+      color: var(--color-text-muted);
+      line-height: 1.6;
+    }
+
+    .feature-row__list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      margin-top: var(--space-xs);
+    }
+
+    .feature-row__list-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: var(--font-size-body);
+      color: var(--color-text-main);
+      font-weight: 500;
+    }
+
+    .feature-row__list-item::before {
+      content: "✓";
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: var(--color-accent-bg);
+      color: var(--color-accent);
+      font-weight: 700;
+      font-size: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .feature-row__media {
+      background-color: var(--color-bg-subtle);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-l);
+      padding: var(--space-m);
+      aspect-ratio: 16 / 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .feature-row__media-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border-radius: var(--radius-m);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      font-family: monospace;
+      font-size: 0.875rem;
+      text-align: center;
+      padding: var(--space-s);
+    }
+
+    /* Tier 2: Tabbed Feature Switcher */
+    .feature-switcher {
+      background-color: var(--color-bg-subtle);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-l);
+      padding: var(--space-l);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-l);
+    }
+
+    .tab-list {
+      display: flex;
+      gap: var(--space-xs);
+      border-bottom: 2px solid var(--color-border);
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .tab-button {
+      background: none;
+      border: none;
+      padding: var(--space-s) var(--space-m);
+      font-family: inherit;
+      font-size: var(--font-size-body);
+      font-weight: 600;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      white-space: nowrap;
+      transition: color 0.2s, border-color 0.2s;
+      min-height: 44px;
+    }
+
+    .tab-button:hover {
+      color: var(--color-text-main);
+    }
+
+    .tab-button[aria-selected="true"] {
+      color: var(--color-accent);
+      border-bottom-color: var(--color-accent);
+    }
+
+    .tab-button:focus-visible {
+      outline: 2px solid var(--color-focus-ring);
+      outline-offset: 2px;
+      border-radius: var(--radius-s);
+    }
+
+    .tab-panel {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-l);
+      align-items: center;
+    }
+
+    @media (min-width: 1024px) {
+      .tab-panel {
+        grid-template-columns: 40% 60%;
+      }
+    }
+
+    .tab-panel[hidden] {
+      display: none;
+    }
+
+    /* Tier 3: Secondary Feature Grid */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-l);
+    }
+
+    @media (min-width: 640px) {
+      .feature-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .feature-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .feature-card {
+      background-color: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-m);
+      padding: var(--space-l);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-s);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .feature-card:hover {
+      border-color: var(--color-border-hover);
+      box-shadow: var(--shadow-md);
+    }
+
+    .feature-card__icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-s);
+      background-color: var(--color-accent-bg);
+      color: var(--color-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+
+    .feature-card__title {
+      font-size: clamp(1.125rem, 1.5vw, 1.25rem);
+      font-weight: 700;
+      color: var(--color-text-main);
+    }
+
+    .feature-card__description {
+      font-size: var(--font-size-body);
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <section class="feature-section" aria-labelledby="section-heading">
+
+    <!-- Section Header -->
+    <header class="feature-section__header">
+      <span class="feature-section__kicker">Core Capabilities</span>
+      <h2 id="section-heading" class="feature-section__title">
+        Designed for Scale, Built for Absolute Reliability
+      </h2>
+      <p class="feature-section__subhead">
+        Everything you need to orchestrate complex data flows with complete visibility, high performance, and enterprise-grade security controls.
+      </p>
+    </header>
+
+    <!-- Tier 1: Alternating Feature Rows -->
+    <div class="feature-row-group">
+
+      <!-- Feature Row 1: Text Left / Media Right -->
+      <article class="feature-row">
+        <div class="feature-row__content">
+          <span class="feature-row__badge">Real-Time Ingestion</span>
+          <h3 class="feature-row__title">High-Throughput Stream Pipeline</h3>
+          <p class="feature-row__description">
+            Process millions of concurrent events per second with guaranteed sub-millisecond delivery latencies across global regions.
+          </p>
+          <ul class="feature-row__list">
+            <li class="feature-row__list-item">Automatic partition rebalancing without stream pauses</li>
+            <li class="feature-row__list-item">Zero-data-loss backpressure mitigation</li>
+          </ul>
+        </div>
+        <div class="feature-row__media">
+          <div class="feature-row__media-placeholder">
+            [ UI Visual Asset: Real-Time Stream Topology Canvas ]
+          </div>
+        </div>
+      </article>
+
+      <!-- Feature Row 2: Media Left / Text Right (Reversed on Desktop) -->
+      <article class="feature-row feature-row--media-first">
+        <div class="feature-row__content">
+          <span class="feature-row__badge">Schema Governance</span>
+          <h3 class="feature-row__title">Automated Payload Validation</h3>
+          <p class="feature-row__description">
+            Prevent bad data from breaking downstream applications with instant schema version enforcement and automatic backward compatibility checks.
+          </p>
+          <ul class="feature-row__list">
+            <li class="feature-row__list-item">Real-time diff highlighting for field changes</li>
+            <li class="feature-row__list-item">One-click backward compatibility rollbacks</li>
+          </ul>
+        </div>
+        <div class="feature-row__media">
+          <div class="feature-row__media-placeholder">
+            [ UI Visual Asset: Schema Version Diff Viewer ]
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- Tier 2: Interactive Feature Switcher -->
+    <div class="feature-switcher">
+      <div role="tablist" aria-label="Workflow Categories" class="tab-list">
+        <button role="tab" aria-selected="true" aria-controls="panel-analytics" id="tab-analytics" class="tab-button">
+          Real-Time Analytics
+        </button>
+        <button role="tab" aria-selected="false" aria-controls="panel-security" id="tab-security" class="tab-button" tabindex="-1">
+          Security & Access Controls
+        </button>
+        <button role="tab" aria-selected="false" aria-controls="panel-integrations" id="tab-integrations" class="tab-button" tabindex="-1">
+          Ecosystem Connectors
+        </button>
+      </div>
+
+      <div role="tabpanel" id="panel-analytics" aria-labelledby="tab-analytics" class="tab-panel">
+        <div class="feature-row__content">
+          <h3 class="feature-row__title">Sub-Second Query Engine</h3>
+          <p class="feature-row__description">
+            Run SQL queries over active streams with instantaneous aggregations and automated streaming window joins.
+          </p>
+        </div>
+        <div class="feature-row__media">
+          <div class="feature-row__media-placeholder">
+            [ Interactive Preview: Streaming Query Console ]
+          </div>
+        </div>
+      </div>
+
+      <div role="tabpanel" id="panel-security" aria-labelledby="tab-security" class="tab-panel" hidden>
+        <div class="feature-row__content">
+          <h3 class="feature-row__title">Granular RBAC & Encryption</h3>
+          <p class="feature-row__description">
+            Enforce end-to-end field-level encryption with SAML/SSO integration and immutable audit logging.
+          </p>
+        </div>
+        <div class="feature-row__media">
+          <div class="feature-row__media-placeholder">
+            [ Interactive Preview: Security Audit Trail Dashboard ]
+          </div>
+        </div>
+      </div>
+
+      <div role="tabpanel" id="panel-integrations" aria-labelledby="tab-integrations" class="tab-panel" hidden>
+        <div class="feature-row__content">
+          <h3 class="feature-row__title">Turnkey Cloud Adapters</h3>
+          <p class="feature-row__description">
+            Sync data seamlessly with 100+ native sinks including Snowflake, BigQuery, AWS S3, and Kafka brokers.
+          </p>
+        </div>
+        <div class="feature-row__media">
+          <div class="feature-row__media-placeholder">
+            [ Interactive Preview: Integration Connector Grid ]
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tier 3: Secondary Feature Grid -->
+    <div class="feature-grid">
+      <article class="feature-card">
+        <div class="feature-card__icon">⚡</div>
+        <h3 class="feature-card__title">Zero Latency Buffering</h3>
+        <p class="feature-card__description">
+          In-memory queue architecture designed to eliminate stream bottlenecks during peak traffic spikes.
+        </p>
+      </article>
+
+      <article class="feature-card">
+        <div class="feature-card__icon">🔒</div>
+        <h3 class="feature-card__title">SOC2 Type II Certified</h3>
+        <p class="feature-card__description">
+          Completely compliant with global security standards, HIPAA, and GDPR privacy regulations.
+        </p>
+      </article>
+
+      <article class="feature-card">
+        <div class="feature-card__icon">🌐</div>
+        <h3 class="feature-card__title">Multi-Region Failover</h3>
+        <p class="feature-card__description">
+          Automatic high-availability cluster replication ensuring 99.999% uninterrupted platform uptime.
+        </p>
+      </article>
+    </div>
+
+  </section>
+
+  <!-- Keyboard Script for Accessible Tab Switcher -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabList = document.querySelector('[role="tablist"]');
+      const tabs = Array.from(tabList.querySelectorAll('[role="tab"]'));
+      const panels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
+
+      tabList.addEventListener('keydown', (e) => {
+        const index = tabs.indexOf(document.activeElement);
+        if (index === -1) return;
+
+        let newIndex = index;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          newIndex = (index + 1) % tabs.length;
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          newIndex = (index - 1 + tabs.length) % tabs.length;
+        } else if (e.key === 'Home') {
+          newIndex = 0;
+        } else if (e.key === 'End') {
+          newIndex = tabs.length - 1;
+        } else {
+          return;
+        }
+
+        e.preventDefault();
+        activateTab(tabs[newIndex]);
+      });
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => activateTab(tab));
+      });
+
+      function activateTab(selectedTab) {
+        tabs.forEach(tab => {
+          const isSelected = tab === selectedTab;
+          tab.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+          tab.setAttribute('tabindex', isSelected ? '0' : '-1');
+        });
+
+        const targetPanelId = selectedTab.getAttribute('aria-controls');
+        panels.forEach(panel => {
+          if (panel.id === targetPanelId) {
+            panel.removeAttribute('hidden');
+          } else {
+            panel.setAttribute('hidden', 'true');
+          }
+        });
+
+        selectedTab.focus();
+      }
+    });
+  </script>
+</body>
+</html>
