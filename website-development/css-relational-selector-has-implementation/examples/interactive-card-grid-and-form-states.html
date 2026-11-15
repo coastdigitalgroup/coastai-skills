@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS :has() Relational Selector Implementation Examples</title>
+  <style>
+    /* Reset & CSS Custom Properties */
+    :root {
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-text-primary: #0f172a;
+      --color-text-secondary: #475569;
+      --color-border: #e2e8f0;
+
+      --color-primary: #2563eb;
+      --color-primary-light: #eff6ff;
+      --color-primary-border: #93c5fd;
+
+      --color-danger: #dc2626;
+      --color-danger-light: #fef2f2;
+      --color-danger-border: #fca5a5;
+
+      --color-success: #16a34a;
+      --color-success-light: #f0fdf4;
+
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+
+      --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--color-bg);
+      color: var(--color-text-primary);
+      line-height: 1.5;
+      padding: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    h1, h2, h3 {
+      color: var(--color-text-primary);
+      margin-top: 0;
+    }
+
+    .section {
+      background: var(--color-surface);
+      border-radius: var(--radius-md);
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ==========================================================================
+       EXAMPLE 1: Interactive Selection Cards (Pure CSS Parent Styling)
+       ========================================================================== */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    /* Base Card Container */
+    .selectable-card {
+      position: relative;
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      background: var(--color-surface);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .selectable-card:hover {
+      border-color: #cbd5e1;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Pure CSS Parent Styling with :has() when child radio/checkbox is checked */
+    .selectable-card:has(input[type="radio"]:checked),
+    .selectable-card:has(input[type="checkbox"]:checked) {
+      border-color: var(--color-primary);
+      background-color: var(--color-primary-light);
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* Parent focus-visible styling when internal input receives keyboard focus */
+    .selectable-card:has(input:focus-visible) {
+      outline: 3px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-title {
+      font-weight: 600;
+      font-size: 1.125rem;
+      margin: 0;
+    }
+
+    .card-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0.25rem 0.5rem;
+      border-radius: 9999px;
+      background: var(--color-border);
+      color: var(--color-text-secondary);
+      transition: background var(--transition-fast), color var(--transition-fast);
+    }
+
+    /* Dynamic badge visual shift based on internal checked state */
+    .selectable-card:has(input:checked) .card-badge {
+      background: var(--color-primary);
+      color: #ffffff;
+    }
+
+    /* ==========================================================================
+       EXAMPLE 2: Form Field Group Container Validation & Focus States
+       ========================================================================== */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      max-width: 500px;
+    }
+
+    /* Base Form Field Wrapper */
+    .field-wrapper {
+      position: relative;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      background: var(--color-surface);
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .field-wrapper label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      margin-bottom: 0.25rem;
+      transition: color var(--transition-fast);
+    }
+
+    .field-wrapper input {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      color: var(--color-text-primary);
+      background: transparent;
+      box-sizing: border-box;
+    }
+
+    /* Form Field Parent Focus State using :has() */
+    .field-wrapper:has(input:focus-visible) {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-light);
+    }
+
+    .field-wrapper:has(input:focus-visible) label {
+      color: var(--color-primary);
+    }
+
+    /* Form Field Parent User-Invalid State using :has() */
+    .field-wrapper:has(input:user-invalid) {
+      border-color: var(--color-danger);
+      background-color: var(--color-danger-light);
+    }
+
+    .field-wrapper:has(input:user-invalid) label {
+      color: var(--color-danger);
+    }
+
+    .error-msg {
+      display: none;
+      font-size: 0.75rem;
+      color: var(--color-danger);
+      margin-top: 0.25rem;
+    }
+
+    /* Show error message conditionally via parent :has() state */
+    .field-wrapper:has(input:user-invalid) .error-msg {
+      display: block;
+    }
+
+    /* ==========================================================================
+       EXAMPLE 3: Preceding Sibling Focus & Hover Highlight (Star Rating)
+       ========================================================================== */
+    .star-rating-fieldset {
+      border: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+      gap: 0.5rem;
+    }
+
+    .star-rating-fieldset legend {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .star-label {
+      cursor: pointer;
+      font-size: 2rem;
+      color: #cbd5e1;
+      transition: color var(--transition-fast);
+    }
+
+    .star-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Preceding sibling fill effect using :has() */
+    .star-label:has(~ .star-input:checked),
+    .star-label:has(+ .star-input:checked) {
+      color: #f59e0b;
+    }
+
+    .star-rating-fieldset:has(.star-label:hover) .star-label {
+      color: #cbd5e1;
+    }
+
+    .star-label:hover,
+    .star-label:has(~ .star-label:hover) {
+      color: #f59e0b !important;
+    }
+
+    /* ==========================================================================
+       EXAMPLE 4: Dynamic Structural Layout Adaptation
+       ========================================================================== */
+    .dynamic-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      padding: 1rem;
+      background: #f1f5f9;
+      border-radius: var(--radius-md);
+    }
+
+    /* Expand layout dynamically when optional slot contains active content */
+    .dynamic-layout:has(.sidebar-slot:not(:empty)) {
+      grid-template-columns: 2fr 1fr;
+    }
+
+    .main-content {
+      background: #ffffff;
+      padding: 1.5rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .sidebar-slot {
+      background: #ffffff;
+      padding: 1.5rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .sidebar-slot:empty {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>CSS <code>:has()</code> Relational Selector Patterns</h1>
+  <p>Interactive examples demonstrating pure CSS parent, ancestor, and sibling styling based on internal DOM states without JavaScript event handlers.</p>
+
+  <!-- EXAMPLE 1: Interactive Cards -->
+  <div class="section">
+    <h2>1. Pure CSS Selectable Card Grid</h2>
+    <p>Click or keyboard focus any card. The parent container styles update automatically based on child input selection.</p>
+
+    <div class="card-grid">
+      <label class="selectable-card">
+        <div class="card-header">
+          <h3 class="card-title">Starter Plan</h3>
+          <span class="card-badge">Basic</span>
+        </div>
+        <p style="margin: 0; font-size: 0.875rem; color: var(--color-text-secondary);">Ideal for personal side projects and exploratory testing.</p>
+        <input type="radio" name="plan" value="starter" style="margin-top: auto; accent-color: var(--color-primary);">
+      </label>
+
+      <label class="selectable-card">
+        <div class="card-header">
+          <h3 class="card-title">Pro Plan</h3>
+          <span class="card-badge">Popular</span>
+        </div>
+        <p style="margin: 0; font-size: 0.875rem; color: var(--color-text-secondary);">Full access to advanced relational selector toolkits and high-performance components.</p>
+        <input type="radio" name="plan" value="pro" checked style="margin-top: auto; accent-color: var(--color-primary);">
+      </label>
+
+      <label class="selectable-card">
+        <div class="card-header">
+          <h3 class="card-title">Enterprise Plan</h3>
+          <span class="card-badge">Custom</span>
+        </div>
+        <p style="margin: 0; font-size: 0.875rem; color: var(--color-text-secondary);">Dedicated performance optimization reviews and custom design system integration.</p>
+        <input type="radio" name="plan" value="enterprise" style="margin-top: auto; accent-color: var(--color-primary);">
+      </label>
+    </div>
+  </div>
+
+  <!-- EXAMPLE 2: Form Field Container Validation -->
+  <div class="section">
+    <h2>2. Form Field Wrapper Validation & Focus Highlights</h2>
+    <p>Type an invalid email below and click outside to trigger <code>:user-invalid</code> styling on the parent wrapper.</p>
+
+    <form class="form-group" onsubmit="event.preventDefault();">
+      <div class="field-wrapper">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="e.g. jules_dev" required>
+        <span class="error-msg">Username is required.</span>
+      </div>
+
+      <div class="field-wrapper">
+        <label for="email">Work Email</label>
+        <input type="email" id="email" name="email" placeholder="alex@company.com" required>
+        <span class="error-msg">Please enter a valid work email address.</span>
+      </div>
+    </form>
+  </div>
+
+  <!-- EXAMPLE 3: Preceding Sibling Star Rating -->
+  <div class="section">
+    <h2>3. Accessible Natural DOM Order Star Rating</h2>
+    <p>Uses <code>:has()</code> to fill preceding star labels based on the currently checked or hovered input.</p>
+
+    <fieldset class="star-rating-fieldset">
+      <legend>Rate your experience:</legend>
+
+      <label class="star-label" for="star5">★</label>
+      <input type="radio" id="star5" name="rating" value="5" class="star-input">
+
+      <label class="star-label" for="star4">★</label>
+      <input type="radio" id="star4" name="rating" value="4" class="star-input" checked>
+
+      <label class="star-label" for="star3">★</label>
+      <input type="radio" id="star3" name="rating" value="3" class="star-input">
+
+      <label class="star-label" for="star2">★</label>
+      <input type="radio" id="star2" name="rating" value="2" class="star-input">
+
+      <label class="star-label" for="star1">★</label>
+      <input type="radio" id="star1" name="rating" value="1" class="star-input">
+    </fieldset>
+  </div>
+
+  <!-- EXAMPLE 4: Dynamic Structural Layout -->
+  <div class="section">
+    <h2>4. Content-Driven Grid Layout Adaptation</h2>
+    <p>The container uses <code>.dynamic-layout:has(.sidebar-slot:not(:empty))</code> to switch from single column to a 2-column split layout.</p>
+
+    <div class="dynamic-layout">
+      <div class="main-content">
+        <h3>Main Article Area</h3>
+        <p>This container dynamically expands or contracts depending on whether the sidebar slot contains child elements.</p>
+      </div>
+      <aside class="sidebar-slot">
+        <h4>Sidebar Widget</h4>
+        <p>Content exists inside this slot, triggering two-column grid mode via CSS <code>:has()</code>.</p>
+      </aside>
+    </div>
+  </div>
+
+</body>
+</html>
