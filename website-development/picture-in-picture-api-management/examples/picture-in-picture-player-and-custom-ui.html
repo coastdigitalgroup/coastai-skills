@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Picture-in-Picture API Management - Interactive Example</title>
+  <style>
+    :root {
+      --color-bg: #0f172a;
+      --color-card: #1e293b;
+      --color-card-border: #334155;
+      --color-primary: #38bdf8;
+      --color-primary-hover: #0284c7;
+      --color-text: #f8fafc;
+      --color-text-muted: #94a3b8;
+      --color-success: #22c55e;
+      --color-warning: #f59e0b;
+      --radius: 12px;
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      padding: 2rem 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+    }
+
+    header {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--color-text);
+    }
+
+    p.subtitle {
+      color: var(--color-text-muted);
+      font-size: 1rem;
+    }
+
+    /* Player Container */
+    .player-card {
+      background-color: var(--color-card);
+      border: 1px solid var(--color-card-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      position: relative;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .player-card.is-pip {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      background-color: #000;
+      aspect-ratio: 16 / 9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Floating Status Badge */
+    .status-badge {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.375rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      z-index: 10;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--color-text-muted);
+    }
+
+    .status-badge.active .status-dot {
+      background-color: var(--color-success);
+      box-shadow: 0 0 8px var(--color-success);
+    }
+
+    /* Controls Bar */
+    .controls-bar {
+      padding: 1rem;
+      background: var(--color-card);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .progress-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .progress-bar {
+      flex: 1;
+      height: 6px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--color-card-border);
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .progress-bar::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+
+    .progress-bar::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    .time-display {
+      font-size: 0.8125rem;
+      font-variant-numeric: tabular-nums;
+      color: var(--color-text-muted);
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .left-controls, .right-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    button {
+      background: #334155;
+      color: var(--color-text);
+      border: 1px solid transparent;
+      padding: 0.5rem 0.875rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    button:hover {
+      background: #475569;
+    }
+
+    button:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+
+    button.btn-primary {
+      background: var(--color-primary);
+      color: #0f172a;
+      font-weight: 600;
+    }
+
+    button.btn-primary:hover {
+      background: var(--color-primary-hover);
+      color: #ffffff;
+    }
+
+    button[aria-pressed="true"] {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: var(--color-primary);
+    }
+
+    /* Placeholder overlay when element is migrated to Document PiP window */
+    .pip-placeholder-overlay {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+      background: rgba(15, 23, 42, 0.95);
+      border-radius: var(--radius);
+      text-align: center;
+      gap: 1rem;
+      border: 2px dashed var(--color-primary);
+    }
+
+    .pip-placeholder-overlay p {
+      color: var(--color-text-muted);
+      font-size: 0.9375rem;
+    }
+
+    /* Visually Hidden Screen Reader Only */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .info-panel {
+      margin-top: 1.5rem;
+      background: #1e293b;
+      border: 1px solid var(--color-card-border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+
+    .info-panel h3 {
+      color: var(--color-text);
+      margin-bottom: 0.5rem;
+      font-size: 0.9375rem;
+    }
+
+    .info-panel ul {
+      margin-left: 1.25rem;
+    }
+
+    .info-panel li {
+      margin-bottom: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Picture-in-Picture API Management</h1>
+      <p class="subtitle">Document Picture-in-Picture with HTMLVideoElement Fallback & State Sync</p>
+    </header>
+
+    <main>
+      <!-- Target Interactive Card / Player Container -->
+      <div id="playerCard" class="player-card">
+        <div class="video-wrapper">
+          <div id="statusBadge" class="status-badge" aria-live="polite">
+            <span class="status-dot"></span>
+            <span id="statusText">Inline View</span>
+          </div>
+
+          <!-- Synthetic Canvas Video Stream for Zero-Asset Reliability -->
+          <video id="demoVideo" playsinline loop muted crossorigin="anonymous"></video>
+        </div>
+
+        <div class="controls-bar">
+          <div class="progress-container">
+            <input
+              type="range"
+              id="seekBar"
+              class="progress-bar"
+              min="0"
+              max="100"
+              value="0"
+              aria-label="Video Seek Bar"
+            />
+            <span id="timeDisplay" class="time-display">00:00 / 00:00</span>
+          </div>
+
+          <div class="button-group">
+            <div class="left-controls">
+              <button type="button" id="playBtn" aria-label="Play Video">
+                <span id="playIcon">▶</span>
+                <span id="playText">Play</span>
+              </button>
+
+              <button type="button" id="muteBtn" aria-label="Mute Audio">
+                <span id="muteIcon">🔊</span>
+              </button>
+            </div>
+
+            <div class="right-controls">
+              <button
+                type="button"
+                id="pipToggleBtn"
+                class="btn-primary"
+                aria-pressed="false"
+                aria-describedby="pipStatusAnnouncer"
+              >
+                <span>📺</span>
+                <span id="pipBtnLabel">Pop Out (PiP)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ARIA Live Announcer for Screen Readers -->
+      <div id="pipStatusAnnouncer" class="sr-only" aria-live="polite">
+        Video player is currently inline on page.
+      </div>
+
+      <!-- Capability Feature Info -->
+      <div class="info-panel">
+        <h3>Detected Capabilities & Behavior</h3>
+        <ul>
+          <li><strong>Document Picture-in-Picture API:</strong> <span id="docPipSupportStatus">Checking...</span></li>
+          <li><strong>Standard Video PiP API:</strong> <span id="videoPipSupportStatus">Checking...</span></li>
+          <li><strong>Current Active Mode:</strong> <span id="activeModeStatus">Inline</span></li>
+        </ul>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // System Feature Detection & State Controller
+    class PictureInPictureController {
+      constructor() {
+        this.video = document.getElementById('demoVideo');
+        this.playerCard = document.getElementById('playerCard');
+        this.playBtn = document.getElementById('playBtn');
+        this.playIcon = document.getElementById('playIcon');
+        this.playText = document.getElementById('playText');
+        this.muteBtn = document.getElementById('muteBtn');
+        this.muteIcon = document.getElementById('muteIcon');
+        this.pipBtn = document.getElementById('pipToggleBtn');
+        this.pipBtnLabel = document.getElementById('pipBtnLabel');
+        this.seekBar = document.getElementById('seekBar');
+        this.timeDisplay = document.getElementById('timeDisplay');
+        this.statusBadge = document.getElementById('statusBadge');
+        this.statusText = document.getElementById('statusText');
+        this.statusAnnouncer = document.getElementById('pipStatusAnnouncer');
+
+        this.docPipWindow = null;
+        this.placeholder = null;
+
+        this.initCanvasStream();
+        this.updateFeatureSupportUI();
+        this.bindEvents();
+      }
+
+      // Generate a dynamic Canvas Video Stream so the demo works natively without external dependencies
+      initCanvasStream() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 640;
+        canvas.height = 360;
+        const ctx = canvas.getContext('2d');
+        let frame = 0;
+
+        function draw() {
+          frame++;
+          ctx.fillStyle = '#0284c7';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          // Animated graphics
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 28px system-ui, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('Interactive Video Stream', canvas.width / 2, canvas.height / 2 - 20);
+
+          ctx.font = '18px system-ui, sans-serif';
+          ctx.fillStyle = '#93c5fd';
+          ctx.fillText(`Frame Counter: ${frame}`, canvas.width / 2, canvas.height / 2 + 20);
+
+          // Bouncing orb
+          const x = canvas.width / 2 + Math.cos(frame * 0.05) * 200;
+          const y = canvas.height / 2 + Math.sin(frame * 0.08) * 80;
+          ctx.beginPath();
+          ctx.arc(x, y, 16, 0, Math.PI * 2);
+          ctx.fillStyle = '#38bdf8';
+          ctx.fill();
+
+          requestAnimationFrame(draw);
+        }
+        draw();
+
+        const stream = canvas.captureStream(30);
+        this.video.srcObject = stream;
+      }
+
+      updateFeatureSupportUI() {
+        const hasDocPip = 'documentPictureInPicture' in window;
+        const hasVideoPip = 'pictureInPictureEnabled' in document && document.pictureInPictureEnabled;
+
+        document.getElementById('docPipSupportStatus').textContent = hasDocPip
+          ? 'Supported (Full Interactive Pop-Out)'
+          : 'Not Supported in this Browser';
+
+        document.getElementById('videoPipSupportStatus').textContent = hasVideoPip
+          ? 'Supported (Video Only Frame Pop-Out)'
+          : 'Not Supported';
+      }
+
+      bindEvents() {
+        // Play / Pause Toggle
+        this.playBtn.addEventListener('click', () => this.togglePlay());
+
+        // Mute Toggle
+        this.muteBtn.addEventListener('click', () => this.toggleMute());
+
+        // Video Event Listeners
+        this.video.addEventListener('play', () => this.onPlayStateChange(true));
+        this.video.addEventListener('pause', () => this.onPlayStateChange(false));
+        this.video.addEventListener('timeupdate', () => this.onTimeUpdate());
+
+        // Main PiP Action Button
+        this.pipBtn.addEventListener('click', () => this.togglePictureInPicture());
+
+        // Standard Video PiP Event Listeners (Fallback)
+        this.video.addEventListener('enterpictureinpicture', () => this.onVideoPipEntered());
+        this.video.addEventListener('leavepictureinpicture', () => this.onVideoPipLeft());
+      }
+
+      togglePlay() {
+        if (this.video.paused) {
+          this.video.play();
+        } else {
+          this.video.pause();
+        }
+      }
+
+      toggleMute() {
+        this.video.muted = !this.video.muted;
+        this.muteIcon.textContent = this.video.muted ? '🔇' : '🔊';
+      }
+
+      onPlayStateChange(isPlaying) {
+        this.playIcon.textContent = isPlaying ? '⏸' : '▶';
+        this.playText.textContent = isPlaying ? 'Pause' : 'Play';
+        this.playBtn.setAttribute('aria-label', isPlaying ? 'Pause Video' : 'Play Video');
+      }
+
+      onTimeUpdate() {
+        // Demo synthetic timer based on video currentTime
+        const current = Math.floor(this.video.currentTime || 0);
+        const mins = String(Math.floor(current / 60)).padStart(2, '0');
+        const secs = String(current % 60).padStart(2, '0');
+        this.timeDisplay.textContent = `${mins}:${secs} / 05:00`;
+        this.seekBar.value = (current % 100);
+      }
+
+      async togglePictureInPicture() {
+        if (this.docPipWindow || document.pictureInPictureElement) {
+          await this.exitPictureInPicture();
+        } else {
+          await this.enterPictureInPicture();
+        }
+      }
+
+      async enterPictureInPicture() {
+        // Preferred Choice: Document Picture-in-Picture API
+        if ('documentPictureInPicture' in window) {
+          try {
+            await this.enterDocumentPip();
+            return;
+          } catch (err) {
+            console.warn('Document Picture-in-Picture failed, falling back to Video PiP:', err);
+          }
+        }
+
+        // Fallback Choice: Standard HTMLVideoElement Picture-in-Picture API
+        if ('pictureInPictureEnabled' in document && document.pictureInPictureEnabled) {
+          try {
+            await this.video.requestPictureInPicture();
+          } catch (err) {
+            console.error('Video Picture-in-Picture request failed:', err);
+            alert('Unable to launch Picture-in-Picture mode.');
+          }
+        } else {
+          alert('Picture-in-Picture is not supported in your browser.');
+        }
+      }
+
+      async enterDocumentPip() {
+        // 1. Open floating document window
+        this.docPipWindow = await window.documentPictureInPicture.requestWindow({
+          width: 520,
+          height: 380,
+        });
+
+        // 2. Copy CSS stylesheets from main page to the floating window
+        Array.from(document.styleSheets).forEach((styleSheet) => {
+          try {
+            if (styleSheet.cssRules) {
+              const newStyle = document.createElement('style');
+              Array.from(styleSheet.cssRules).forEach((rule) => {
+                newStyle.appendChild(document.createTextNode(rule.cssText));
+              });
+              this.docPipWindow.document.head.appendChild(newStyle);
+            } else if (styleSheet.href) {
+              const link = document.createElement('link');
+              link.rel = 'stylesheet';
+              link.href = styleSheet.href;
+              this.docPipWindow.document.head.appendChild(link);
+            }
+          } catch (e) {
+            if (styleSheet.href) {
+              const link = document.createElement('link');
+              link.rel = 'stylesheet';
+              link.href = styleSheet.href;
+              this.docPipWindow.document.head.appendChild(link);
+            }
+          }
+        });
+
+        // 3. Create Placeholder in main document
+        this.placeholder = document.createElement('div');
+        this.placeholder.className = 'pip-placeholder-overlay';
+        this.placeholder.innerHTML = `
+          <h3>Media Player is Floating</h3>
+          <p>The interactive player is running in a Picture-in-Picture window.</p>
+          <button type="button" id="returnFromPipBtn">Return Player to Page</button>
+        `;
+        this.playerCard.parentNode.insertBefore(this.placeholder, this.playerCard);
+
+        const returnBtn = this.placeholder.querySelector('#returnFromPipBtn');
+        returnBtn.addEventListener('click', () => this.exitPictureInPicture());
+
+        // 4. Move player card DOM element into floating window
+        this.docPipWindow.document.body.appendChild(this.playerCard);
+
+        // 5. Handle window closure and DOM restoration
+        this.docPipWindow.addEventListener('pagehide', () => {
+          this.restoreFromDocumentPip();
+        });
+
+        // Update UI states
+        this.playerCard.classList.add('is-pip');
+        this.statusBadge.classList.add('active');
+        this.statusText.textContent = 'Floating Document PiP';
+        this.pipBtn.setAttribute('aria-pressed', 'true');
+        this.pipBtnLabel.textContent = 'Return Player';
+        this.statusAnnouncer.textContent = 'Media player entered Picture-in-Picture window.';
+        document.getElementById('activeModeStatus').textContent = 'Document Picture-in-Picture (Interactive)';
+      }
+
+      restoreFromDocumentPip() {
+        if (!this.docPipWindow) return;
+
+        // Restore player card back to parent location
+        if (this.placeholder && this.placeholder.parentNode) {
+          this.placeholder.parentNode.insertBefore(this.playerCard, this.placeholder);
+          this.placeholder.remove();
+          this.placeholder = null;
+        }
+
+        this.docPipWindow = null;
+
+        // Reset UI states
+        this.playerCard.classList.remove('is-pip');
+        this.statusBadge.classList.remove('active');
+        this.statusText.textContent = 'Inline View';
+        this.pipBtn.setAttribute('aria-pressed', 'false');
+        this.pipBtnLabel.textContent = 'Pop Out (PiP)';
+        this.statusAnnouncer.textContent = 'Media player returned to inline page view.';
+        document.getElementById('activeModeStatus').textContent = 'Inline View';
+      }
+
+      async exitPictureInPicture() {
+        if (this.docPipWindow) {
+          this.docPipWindow.close();
+          this.restoreFromDocumentPip();
+        } else if (document.pictureInPictureElement) {
+          await document.exitPictureInPicture();
+        }
+      }
+
+      onVideoPipEntered() {
+        this.playerCard.classList.add('is-pip');
+        this.statusBadge.classList.add('active');
+        this.statusText.textContent = 'Video Frame PiP';
+        this.pipBtn.setAttribute('aria-pressed', 'true');
+        this.pipBtnLabel.textContent = 'Return Player';
+        this.statusAnnouncer.textContent = 'Entered video Picture-in-Picture.';
+        document.getElementById('activeModeStatus').textContent = 'HTMLVideoElement Picture-in-Picture (Frame Only)';
+      }
+
+      onVideoPipLeft() {
+        this.playerCard.classList.remove('is-pip');
+        this.statusBadge.classList.remove('active');
+        this.statusText.textContent = 'Inline View';
+        this.pipBtn.setAttribute('aria-pressed', 'false');
+        this.pipBtnLabel.textContent = 'Pop Out (PiP)';
+        this.statusAnnouncer.textContent = 'Exited Picture-in-Picture.';
+        document.getElementById('activeModeStatus').textContent = 'Inline View';
+      }
+    }
+
+    // Initialize Controller on DOM Ready
+    document.addEventListener('DOMContentLoaded', () => {
+      window.pipController = new PictureInPictureController();
+    });
+  </script>
+</body>
+</html>
