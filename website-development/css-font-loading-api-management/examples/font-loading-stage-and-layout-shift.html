@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Font Loading API & CLS Mitigation Example</title>
+  <style>
+    /* CSS Custom Properties */
+    :root {
+      --font-body: 'FallbackSans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-brand: 'FallbackSans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --primary: #2563eb;
+      --border: #e2e8f0;
+      --status-bg: #f1f5f9;
+    }
+
+    /* Fallback Font Metric Overrides to Align with Custom Font Sizing (Mitigate CLS) */
+    @font-face {
+      font-family: 'FallbackSans';
+      src: local('Arial');
+      ascent-override: 92%;
+      descent-override: 24%;
+      line-gap-override: 0%;
+      size-adjust: 100%;
+    }
+
+    /* Custom Font Class Activation */
+    .fonts-loaded {
+      --font-brand: 'SpaceGrotesk', 'FallbackSans', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding: 2rem;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    header {
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 1rem;
+    }
+
+    h1 {
+      font-family: var(--font-brand);
+      font-size: 2.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .status-panel {
+      background-color: var(--status-bg);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      padding: 1rem 1.25rem;
+      font-family: monospace;
+      font-size: 0.875rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+    }
+
+    .badge-loading { background-color: #fef3c7; color: #92400e; }
+    .badge-loaded  { background-color: #dcfce7; color: #166534; }
+    .badge-failed  { background-color: #fee2e2; color: #991b1b; }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .card h2 {
+      font-family: var(--font-brand);
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .controls {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.625rem 1.25rem;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    canvas {
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      margin-top: 1rem;
+      background-color: #ffffff;
+      width: 100%;
+      max-width: 500px;
+      height: 120px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>CSS Font Loading API Showcase</h1>
+      <p style="color: var(--text-muted); margin-top: 0.5rem;">
+        Demonstrating controlled font loading, canvas text synchronization, and fallback metric alignment.
+      </p>
+    </header>
+
+    <!-- Real-Time Font Status Panel -->
+    <div class="status-panel">
+      <div class="status-row">
+        <span>Font State:</span>
+        <span id="fontStateBadge" class="badge badge-loading">Initial / Pending</span>
+      </div>
+      <div class="status-row">
+        <span>Document Fonts Check:</span>
+        <span id="fontCheckResult" style="font-weight: 600;">false</span>
+      </div>
+      <div class="status-row">
+        <span>Elapsed Time:</span>
+        <span id="fontTimer">0ms</span>
+      </div>
+    </div>
+
+    <!-- Article Content -->
+    <article class="card">
+      <h2>High-Precision Typography Without CLS</h2>
+      <p>
+        When web fonts download asynchronously, unmanaged layout shifts degrade user experience.
+        By using <code>FontFace</code> and <code>document.fonts</code> alongside metric overrides
+        (<code>ascent-override</code>, <code>size-adjust</code>), text layout dimensions remain stable
+        before and after the custom font is swapped in.
+      </p>
+
+      <div class="controls">
+        <button id="btnLoadFont">Trigger Programmatic Font Load</button>
+        <button id="btnSimulateTimeout" style="background-color: #dc2626;">Simulate Network Timeout</button>
+      </div>
+    </article>
+
+    <!-- Canvas Text Render Card -->
+    <section class="card">
+      <h2>Canvas Text Rendering Safety</h2>
+      <p style="color: var(--text-muted); font-size: 0.875rem;">
+        Canvas 2D contexts cannot dynamically update previously drawn bitmap text when fonts load.
+        We await <code>document.fonts.load()</code> before executing <code>fillText()</code>.
+      </p>
+
+      <canvas id="textCanvas" width="500" height="120"></canvas>
+      <div class="controls">
+        <button id="btnDrawCanvas">Draw Text To Canvas</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Elements
+    const badge = document.getElementById('fontStateBadge');
+    const checkResult = document.getElementById('fontCheckResult');
+    const timerElem = document.getElementById('fontTimer');
+    const btnLoad = document.getElementById('btnLoadFont');
+    const btnTimeout = document.getElementById('btnSimulateTimeout');
+    const btnCanvas = document.getElementById('btnDrawCanvas');
+    const canvas = document.getElementById('textCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let startTime = Date.now();
+    const timerInterval = setInterval(() => {
+      timerElem.textContent = `${Date.now() - startTime}ms`;
+    }, 50);
+
+    // Initial Canvas Placeholder
+    function drawCanvasPlaceholder() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#f1f5f9';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#64748b';
+      ctx.font = '16px sans-serif';
+      ctx.fillText('Canvas awaiting custom font confirmation...', 20, 65);
+    }
+    drawCanvasPlaceholder();
+
+    /**
+     * Programmatic Font Registration & Loading Handler
+     */
+    async function loadCustomFont(simulatedUrl, timeoutMs = 3000) {
+      btnLoad.disabled = true;
+      btnTimeout.disabled = true;
+      badge.className = 'badge badge-loading';
+      badge.textContent = 'Loading Font...';
+
+      // Instantiate FontFace
+      // Using a publicly accessible web font URL (Space Grotesk via Google Fonts static storage)
+      const fontUrl = simulatedUrl || 'https://fonts.gstatic.com/s/spacegrotesk/v16/V8mQo33547Mpw50L2-g16120.woff2';
+      const customFont = new FontFace(
+        'SpaceGrotesk',
+        `url(${fontUrl})`,
+        { style: 'normal', weight: '700', display: 'swap' }
+      );
+
+      // Add to document FontFaceSet
+      document.fonts.add(customFont);
+
+      // Create timeout promise
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Font load timeout exceeded')), timeoutMs)
+      );
+
+      try {
+        // Race font load against timeout
+        await Promise.race([customFont.load(), timeoutPromise]);
+
+        // Verify with document.fonts.check() using valid shorthand syntax
+        const isVerified = document.fonts.check('700 16px "SpaceGrotesk"');
+
+        clearInterval(timerInterval);
+        badge.className = 'badge badge-loaded';
+        badge.textContent = 'Font Loaded & Ready';
+        checkResult.textContent = String(isVerified);
+
+        // Apply loaded state class to document root
+        document.documentElement.classList.add('fonts-loaded');
+
+        // Render Canvas Safely
+        renderCanvasText();
+
+      } catch (err) {
+        clearInterval(timerInterval);
+        console.warn('Font load failed or timed out:', err);
+        badge.className = 'badge badge-failed';
+        badge.textContent = 'Fallback Mode (Failed/Timeout)';
+        checkResult.textContent = 'false';
+
+        document.documentElement.classList.add('fonts-failed');
+        renderCanvasTextFallback();
+      } finally {
+        btnLoad.disabled = false;
+        btnTimeout.disabled = false;
+      }
+    }
+
+    /**
+     * Draw to Canvas using Custom Font (Guaranteed Ready)
+     */
+    function renderCanvasText() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '700 24px "SpaceGrotesk", sans-serif';
+      ctx.fillText('Custom Font Active on Canvas!', 20, 50);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '14px sans-serif';
+      ctx.fillText('Verified via document.fonts.check()', 20, 85);
+    }
+
+    function renderCanvasTextFallback() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#450a0a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#fca5a5';
+      ctx.font = 'bold 20px sans-serif';
+      ctx.fillText('Fallback System Font Active', 20, 50);
+
+      ctx.fillStyle = '#fecaca';
+      ctx.font = '14px sans-serif';
+      ctx.fillText('Font download timed out or failed gracefully.', 20, 85);
+    }
+
+    // Event Listeners
+    btnLoad.addEventListener('click', () => {
+      startTime = Date.now();
+      loadCustomFont();
+    });
+
+    btnTimeout.addEventListener('click', () => {
+      startTime = Date.now();
+      // Pass an invalid/blocked URL and short timeout to simulate failure
+      loadCustomFont('https://invalid-domain-test-xyz.com/font.woff2', 800);
+    });
+
+    btnCanvas.addEventListener('click', () => {
+      if (document.fonts.check('700 16px "SpaceGrotesk"')) {
+        renderCanvasText();
+      } else {
+        renderCanvasTextFallback();
+      }
+    });
+
+    // Auto-load on init
+    loadCustomFont();
+  </script>
+</body>
+</html>
