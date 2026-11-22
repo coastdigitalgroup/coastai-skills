@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Subgrid Form Layout Example</title>
+  <style>
+    :root {
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-border: #cbd5e1;
+      --color-primary: #2563eb;
+      --color-text: #0f172a;
+      --color-text-muted: #64748b;
+      --color-error: #dc2626;
+      --radius: 0.5rem;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.5;
+      padding: 2rem;
+    }
+
+    .form-wrapper {
+      max-width: 800px;
+      margin: 0 auto;
+      background: var(--color-surface);
+      padding: 2rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--color-border);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p.intro {
+      color: var(--color-text-muted);
+      margin-bottom: 2rem;
+      font-size: 0.9375rem;
+    }
+
+    /* -------------------------------------------------------------
+       CSS SUBGRID FORM LAYOUT
+       Parent form defines a 3-column track structure:
+       Column 1: Label (sized to longest label width max-content)
+       Column 2: Input control (expands 1fr)
+       Column 3: Help / Validation icon (auto)
+       ------------------------------------------------------------- */
+
+    /* Fallback layout for legacy engines */
+    .subgrid-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+    }
+
+    .form-row label {
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+
+    .form-row input,
+    .form-row select {
+      padding: 0.625rem 0.875rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      font-size: 0.9375rem;
+      width: 100%;
+    }
+
+    .form-row .help-text {
+      font-size: 0.8125rem;
+      color: var(--color-text-muted);
+    }
+
+    /* Modern Column Subgrid Progressive Enhancement */
+    @supports (grid-template-columns: subgrid) {
+      .subgrid-form {
+        display: grid;
+        /* Define 3 columns shared across all fieldsets/rows */
+        grid-template-columns: max-content minmax(260px, 1fr) max-content;
+        row-gap: 1.25rem;
+        column-gap: 1rem;
+        align-items: center;
+      }
+
+      /* Each field group spans all 3 parent columns */
+      .form-row {
+        display: grid;
+        grid-column: 1 / -1; /* Span from column 1 to last column */
+        grid-template-columns: subgrid; /* Inherit the 3 column tracks */
+        align-items: center;
+      }
+
+      .form-row label {
+        grid-column: 1;
+        text-align: right;
+        padding-right: 0.5rem;
+      }
+
+      .form-row input,
+      .form-row select {
+        grid-column: 2;
+      }
+
+      .form-row .help-text {
+        grid-column: 3;
+        white-space: nowrap;
+      }
+
+      /* Full width submit row */
+      .form-actions {
+        grid-column: 1 / -1;
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--color-border);
+      }
+    }
+
+    .btn-primary {
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--color-text-muted);
+      border: 1px solid var(--color-border);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-weight: 500;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-wrapper">
+    <h1>Account Configuration Settings</h1>
+    <p class="intro">
+      This form uses Column Subgrid (`grid-template-columns: subgrid`) on individual field rows.
+      Labels in column 1 automatically adjust to fit the widest label across the entire form without explicit fixed widths.
+    </p>
+
+    <form class="subgrid-form">
+
+      <div class="form-row">
+        <label for="username">Username Handle</label>
+        <input type="text" id="username" name="username" value="jules_dev" required>
+        <span class="help-text">Public unique identifier</span>
+      </div>
+
+      <div class="form-row">
+        <label for="email">Primary Work Email Address</label>
+        <input type="email" id="email" name="email" value="jules@example.com" required>
+        <span class="help-text">Used for security alerts</span>
+      </div>
+
+      <div class="form-row">
+        <label for="timezone">Preferred Timezone</label>
+        <select id="timezone" name="timezone">
+          <option value="UTC-8">Pacific Time (US & Canada)</option>
+          <option value="UTC-5" selected>Eastern Time (US & Canada)</option>
+          <option value="UTC+0">Coordinated Universal Time (UTC)</option>
+        </select>
+        <span class="help-text">Affects notification timestamps</span>
+      </div>
+
+      <div class="form-row">
+        <label for="api_key">Production API Token Key</label>
+        <input type="password" id="api_key" name="api_key" value="sk_live_9948102938471" readonly>
+        <span class="help-text">Keep confidential</span>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary">Cancel</button>
+        <button type="submit" class="btn-primary">Save Changes</button>
+      </div>
+
+    </form>
+  </div>
+
+</body>
+</html>

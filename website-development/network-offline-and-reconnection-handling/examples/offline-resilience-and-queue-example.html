@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline Resilience & Action Queue Example</title>
+  <style>
+    :root {
+      --color-online-bg: #e6f4ea;
+      --color-online-text: #137333;
+      --color-offline-bg: #fce8e6;
+      --color-offline-text: #c5221f;
+      --color-sync-bg: #e8f0fe;
+      --color-sync-text: #1a73e8;
+      --border-radius: 8px;
+      --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      font-family: var(--font-family);
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      color: #202124;
+      line-height: 1.5;
+    }
+
+    h1 {
+      margin-bottom: 0.5rem;
+    }
+
+    .status-banner {
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .status-banner--online {
+      background-color: var(--color-online-bg);
+      color: var(--color-online-text);
+      border: 1px solid #ceead6;
+    }
+
+    .status-banner--offline {
+      background-color: var(--color-offline-bg);
+      color: var(--color-offline-text);
+      border: 1px solid #fad2cf;
+    }
+
+    .status-banner--syncing {
+      background-color: var(--color-sync-bg);
+      color: var(--color-sync-text);
+      border: 1px solid #d2e3fc;
+    }
+
+    .status-banner--hidden {
+      display: none;
+    }
+
+    .card {
+      border: 1px solid #dadce0;
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      background: #ffffff;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #80868b;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+
+    button {
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1557b0;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .controls button.secondary {
+      background-color: #f1f3f4;
+      color: #3c4043;
+      border: 1px solid #dadce0;
+    }
+
+    .controls button.secondary:hover {
+      background-color: #e8eaed;
+    }
+
+    .queue-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .queue-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem;
+      border-bottom: 1px solid #e8eaed;
+    }
+
+    .queue-item:last-child {
+      border-bottom: none;
+    }
+
+    .badge {
+      font-size: 0.8rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+      background-color: #e8eaed;
+      color: #3c4043;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Network Offline & Reconnection Handling</h1>
+  <p>Simulate network transitions, queue offline form actions, and observe automatic reconnection syncing.</p>
+
+  <!-- ARIA Live Region for Status Banner -->
+  <div id="status-banner"
+       role="status"
+       aria-live="polite"
+       aria-atomic="true"
+       class="status-banner status-banner--online">
+    <span id="status-text">Network status: Connected and Online</span>
+  </div>
+
+  <div class="card">
+    <h2>Submit Post / Feedback</h2>
+    <form id="feedback-form">
+      <div class="form-group">
+        <label for="post-title">Title</label>
+        <input type="text" id="post-title" required placeholder="e.g., Application Offline Feedback">
+      </div>
+      <div class="form-group">
+        <label for="post-content">Message</label>
+        <textarea id="post-content" rows="3" required placeholder="Write your feedback..."></textarea>
+      </div>
+      <button type="submit" id="submit-btn">Submit Action</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Simulated Offline Queue (<span id="queue-count">0</span>)</h2>
+    <ul id="queue-list" class="queue-list">
+      <li style="padding: 0.75rem 0; color: #5f6368;">No pending offline actions.</li>
+    </ul>
+
+    <div class="controls">
+      <button type="button" class="secondary" id="toggle-lie-fi-btn">Simulate "Lie-Fi" Mode</button>
+      <button type="button" class="secondary" id="clear-queue-btn">Clear Queue</button>
+    </div>
+  </div>
+
+  <script>
+    // --- 1. NETWORK CONNECTIVITY MANAGER CLASS ---
+    class NetworkConnectivityManager {
+      constructor(options = {}) {
+        this.pingUrl = options.pingUrl || 'https://httpbin.org/status/200';
+        this.isOnline = navigator.onLine;
+        this.isLieFi = false;
+        this.listeners = new Set();
+
+        this.handleOnline = this.handleOnline.bind(this);
+        this.handleOffline = this.handleOffline.bind(this);
+
+        window.addEventListener('online', this.handleOnline);
+        window.addEventListener('offline', this.handleOffline);
+      }
+
+      subscribe(callback) {
+        this.listeners.add(callback);
+        callback(this.isOnline, this.isLieFi);
+      }
+
+      async verifyReachability() {
+        if (!navigator.onLine) {
+          this.updateState(false, false);
+          return false;
+        }
+
+        if (this.isLieFi) {
+          this.updateState(false, true);
+          return false;
+        }
+
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+          const response = await fetch(`${this.pingUrl}?_=${Date.now()}`, {
+            method: 'HEAD',
+            cache: 'no-store',
+            signal: controller.signal
+          });
+
+          clearTimeout(timeoutId);
+          const reachable = response.ok || response.status === 204;
+          this.updateState(reachable, false);
+          return reachable;
+        } catch {
+          this.updateState(false, true); // Simulated Lie-Fi or probe failure
+          return false;
+        }
+      }
+
+      handleOnline() {
+        this.verifyReachability();
+      }
+
+      handleOffline() {
+        this.updateState(false, false);
+      }
+
+      toggleLieFiSimulation() {
+        this.isLieFi = !this.isLieFi;
+        this.verifyReachability();
+      }
+
+      updateState(onlineState, lieFiState = false) {
+        this.isOnline = onlineState;
+        this.isLieFi = lieFiState;
+        this.listeners.forEach(cb => cb(this.isOnline, this.isLieFi));
+      }
+    }
+
+    // --- 2. OFFLINE ACTION QUEUE CLASS ---
+    class OfflineQueue {
+      constructor(key = 'demo_offline_queue') {
+        this.key = key;
+      }
+
+      enqueue(action) {
+        const queue = this.getQueue();
+        queue.push({
+          id: `act_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+          timestamp: new Date().toLocaleTimeString(),
+          ...action
+        });
+        localStorage.setItem(this.key, JSON.stringify(queue));
+      }
+
+      getQueue() {
+        try {
+          return JSON.parse(localStorage.getItem(this.key)) || [];
+        } catch {
+          return [];
+        }
+      }
+
+      remove(id) {
+        const queue = this.getQueue().filter(item => item.id !== id);
+        localStorage.setItem(this.key, JSON.stringify(queue));
+      }
+
+      clear() {
+        localStorage.removeItem(this.key);
+      }
+    }
+
+    // --- 3. APPLICATION INTEGRATION ---
+    const networkMgr = new NetworkConnectivityManager();
+    const offlineQueue = new OfflineQueue();
+
+    const banner = document.getElementById('status-banner');
+    const bannerText = document.getElementById('status-text');
+    const queueList = document.getElementById('queue-list');
+    const queueCount = document.getElementById('queue-count');
+    const form = document.getElementById('feedback-form');
+    const lieFiBtn = document.getElementById('toggle-lie-fi-btn');
+    const clearBtn = document.getElementById('clear-queue-btn');
+
+    function renderQueueUI() {
+      const queue = offlineQueue.getQueue();
+      queueCount.textContent = queue.length;
+
+      if (queue.length === 0) {
+        queueList.innerHTML = '<li style="padding: 0.75rem 0; color: #5f6368;">No pending offline actions.</li>';
+        return;
+      }
+
+      queueList.innerHTML = queue.map(item => `
+        <li class="queue-item">
+          <div>
+            <strong>${escapeHtml(item.title)}</strong> - <span style="color: #5f6368;">${escapeHtml(item.content)}</span>
+          </div>
+          <span class="badge">Queued ${item.timestamp}</span>
+        </li>
+      `).join('');
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    networkMgr.subscribe((isOnline, isLieFi) => {
+      if (isLieFi) {
+        banner.className = 'status-banner status-banner--offline';
+        bannerText.textContent = 'Network Warning: Connected to Wi-Fi but Internet is unreachable ("Lie-Fi"). Actions will be queued.';
+        lieFiBtn.textContent = 'Disable "Lie-Fi" Mode';
+      } else if (!isOnline) {
+        banner.className = 'status-banner status-banner--offline';
+        bannerText.textContent = 'You are currently offline. Any actions submitted will be queued for automatic sync.';
+        lieFiBtn.textContent = 'Simulate "Lie-Fi" Mode';
+      } else {
+        lieFiBtn.textContent = 'Simulate "Lie-Fi" Mode';
+        const pending = offlineQueue.getQueue();
+
+        if (pending.length > 0) {
+          banner.className = 'status-banner status-banner--syncing';
+          bannerText.textContent = `Reconnected! Syncing ${pending.length} pending action(s)...`;
+          flushQueue();
+        } else {
+          banner.className = 'status-banner status-banner--online';
+          bannerText.textContent = 'Network status: Connected and Online';
+        }
+      }
+    });
+
+    async function flushQueue() {
+      const items = offlineQueue.getQueue();
+      for (const item of items) {
+        await new Promise(resolve => setTimeout(resolve, 800)); // Simulate API network latency
+        offlineQueue.remove(item.id);
+        renderQueueUI();
+      }
+
+      banner.className = 'status-banner status-banner--online';
+      bannerText.textContent = 'All offline actions successfully synced to server!';
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = document.getElementById('post-title').value;
+      const content = document.getElementById('post-content').value;
+
+      if (!networkMgr.isOnline) {
+        offlineQueue.enqueue({ title, content });
+        renderQueueUI();
+        alert('You are offline. Your submission has been saved to the queue!');
+      } else {
+        alert(`Success! Post "${title}" submitted online.`);
+      }
+
+      form.reset();
+    });
+
+    lieFiBtn.addEventListener('click', () => {
+      networkMgr.toggleLieFiSimulation();
+    });
+
+    clearBtn.addEventListener('click', () => {
+      offlineQueue.clear();
+      renderQueueUI();
+    });
+
+    // Initial render
+    renderQueueUI();
+  </script>
+</body>
+</html>

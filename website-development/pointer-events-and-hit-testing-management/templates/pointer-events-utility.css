@@ -1,0 +1,167 @@
+/* ==========================================================================
+   Pointer Events and Hit-Testing Utility Stylesheet
+   Modular utility classes for layer pass-throughs, hit-box expansion,
+   touch-action overrides, and interactive state isolation.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. LAYER PASS-THROUGH & HIT-TEST TOGGLES
+   -------------------------------------------------------------------------- */
+
+/**
+ * .hit-pass-through
+ * Renders the container transparent to browser hit-testing (clicks, hover, touch).
+ * Clicks and cursor events pass directly through to underlying elements.
+ * IMPORTANT: Does NOT remove keyboard focusability (tabindex/disabled required for keyboard).
+ */
+.hit-pass-through {
+  pointer-events: none !important;
+}
+
+/**
+ * .hit-capture
+ * Re-enables pointer events for nested children inside a .hit-pass-through parent container.
+ */
+.hit-capture {
+  pointer-events: auto !important;
+}
+
+/**
+ * .hit-disabled
+ * Completely disables mouse and touch interaction on an element (e.g. pending/loading state).
+ */
+.hit-disabled {
+  pointer-events: none !important;
+  user-select: none !important;
+  cursor: not-allowed !important;
+}
+
+/* --------------------------------------------------------------------------
+   2. TOUCH ACTION & GESTURE OVERRIDES
+   -------------------------------------------------------------------------- */
+
+/**
+ * .touch-action-none
+ * Prevents native browser scrolling, pinch-zoom, and double-tap gestures.
+ * Essential for canvas drawing surfaces, custom sliders, and drag-and-drop handles.
+ */
+.touch-action-none {
+  touch-action: none !important;
+}
+
+/**
+ * .touch-action-pan-x
+ * Allows horizontal panning/scrolling while blocking vertical scrolling and pull-to-refresh.
+ * Ideal for horizontal carousels and swipeable table containers.
+ */
+.touch-action-pan-x {
+  touch-action: pan-x !important;
+}
+
+/**
+ * .touch-action-pan-y
+ * Allows vertical scrolling while blocking horizontal swiping gestures.
+ */
+.touch-action-pan-y {
+  touch-action: pan-y !important;
+}
+
+/**
+ * .touch-action-manipulation
+ * Disables double-tap to zoom, eliminating the 300ms click delay on mobile browsers
+ * while preserving vertical and horizontal pan/scroll gestures.
+ */
+.touch-action-manipulation {
+  touch-action: manipulation !important;
+}
+
+/* --------------------------------------------------------------------------
+   3. ACCESSIBLE HIT-BOX TARGET EXPANSION
+   -------------------------------------------------------------------------- */
+
+/**
+ * .hit-target-expand-44
+ * Expands the clickable/touchable area of a small control (e.g. 16px icon button)
+ * to a WCAG compliant minimum of 44x44px using an invisible ::before pseudo-element.
+ * Does NOT alter flexbox, grid, or text layout flow.
+ */
+.hit-target-expand-44 {
+  position: relative !important;
+}
+
+.hit-target-expand-44::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  transform: translate(-50%, -50%) !important;
+  background: transparent !important;
+  cursor: pointer !important;
+  z-index: 1 !important;
+}
+
+/**
+ * .hit-target-expand-48
+ * Expands touch target to 48x48px (Android / Material recommendation).
+ */
+.hit-target-expand-48 {
+  position: relative !important;
+}
+
+.hit-target-expand-48::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  transform: translate(-50%, -50%) !important;
+  background: transparent !important;
+  cursor: pointer !important;
+  z-index: 1 !important;
+}
+
+/* --------------------------------------------------------------------------
+   4. FLOATING OVERLAY HUD & BACKDROP BLUEPRINTS
+   -------------------------------------------------------------------------- */
+
+/**
+ * .hud-overlay-container
+ * Full-screen floating viewport container for HUDs, floating banners, and toasts.
+ */
+.hud-overlay-container {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none; /* Let all clicks pass through background */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hud-overlay-container button,
+.hud-overlay-container a,
+.hud-overlay-container input,
+.hud-overlay-container [role="button"],
+.hud-overlay-container .interactive-layer {
+  pointer-events: auto; /* Restore interactivity on HUD controls */
+}
+
+/* --------------------------------------------------------------------------
+   5. DIAGNOSTIC DEBUGGING OVERLAYS (Development Only)
+   -------------------------------------------------------------------------- */
+
+/**
+ * [data-debug-hit-box="true"]
+ * Visualizes expanded pseudo-element hit boxes during QA audit testing.
+ */
+[data-debug-hit-box="true"]::before {
+  background: rgba(244, 63, 94, 0.25) !important;
+  outline: 1px dashed #f43f5e !important;
+}

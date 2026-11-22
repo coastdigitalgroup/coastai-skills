@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Subgrid Alignment Example</title>
+  <style>
+    :root {
+      --color-bg: #f8fafc;
+      --color-card-bg: #ffffff;
+      --color-border: #e2e8f0;
+      --color-primary: #2563eb;
+      --color-text: #0f172a;
+      --color-text-muted: #64748b;
+      --color-badge-bg: #dbeafe;
+      --color-badge-text: #1e40af;
+      --radius: 0.75rem;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.5;
+      padding: 2rem;
+    }
+
+    header {
+      max-width: 1200px;
+      margin: 0 auto 2rem auto;
+    }
+
+    h1 {
+      font-size: 1.875rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p.description {
+      color: var(--color-text-muted);
+      max-width: 700px;
+    }
+
+    /* -------------------------------------------------------------
+       BEFORE / FALLBACK: Standard CSS Grid without Subgrid
+       Notice how card sections (header, body, footer) mismatch in height
+       across neighboring cards when content lengths vary.
+       ------------------------------------------------------------- */
+    .grid-container-legacy {
+      max-width: 1200px;
+      margin: 0 auto 3rem auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .legacy-card {
+      background: var(--color-card-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .legacy-card .card-badge {
+      display: inline-block;
+      align-self: flex-start;
+      background: var(--color-badge-bg);
+      color: var(--color-badge-text);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.625rem;
+      border-radius: 9999px;
+      margin-bottom: 0.75rem;
+    }
+
+    .legacy-card h2 {
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .legacy-card .card-body {
+      color: var(--color-text-muted);
+      margin-bottom: 1.25rem;
+      flex: 1; /* Pushes footer down, but headers/titles don't line up across cards */
+    }
+
+    .legacy-card .card-price {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: 1rem;
+    }
+
+    .legacy-card button {
+      width: 100%;
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* -------------------------------------------------------------
+       AFTER: CSS Subgrid Enabled Layout
+       Cards span multiple row tracks and inherit them via `subgrid`.
+       Every section (badge, header, body, price, footer) lines up
+       perfectly across all cards in the same horizontal row.
+       ------------------------------------------------------------- */
+
+    /* Generic Fallback Rules for Card Grid */
+    .product-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .product-card {
+      background: var(--color-card-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product-card .card-badge-wrapper {
+      margin-bottom: 0.75rem;
+    }
+
+    .product-card .card-badge {
+      display: inline-block;
+      background: var(--color-badge-bg);
+      color: var(--color-badge-text);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.625rem;
+      border-radius: 9999px;
+    }
+
+    .product-card h2 {
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .product-card .card-body {
+      color: var(--color-text-muted);
+      margin-bottom: 1.25rem;
+      flex: 1 1 auto;
+    }
+
+    .product-card .card-price {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: 1rem;
+    }
+
+    .product-card button {
+      width: 100%;
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Modern Subgrid Enhancement */
+    @supports (grid-template-rows: subgrid) {
+      .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        /* Define N tracks per card row: 5 sections (Badge, Title, Body, Price, CTA) */
+        grid-template-rows: repeat(5, auto);
+        row-gap: 0; /* Row gaps managed inside subgrid or parent */
+      }
+
+      .product-card {
+        display: grid;
+        grid-row: span 5; /* Card spans 5 parent tracks */
+        grid-template-rows: subgrid; /* Inherits the 5 row tracks */
+        row-gap: 0.75rem;
+      }
+
+      /* Explicit track binding for predictable reading order */
+      .product-card .card-badge-wrapper { grid-row: 1; margin-bottom: 0; }
+      .product-card h2                 { grid-row: 2; margin-bottom: 0; }
+      .product-card .card-body         { grid-row: 3; margin-bottom: 0; }
+      .product-card .card-price        { grid-row: 4; margin-bottom: 0; }
+      .product-card .card-actions      { grid-row: 5; }
+    }
+
+    .section-title {
+      max-width: 1200px;
+      margin: 2rem auto 1rem auto;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--color-border);
+      font-size: 1.25rem;
+      color: var(--color-primary);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>CSS Subgrid Multi-Card Alignment</h1>
+    <p class="description">
+      Comparing legacy flexbox cards (where headers and body sections mismatch in height across cards) with modern CSS Subgrid cards (where every card section aligns directly to shared parent grid tracks).
+    </p>
+  </header>
+
+  <h2 class="section-title">1. Without Subgrid (Notice misaligned titles & body content)</h2>
+
+  <div class="grid-container-legacy">
+    <!-- Card 1 -->
+    <article class="legacy-card">
+      <span class="legacy-card-badge">Starter Plan</span>
+      <h2>Basic Web Hosting Package</h2>
+      <div class="card-body">
+        Ideal for personal blogs and simple marketing pages with light traffic.
+      </div>
+      <div class="card-price">$9/mo</div>
+      <button>Select Starter</button>
+    </article>
+
+    <!-- Card 2 -->
+    <article class="legacy-card">
+      <span class="legacy-card-badge">Most Popular</span>
+      <h2>Professional Business Cloud Infrastructure Platform</h2>
+      <div class="card-body">
+        Comprehensive enterprise hosting solution with high availability, automated daily backups, global CDN integration, dedicated DDoS protection, and 24/7 priority developer support.
+      </div>
+      <div class="card-price">$49/mo</div>
+      <button>Select Professional</button>
+    </article>
+
+    <!-- Card 3 -->
+    <article class="legacy-card">
+      <span class="legacy-card-badge">Enterprise</span>
+      <h2>Dedicated Instance</h2>
+      <div class="card-body">
+        Custom isolated cloud resources with guaranteed hardware allocation and SLA assurances.
+      </div>
+      <div class="card-price">$199/mo</div>
+      <button>Contact Sales</button>
+    </article>
+  </div>
+
+  <h2 class="section-title">2. With CSS Subgrid (Perfect section-by-section horizontal alignment)</h2>
+
+  <div class="product-grid">
+    <!-- Card 1 -->
+    <article class="product-card">
+      <div class="card-badge-wrapper">
+        <span class="card-badge">Starter Plan</span>
+      </div>
+      <h2>Basic Web Hosting Package</h2>
+      <div class="card-body">
+        Ideal for personal blogs and simple marketing pages with light traffic.
+      </div>
+      <div class="card-price">$9/mo</div>
+      <div class="card-actions">
+        <button>Select Starter</button>
+      </div>
+    </article>
+
+    <!-- Card 2 -->
+    <article class="product-card">
+      <div class="card-badge-wrapper">
+        <span class="card-badge">Most Popular</span>
+      </div>
+      <h2>Professional Business Cloud Infrastructure Platform</h2>
+      <div class="card-body">
+        Comprehensive enterprise hosting solution with high availability, automated daily backups, global CDN integration, dedicated DDoS protection, and 24/7 priority developer support.
+      </div>
+      <div class="card-price">$49/mo</div>
+      <div class="card-actions">
+        <button>Select Professional</button>
+      </div>
+    </article>
+
+    <!-- Card 3 -->
+    <article class="product-card">
+      <div class="card-badge-wrapper">
+        <span class="card-badge">Enterprise</span>
+      </div>
+      <h2>Dedicated Instance</h2>
+      <div class="card-body">
+        Custom isolated cloud resources with guaranteed hardware allocation and SLA assurances.
+      </div>
+      <div class="card-price">$199/mo</div>
+      <div class="card-actions">
+        <button>Contact Sales</button>
+      </div>
+    </article>
+  </div>
+
+</body>
+</html>

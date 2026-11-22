@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prioritized Task Scheduling & Cooperative Yielding Demo</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --border-color: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --success: #4ade80;
+      --warning: #facc15;
+      --danger: #f87171;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding: 2rem;
+      line-height: 1.5;
+    }
+
+    header {
+      max-width: 900px;
+      margin: 0 auto 2rem auto;
+    }
+
+    h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+    }
+
+    p {
+      color: var(--text-muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .card h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    button {
+      background: #334155;
+      color: #fff;
+      border: none;
+      padding: 0.6rem 1rem;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    button:hover {
+      background: #475569;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    button.primary {
+      background: #0284c7;
+    }
+
+    button.primary:hover {
+      background: #0369a1;
+    }
+
+    button.danger {
+      background: #dc2626;
+    }
+
+    button.danger:hover {
+      background: #b91c1c;
+    }
+
+    .metrics-panel {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: monospace;
+      font-size: 0.85rem;
+    }
+
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.4rem;
+    }
+
+    .metric-value {
+      font-weight: bold;
+    }
+
+    .metric-value.good { color: var(--success); }
+    .metric-value.warn { color: var(--warning); }
+    .metric-value.bad { color: var(--danger); }
+
+    .animator-box {
+      width: 100%;
+      height: 12px;
+      background: #334155;
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .animator-bar {
+      height: 100%;
+      width: 30%;
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      position: absolute;
+      left: 0;
+      animation: slide 1.5s infinite alternate ease-in-out;
+    }
+
+    @keyframes slide {
+      from { left: 0%; }
+      to { left: 70%; }
+    }
+
+    .log-window {
+      background: #090d16;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem;
+      height: 180px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: #cbd5e1;
+    }
+
+    .log-entry {
+      margin-bottom: 0.25rem;
+      word-break: break-all;
+    }
+
+    .log-entry.user-blocking { color: var(--danger); }
+    .log-entry.user-visible { color: var(--warning); }
+    .log-entry.background { color: var(--primary); }
+    .log-entry.yield { color: var(--success); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Prioritized Task Scheduling & Cooperative Yielding</h1>
+    <p>Compare monolithic unblocked tasks vs prioritized chunked tasks with <code>scheduler.postTask()</code> and <code>scheduler.yield()</code> to eliminate input lag and preserve 60fps animations.</p>
+  </header>
+
+  <div class="grid">
+    <!-- Panel 1: Animation Smoothness & Input Tester -->
+    <div class="card">
+      <h2>Main Thread Responsiveness</h2>
+      <p>Observe animation stutter when running long synchronous tasks vs scheduled yield tasks.</p>
+
+      <div class="animator-box">
+        <div class="animator-bar"></div>
+      </div>
+
+      <div class="btn-group">
+        <button id="btn-click-test" class="primary">Click Me for Fast Response</button>
+      </div>
+
+      <div class="metrics-panel">
+        <div class="metric-row">
+          <span>Click Response Lag:</span>
+          <span id="metric-response" class="metric-value good">0ms</span>
+        </div>
+        <div class="metric-row">
+          <span>Long Task Count (>50ms):</span>
+          <span id="metric-longtasks" class="metric-value good">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 2: Blocking vs Cooperative Execution -->
+    <div class="card">
+      <h2>Task Scheduling Controls</h2>
+      <p>Process 500,000 heavy data items using different main-thread strategies.</p>
+
+      <div class="btn-group">
+        <button id="btn-monolithic" class="danger">1. Monolithic (Blocking)</button>
+        <button id="btn-yield" class="primary">2. Chunked + scheduler.yield()</button>
+        <button id="btn-priority-queue">3. Priority Queue Demo</button>
+      </div>
+
+      <div class="btn-group">
+        <button id="btn-abort" class="danger">Cancel Pending Tasks</button>
+      </div>
+    </div>
+
+    <!-- Panel 3: Execution Log -->
+    <div class="card" style="grid-column: 1 / -1;">
+      <h2>Execution Event Log</h2>
+      <div id="log-window" class="log-window"></div>
+    </div>
+  </div>
+
+  <script>
+    // System Feature Detection & State
+    const hasPostTask = typeof window !== 'undefined' && 'scheduler' in window && 'postTask' in window.scheduler;
+    const hasYield = typeof window !== 'undefined' && 'scheduler' in window && 'yield' in window.scheduler;
+
+    const logWindow = document.getElementById('log-window');
+    const metricResponse = document.getElementById('metric-response');
+    const metricLongTasks = document.getElementById('metric-longtasks');
+
+    let longTaskCount = 0;
+    let currentTaskController = null;
+
+    function log(msg, category = '') {
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${category}`;
+      const timestamp = (performance.now() % 10000).toFixed(1);
+      entry.textContent = `[${timestamp}ms] ${msg}`;
+      logWindow.appendChild(entry);
+      logWindow.scrollTop = logWindow.scrollHeight;
+    }
+
+    // Monitor Long Tasks using PerformanceObserver
+    if ('PerformanceObserver' in window && PerformanceObserver.supportedEntryTypes?.includes('longtask')) {
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          longTaskCount++;
+          metricLongTasks.textContent = longTaskCount;
+          metricLongTasks.className = 'metric-value bad';
+          log(`⚠️ Long Task Detected: ${entry.duration.toFixed(1)}ms`, 'user-blocking');
+        }
+      });
+      observer.observe({ entryTypes: ['longtask'] });
+    }
+
+    // Interaction response tester
+    document.getElementById('btn-click-test').addEventListener('click', (e) => {
+      const start = performance.now();
+      requestAnimationFrame(() => {
+        const lag = performance.now() - start;
+        metricResponse.textContent = `${lag.toFixed(1)}ms`;
+        metricResponse.className = lag < 50 ? 'metric-value good' : (lag < 150 ? 'metric-value warn' : 'metric-value bad');
+        log(`⚡ User Click Handled in ${lag.toFixed(1)}ms`, 'yield');
+      });
+    });
+
+    // Helper: CPU-heavy calculation
+    function computeWork(iterations) {
+      let val = 0;
+      for (let i = 0; i < iterations; i++) {
+        val += Math.sin(i) * Math.cos(i);
+      }
+      return val;
+    }
+
+    // 1. Monolithic Blocking Approach
+    document.getElementById('btn-monolithic').addEventListener('click', () => {
+      log('🔴 Starting Monolithic Task (Blocking main thread for ~300ms)...');
+      const start = performance.now();
+
+      // Monolithic loop
+      for (let i = 0; i < 50; i++) {
+        computeWork(200000);
+      }
+
+      const elapsed = performance.now() - start;
+      log(`🔴 Monolithic Task Finished in ${elapsed.toFixed(1)}ms! UI froze during execution.`, 'user-blocking');
+    });
+
+    // 2. Chunked + Cooperative Yielding Approach
+    document.getElementById('btn-yield').addEventListener('click', async () => {
+      log(`🟢 Starting Chunked Task using ${hasYield ? 'scheduler.yield()' : 'setTimeout fallback'}...`, 'yield');
+      const totalChunks = 50;
+      const start = performance.now();
+      let lastYield = performance.now();
+
+      currentTaskController = hasPostTask ? new TaskController({ priority: 'user-visible' }) : null;
+
+      for (let i = 0; i < totalChunks; i++) {
+        if (currentTaskController?.signal.aborted) {
+          log('❌ Task sequence aborted by user.', 'user-blocking');
+          return;
+        }
+
+        computeWork(200000); // ~6ms work per chunk
+
+        // Cooperative yield budget: ~10ms
+        if (performance.now() - lastYield > 10) {
+          if (hasYield) {
+            await scheduler.yield();
+          } else if (hasPostTask) {
+            await scheduler.postTask(() => {}, { priority: 'user-visible' });
+          } else {
+            await new Promise((res) => setTimeout(res, 0));
+          }
+          log(`  ↳ Yielded main thread at chunk ${i + 1}/${totalChunks}`, 'yield');
+          lastYield = performance.now();
+        }
+      }
+
+      const elapsed = performance.now() - start;
+      log(`🟢 Chunked Task Finished in ${elapsed.toFixed(1)}ms with zero long tasks!`, 'yield');
+    });
+
+    // 3. Priority Queue Demonstration
+    document.getElementById('btn-priority-queue').addEventListener('click', () => {
+      log('📊 Enqueuing tasks across different priorities...', 'background');
+
+      if (!hasPostTask) {
+        log('⚠️ Native scheduler.postTask not available. Running fallback sequence.', 'user-visible');
+      }
+
+      // Schedule background task
+      const taskBG = hasPostTask
+        ? scheduler.postTask(() => log('  [3] Executed Background Task', 'background'), { priority: 'background' })
+        : Promise.resolve().then(() => log('  [3] Executed Background Task (Fallback)', 'background'));
+
+      // Schedule user-visible task
+      const taskUV = hasPostTask
+        ? scheduler.postTask(() => log('  [2] Executed User-Visible Task', 'user-visible'), { priority: 'user-visible' })
+        : Promise.resolve().then(() => log('  [2] Executed User-Visible Task (Fallback)', 'user-visible'));
+
+      // Schedule user-blocking task
+      const taskUB = hasPostTask
+        ? scheduler.postTask(() => log('  [1] Executed User-Blocking Task', 'user-blocking'), { priority: 'user-blocking' })
+        : Promise.resolve().then(() => log('  [1] Executed User-Blocking Task (Fallback)', 'user-blocking'));
+
+      log('  ↳ Enqueued Background, User-Visible, and User-Blocking tasks in reverse order.', 'background');
+    });
+
+    // Cancel pending task sequence
+    document.getElementById('btn-abort').addEventListener('click', () => {
+      if (currentTaskController) {
+        currentTaskController.abort('User clicked cancel button');
+        log('🛑 Cancel signal triggered for current TaskController.', 'user-blocking');
+      } else {
+        log('ℹ️ No active cancellable TaskController found.');
+      }
+    });
+
+    // Initial status check
+    log(`System initialized. Browser APIs: postTask=${hasPostTask}, yield=${hasYield}`);
+  </script>
+</body>
+</html>

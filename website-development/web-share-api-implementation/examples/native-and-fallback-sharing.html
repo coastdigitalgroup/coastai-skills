@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Share API with Accessible Fallback Example</title>
+  <style>
+    :root {
+      --color-primary: #2563eb;
+      --color-primary-hover: #1d4ed8;
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-text: #0f172a;
+      --color-border: #cbd5e1;
+      --radius-md: 0.5rem;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: var(--color-primary);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.25rem;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn:hover, .btn:focus-visible {
+      background-color: var(--color-primary-hover);
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+
+    /* Fallback Modal Styles */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 1000;
+    }
+
+    .modal-backdrop[hidden] {
+      display: none;
+    }
+
+    .modal-dialog {
+      background: var(--color-surface);
+      border-radius: var(--radius-md);
+      width: 100%;
+      max-width: 480px;
+      padding: 1.5rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .btn-close {
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.25rem;
+      line-height: 1;
+    }
+
+    .share-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .share-option-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: white;
+      color: var(--color-text);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .copy-section {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .copy-input {
+      flex: 1;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-0: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <main>
+    <article class="card">
+      <h1>Web Share API Implementation Guide</h1>
+      <p>Learn how to integrate native OS device sharing with custom WCAG AA accessible fallbacks.</p>
+
+      <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <button id="nativeShareBtn" class="btn" type="button">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+          Share Article
+        </button>
+
+        <button id="shareFileBtn" class="btn" style="background-color: #059669;" type="button">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          Share Sample Image
+        </button>
+      </div>
+
+      <div id="statusLiveRegion" class="sr-only" aria-live="polite"></div>
+    </article>
+  </main>
+
+  <!-- Custom Fallback Modal Dialog -->
+  <div id="shareModal" class="modal-backdrop" hidden role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2 id="modalTitle" class="modal-title">Share this page</h2>
+        <button id="closeModalBtn" class="btn-close" type="button" aria-label="Close share dialog">&times;</button>
+      </div>
+
+      <div class="share-options">
+        <a id="emailShareLink" href="#" class="share-option-btn" target="_blank" rel="noopener">
+          ✉️ Email
+        </a>
+        <a id="twitterShareLink" href="#" class="share-option-btn" target="_blank" rel="noopener">
+          🐦 Twitter / X
+        </a>
+        <a id="linkedinShareLink" href="#" class="share-option-btn" target="_blank" rel="noopener">
+          💼 LinkedIn
+        </a>
+        <a id="whatsappShareLink" href="#" class="share-option-btn" target="_blank" rel="noopener">
+          💬 WhatsApp
+        </a>
+      </div>
+
+      <div class="copy-section">
+        <label for="shareUrlInput" class="sr-only">Page URL</label>
+        <input id="shareUrlInput" class="copy-input" type="text" readonly>
+        <button id="copyUrlBtn" class="btn" type="button">Copy Link</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const nativeShareBtn = document.getElementById('nativeShareBtn');
+      const shareFileBtn = document.getElementById('shareFileBtn');
+      const shareModal = document.getElementById('shareModal');
+      const closeModalBtn = document.getElementById('closeModalBtn');
+      const copyUrlBtn = document.getElementById('copyUrlBtn');
+      const shareUrlInput = document.getElementById('shareUrlInput');
+      const statusLiveRegion = document.getElementById('statusLiveRegion');
+
+      let previouslyFocusedElement = null;
+
+      // Basic Share Payload
+      const getSharePayload = () => ({
+        title: document.title,
+        text: 'Check out this comprehensive Web Share API implementation guide!',
+        url: window.location.href
+      });
+
+      // 1. Native Share Handler with AbortError & Fallback Handling
+      async function handleNativeShare() {
+        const payload = getSharePayload();
+
+        // Check if Web Share API and payload are supported
+        if (navigator.canShare && navigator.canShare(payload)) {
+          try {
+            await navigator.share(payload);
+            announceStatus('Successfully shared content.');
+          } catch (err) {
+            if (err.name === 'AbortError') {
+              // User canceled share sheet - normal behavior
+              console.info('User dismissed native share sheet.');
+            } else {
+              console.warn('Native share failed, opening fallback modal:', err);
+              openFallbackModal(payload);
+            }
+          }
+        } else {
+          // Native share unavailable - trigger fallback UI
+          openFallbackModal(payload);
+        }
+      }
+
+      // 2. Share File Handler (Generates Canvas Image Blob -> File)
+      async function handleFileShare() {
+        // Create an example PNG File in memory
+        const canvas = document.createElement('canvas');
+        canvas.width = 300;
+        canvas.height = 150;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#2563eb';
+        ctx.fillRect(0, 0, 300, 150);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '20px sans-serif';
+        ctx.fillText('Web Share API File', 40, 80);
+
+        canvas.toBlob(async (blob) => {
+          if (!blob) return;
+          const file = new File([blob], 'web-share-demo.png', { type: 'image/png' });
+          const filePayload = {
+            title: 'Sample Generated Image',
+            files: [file]
+          };
+
+          if (navigator.canShare && navigator.canShare(filePayload)) {
+            try {
+              await navigator.share(filePayload);
+              announceStatus('Successfully shared image.');
+            } catch (err) {
+              if (err.name !== 'AbortError') {
+                alert('File sharing not supported by host system.');
+              }
+            }
+          } else {
+            alert('Your browser does not support sharing images directly via Web Share API.');
+          }
+        }, 'image/png');
+      }
+
+      // 3. Fallback Modal Controllers
+      function openFallbackModal(payload) {
+        previouslyFocusedElement = document.activeElement;
+
+        shareUrlInput.value = payload.url;
+
+        // Setup Social Share URLs
+        const encodedUrl = encodeURIComponent(payload.url);
+        const encodedText = encodeURIComponent(payload.text);
+
+        document.getElementById('emailShareLink').href = `mailto:?subject=${encodeURIComponent(payload.title)}&body=${encodedText}%20${encodedUrl}`;
+        document.getElementById('twitterShareLink').href = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
+        document.getElementById('linkedinShareLink').href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+        document.getElementById('whatsappShareLink').href = `https://api.whatsapp.com/send?text=${encodedText}%20${encodedUrl}`;
+
+        shareModal.removeAttribute('hidden');
+        closeModalBtn.focus();
+
+        document.addEventListener('keydown', handleModalKeyDown);
+      }
+
+      function closeFallbackModal() {
+        shareModal.setAttribute('hidden', 'true');
+        document.removeEventListener('keydown', handleModalKeyDown);
+        if (previouslyFocusedElement) {
+          previouslyFocusedElement.focus();
+        }
+      }
+
+      function handleModalKeyDown(e) {
+        if (e.key === 'Escape') {
+          closeFallbackModal();
+        }
+      }
+
+      // 4. Clipboard Copy
+      async function handleCopyUrl() {
+        try {
+          await navigator.clipboard.writeText(shareUrlInput.value);
+          copyUrlBtn.textContent = 'Copied!';
+          announceStatus('Link copied to clipboard.');
+          setTimeout(() => {
+            copyUrlBtn.textContent = 'Copy Link';
+          }, 2000);
+        } catch (err) {
+          console.error('Clipboard copy failed:', err);
+          shareUrlInput.select();
+          document.execCommand('copy');
+          announceStatus('Link selected. Press Ctrl+C to copy.');
+        }
+      }
+
+      function announceStatus(message) {
+        statusLiveRegion.textContent = message;
+      }
+
+      // Event Listeners
+      nativeShareBtn.addEventListener('click', handleNativeShare);
+      shareFileBtn.addEventListener('click', handleFileShare);
+      closeModalBtn.addEventListener('click', closeFallbackModal);
+      copyUrlBtn.addEventListener('click', handleCopyUrl);
+
+      shareModal.addEventListener('click', (e) => {
+        if (e.target === shareModal) {
+          closeFallbackModal();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

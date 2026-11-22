@@ -1,0 +1,110 @@
+/**
+ * Custom Scrollbar System - Reusable CSS Module
+ *
+ * Provides WCAG AA compliant custom scrollbar styling utilizing W3C standard
+ * properties (`scrollbar-width`, `scrollbar-color`), legacy WebKit pseudo-elements,
+ * dark/light mode CSS custom properties, and Windows Forced Colors Mode overrides.
+ */
+
+:root {
+  /* Light Theme Tokens */
+  --sb-track: #f1f5f9;
+  --sb-thumb: #94a3b8;
+  --sb-thumb-hover: #64748b;
+  --sb-thumb-active: #2563eb;
+  --sb-focus-ring: #2563eb;
+  --sb-size: 10px;
+  --sb-radius: 5px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark Theme Tokens */
+    --sb-track: #0f172a;
+    --sb-thumb: #475569;
+    --sb-thumb-hover: #64748b;
+    --sb-thumb-active: #38bdf8;
+    --sb-focus-ring: #38bdf8;
+  }
+}
+
+/* Base Accessible Scroll Container Utility Class */
+.accessible-scroll-region {
+  overflow: auto;
+
+  /* W3C Standard Scrollbar Module Level 1 */
+  scrollbar-width: thin;
+  scrollbar-color: var(--sb-thumb) var(--sb-track);
+}
+
+/* Legacy WebKit / Blink Engine Fallback Rules */
+.accessible-scroll-region::-webkit-scrollbar {
+  width: var(--sb-size);
+  height: var(--sb-size);
+}
+
+.accessible-scroll-region::-webkit-scrollbar-track {
+  background: var(--sb-track);
+  border-radius: var(--sb-radius);
+}
+
+.accessible-scroll-region::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb);
+  border-radius: var(--sb-radius);
+  border: 2px solid var(--sb-track); /* Inset padding effect */
+  min-height: 32px; /* Minimum grab height for pointer precision */
+}
+
+.accessible-scroll-region::-webkit-scrollbar-thumb:hover {
+  background: var(--sb-thumb-hover);
+}
+
+.accessible-scroll-region::-webkit-scrollbar-thumb:active {
+  background: var(--sb-thumb-active);
+}
+
+.accessible-scroll-region::-webkit-scrollbar-corner {
+  background: var(--sb-track);
+}
+
+/* Keyboard Navigation Focus Indicator */
+.accessible-scroll-region:focus-visible {
+  outline: 2px solid var(--sb-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Compact Scrollbar Variation for Sub-components (Code blocks, sidebars) */
+.accessible-scroll-region--compact {
+  scrollbar-width: thin;
+  --sb-size: 6px;
+  --sb-radius: 3px;
+}
+
+.accessible-scroll-region--compact::-webkit-scrollbar {
+  width: var(--sb-size);
+  height: var(--sb-size);
+}
+
+.accessible-scroll-region--compact::-webkit-scrollbar-thumb {
+  border: 1px solid var(--sb-track);
+}
+
+/* Windows Forced Colors Mode (High Contrast Mode) Preservation */
+@media (forced-colors: active) {
+  .accessible-scroll-region {
+    scrollbar-color: ButtonText Canvas;
+  }
+
+  .accessible-scroll-region::-webkit-scrollbar-thumb {
+    background: ButtonText;
+    border: 1px solid Canvas;
+  }
+
+  .accessible-scroll-region::-webkit-scrollbar-track {
+    background: Canvas;
+  }
+
+  .accessible-scroll-region:focus-visible {
+    outline: 2px solid Highlight;
+  }
+}

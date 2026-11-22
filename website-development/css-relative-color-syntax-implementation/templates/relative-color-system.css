@@ -1,0 +1,139 @@
+/* ==========================================================================
+   CSS Relative Color Syntax (RCS) Production Token & Component System
+   File: relative-color-system.css
+   ========================================================================== */
+
+:root {
+  /* -------------------------------------------------------------------------
+     1. Primary Origin Design Tokens (Single Source of Truth)
+     ------------------------------------------------------------------------- */
+  --color-primary-base: oklch(0.56 0.22 255); /* Primary Brand */
+  --color-accent-base:  oklch(0.68 0.18 150); /* Secondary Accent */
+
+  --color-success-base: oklch(0.62 0.19 145); /* Feedback Success */
+  --color-warning-base: oklch(0.75 0.18 75);  /* Feedback Warning */
+  --color-danger-base:  oklch(0.58 0.22 25);  /* Feedback Danger */
+
+  --color-surface-bg:   oklch(0.99 0.002 255); /* Page Background */
+  --color-text-main:    oklch(0.18 0.015 255); /* Body Text */
+
+  /* -------------------------------------------------------------------------
+     2. Relative Color State Derivations (OKLCH Color Space)
+     ------------------------------------------------------------------------- */
+
+  /* Primary Action States */
+  --rcs-primary-hover:        oklch(from var(--color-primary-base) calc(l - 0.08) c h);
+  --rcs-primary-active:       oklch(from var(--color-primary-base) calc(l - 0.14) c h);
+  --rcs-primary-focus-halo:   oklch(from var(--color-primary-base) l c h / 0.45);
+  --rcs-primary-text-on-bg:   oklch(from var(--color-primary-base) 0.98 0.005 h);
+
+  /* Secondary Accent Action States */
+  --rcs-accent-hover:         oklch(from var(--color-accent-base) calc(l - 0.08) c h);
+  --rcs-accent-active:        oklch(from var(--color-accent-base) calc(l - 0.14) c h);
+  --rcs-accent-focus-halo:    oklch(from var(--color-accent-base) l c h / 0.45);
+
+  /* Danger Action States */
+  --rcs-danger-hover:         oklch(from var(--color-danger-base) calc(l - 0.08) c h);
+  --rcs-danger-active:        oklch(from var(--color-danger-base) calc(l - 0.14) c h);
+
+  /* Universal Disabled Component State */
+  --rcs-disabled-bg:          oklch(from var(--color-primary-base) 0.88 calc(c * 0.15) h);
+  --rcs-disabled-text:        oklch(from var(--color-primary-base) 0.55 calc(c * 0.1) h);
+
+  /* Tinted Backdrops, Surfaces & Boundaries */
+  --rcs-surface-tint-subtle:  oklch(from var(--color-primary-base) 0.975 0.012 h);
+  --rcs-border-tint-subtle:   oklch(from var(--color-primary-base) 0.88 0.04 h / 0.4);
+
+  --rcs-success-tint-bg:      oklch(from var(--color-success-base) 0.96 0.03 h);
+  --rcs-success-tint-border:  oklch(from var(--color-success-base) 0.85 0.08 h / 0.5);
+
+  --rcs-danger-tint-bg:       oklch(from var(--color-danger-base) 0.96 0.03 h);
+  --rcs-danger-tint-border:   oklch(from var(--color-danger-base) 0.85 0.08 h / 0.5);
+
+  /* Derived Complementary Accent Badge (180 deg Hue Offset) */
+  --rcs-badge-complement-bg:   oklch(from var(--color-primary-base) 0.92 0.08 calc(h + 180));
+  --rcs-badge-complement-text: oklch(from var(--color-primary-base) 0.35 0.15 calc(h + 180));
+}
+
+/* ---------------------------------------------------------------------------
+   3. Dark Mode Overrides via Relative Color Lightness Adjustment
+   --------------------------------------------------------------------------- */
+[data-theme="dark"] {
+  --color-surface-bg: oklch(0.15 0.015 255);
+  --color-text-main:  oklch(0.96 0.005 255);
+
+  /* Dark mode hover/active lighten instead of darken */
+  --rcs-primary-hover:       oklch(from var(--color-primary-base) calc(l + 0.08) c h);
+  --rcs-primary-active:      oklch(from var(--color-primary-base) calc(l + 0.14) c h);
+
+  --rcs-surface-tint-subtle: oklch(from var(--color-primary-base) 0.22 0.03 h / 0.5);
+  --rcs-border-tint-subtle:  oklch(from var(--color-primary-base) 0.35 0.06 h / 0.5);
+
+  --rcs-badge-complement-bg:   oklch(from var(--color-primary-base) 0.28 0.10 calc(h + 180));
+  --rcs-badge-complement-text: oklch(from var(--color-primary-base) 0.88 0.12 calc(h + 180));
+}
+
+/* ==========================================================================
+   4. Component Utility Classes with Progressive Enhancement Fallbacks
+   ========================================================================== */
+
+/* Button Primary Component */
+.btn-rcs-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+
+  /* Legacy Cascade Fallback */
+  background-color: #2563eb;
+  color: #ffffff;
+
+  /* RCS Implementation */
+  background-color: var(--color-primary-base);
+  color: var(--rcs-primary-text-on-bg);
+}
+
+.btn-rcs-primary:hover {
+  background-color: var(--rcs-primary-hover);
+}
+
+.btn-rcs-primary:active {
+  background-color: var(--rcs-primary-active);
+}
+
+.btn-rcs-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--rcs-primary-focus-halo);
+}
+
+.btn-rcs-primary:disabled {
+  background-color: var(--rcs-disabled-bg);
+  color: var(--rcs-disabled-text);
+  cursor: not-allowed;
+}
+
+/* Surface Card Component */
+.card-rcs-tinted {
+  background-color: var(--rcs-surface-tint-subtle);
+  border: 1px solid var(--rcs-border-tint-subtle);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px oklch(from var(--color-primary-base) 0.20 0.05 h / 0.06);
+}
+
+/* Dynamic Badge Component */
+.badge-rcs-complementary {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  background-color: var(--rcs-badge-complement-bg);
+  color: var(--rcs-badge-complement-text);
+}

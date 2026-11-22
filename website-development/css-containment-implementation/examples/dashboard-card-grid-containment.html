@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Containment Implementation — Dashboard Grid Benchmark</title>
+  <style>
+    :root {
+      --bg-surface: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-green: #34d399;
+      --accent-purple: #c084fc;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-surface);
+      color: var(--text-main);
+      padding: 2rem;
+      line-height: 1.5;
+    }
+
+    header {
+      max-width: 1200px;
+      margin: 0 auto 2rem;
+    }
+
+    h1 {
+      font-size: 1.875rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p.description {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Controls Panel */
+    .controls {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      background: var(--card-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: var(--accent-blue);
+      color: #0f172a;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background: #7dd3fc;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .badge--uncontained {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+
+    .badge--contained {
+      background: rgba(52, 211, 153, 0.2);
+      color: #6ee7b7;
+      border: 1px solid rgba(52, 211, 153, 0.4);
+    }
+
+    /* Dashboard Layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Card Component */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      position: relative;
+    }
+
+    /* BEFORE / WITHOUT CONTAINMENT (Default state) */
+    .card--uncontained {
+      /* No contain property set - DOM edits here invalidates page layout tree */
+    }
+
+    /* AFTER / WITH CSS CONTAINMENT APPLIED */
+    .card--contained-layout {
+      /* Isolates internal layout recalculations from sibling cards and parent grid */
+      contain: layout paint;
+    }
+
+    .card--contained-strict {
+      /* Maximum rendering isolation when height/width are fixed */
+      contain: strict;
+      height: 280px;
+    }
+
+    .card--content-visibility {
+      /* Skips rendering for off-screen cards during fast scrolling */
+      content-visibility: auto;
+      contain-intrinsic-size: auto 280px;
+      contain: layout paint;
+    }
+
+    /* Card Contents */
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 0.5rem;
+    }
+
+    .card-title {
+      font-size: 1.125rem;
+      color: var(--text-main);
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: var(--accent-green);
+
+      /* Containment on pulsing element prevents paint invalidation cascade */
+      contain: paint;
+    }
+
+    .metric-value {
+      font-size: 2.25rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      margin-bottom: 0.5rem;
+    }
+
+    .metric-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .metric-item {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Popover Menu inside Contained Card (Using Top-Layer to avoid paint clipping) */
+    .card-menu-trigger {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+    }
+
+    .card-menu {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 0.5rem;
+      border-radius: 6px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    }
+
+    .card-menu button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      color: var(--text-main);
+      padding: 0.25rem 0.5rem;
+    }
+
+    .card-menu button:hover {
+      background: var(--card-border);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>CSS Containment Implementation — Dashboard Grid</h1>
+    <p class="description">
+      Demonstration of subtree rendering isolation using <code>contain: layout paint</code>, <code>contain: strict</code>, and <code>content-visibility: auto</code>.
+    </p>
+
+    <div class="controls">
+      <button type="button" id="toggle-containment-btn">Enable CSS Containment</button>
+      <button type="button" id="mutate-dom-btn">Simulate Dynamic Data Stream (100 Mutates)</button>
+      <span>Status: <span id="containment-status" class="badge badge--uncontained">Uncontained (Global Relayouts Enabled)</span></span>
+      <span id="perf-metrics" style="color: var(--accent-purple); font-weight: 600;"></span>
+    </div>
+  </header>
+
+  <main>
+    <section class="dashboard-grid" id="grid-container">
+      <!-- Cards generated dynamically or structured in HTML -->
+    </section>
+  </main>
+
+  <script>
+    const gridContainer = document.getElementById('grid-container');
+    const toggleBtn = document.getElementById('toggle-containment-btn');
+    const mutateBtn = document.getElementById('mutate-dom-btn');
+    const statusBadge = document.getElementById('containment-status');
+    const perfMetrics = document.getElementById('perf-metrics');
+
+    let isContained = false;
+    const CARD_COUNT = 48;
+
+    // Render cards
+    function renderGrid() {
+      gridContainer.innerHTML = '';
+      for (let i = 1; i <= CARD_COUNT; i++) {
+        const card = document.createElement('article');
+        card.className = isContained ? 'card card--contained-layout' : 'card card--uncontained';
+        card.id = `card-${i}`;
+
+        card.innerHTML = `
+          <div class="card-header">
+            <h2 class="card-title">Analytics Node #${i}</h2>
+            <div class="status-dot"></div>
+            <button type="button" class="card-menu-trigger" popovertarget="popover-${i}">Actions</button>
+          </div>
+          <div class="metric-value" id="metric-${i}">${(Math.random() * 1000).toFixed(1)} req/s</div>
+          <ul class="metric-list" id="list-${i}">
+            <li class="metric-item"><span>Latency:</span> <span>${Math.floor(Math.random() * 40 + 10)}ms</span></li>
+            <li class="metric-item"><span>Error Rate:</span> <span>0.0${Math.floor(Math.random() * 9)}%</span></li>
+            <li class="metric-item"><span>Memory:</span> <span>${Math.floor(Math.random() * 200 + 300)}MB</span></li>
+          </ul>
+
+          <!-- Native Top-Layer Popover Escapes Containment Paint Clipping -->
+          <div id="popover-${i}" popover class="card-menu">
+            <button type="button" onclick="alert('Exporting Node #${i}')">Export Log</button>
+            <button type="button" onclick="alert('Resetting Node #${i}')">Reset Metrics</button>
+          </div>
+        `;
+
+        gridContainer.appendChild(card);
+      }
+    }
+
+    // Toggle Containment State
+    toggleBtn.addEventListener('click', () => {
+      isContained = !isContained;
+      if (isContained) {
+        toggleBtn.textContent = 'Disable CSS Containment';
+        statusBadge.textContent = 'CSS Containment Active (layout paint)';
+        statusBadge.className = 'badge badge--contained';
+      } else {
+        toggleBtn.textContent = 'Enable CSS Containment';
+        statusBadge.textContent = 'Uncontained (Global Relayouts Enabled)';
+        statusBadge.className = 'badge badge--uncontained';
+      }
+      renderGrid();
+    });
+
+    // Simulate High-Frequency DOM Mutations
+    mutateBtn.addEventListener('click', () => {
+      const startTime = performance.now();
+
+      // Perform 100 rapid DOM mutations across random cards
+      for (let m = 0; m < 100; m++) {
+        const randomCardIdx = Math.floor(Math.random() * CARD_COUNT) + 1;
+        const metricEl = document.getElementById(`metric-${randomCardIdx}`);
+        const listEl = document.getElementById(`list-${randomCardIdx}`);
+
+        if (metricEl) {
+          metricEl.textContent = `${(Math.random() * 1000).toFixed(1)} req/s`;
+        }
+
+        if (listEl) {
+          const newLi = document.createElement('li');
+          newLi.className = 'metric-item';
+          newLi.innerHTML = `<span>Update #${m}:</span> <span>+${Math.floor(Math.random() * 50)}ms</span>`;
+          listEl.appendChild(newLi);
+
+          // Remove oldest item if list gets long
+          if (listEl.children.length > 5) {
+            listEl.removeChild(listEl.children[0]);
+          }
+        }
+      }
+
+      // Force layout measurement to gauge execution time
+      const dummyHeight = gridContainer.offsetHeight;
+      const endTime = performance.now();
+      const elapsed = (endTime - startTime).toFixed(2);
+
+      perfMetrics.textContent = `100 DOM Updates Executed in ${elapsed}ms`;
+    });
+
+    // Initial render
+    renderGrid();
+  </script>
+</body>
+</html>
