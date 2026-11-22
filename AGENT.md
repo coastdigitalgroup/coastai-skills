@@ -357,8 +357,12 @@ Coast Digital Group.
   suggestions, small refactors, test help, TypeScript help, and API hints).
 - Google Jules handles automated micro-maintenance such as small fixes and
   dependency updates. Jules does not own large feature work.
+- xAI Grok (including Grok Bot) is a development assistant like Copilot. It
+  commits and pushes its own work; see [GROK.md](GROK.md).
+- Claude Code has no git access. OpenAI Codex executes all git operations for
+  Claude Code's handed-off work, directly on `main`; see [AGENTS.md](AGENTS.md).
 
-GitHub Copilot, Codex, and Jules do not replace Claude Code's implementation
+GitHub Copilot, Codex, Jules, and Grok do not replace Claude Code's implementation
 leadership in this repository.
 
 All agents in this repository must follow the contribution, naming, and

@@ -5,9 +5,16 @@ All notable changes to this project will be documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `GROK.md` guidance and cross-document role boundaries for xAI Grok and Grok Bot as development assistants with commit and push authority for their own work.
+
 ### Changed
 
-- Updated `@types/node`, `eslint`, `tsx`, and `typescript-eslint` development dependencies.
+- Aligned the agent git policy with the companywide model used in `spectre-init`: Claude Code has no git access; OpenAI Codex executes all git operations (commit and push directly to `main`, tags and GitHub Releases on request); Copilot, Jules, and Grok commit and push their own work; commits must be pushed immediately and keep human-only authorship; `npm publish` remains with Bradley Potts.
+
+- Updated `@modelcontextprotocol/sdk`, `@types/node`, `eslint`, `tsx`, and `typescript-eslint` dependencies and refreshed the lockfile.
+- Defined Claude Code's verified TODO-completion workflow and aligned roadmap and TODO guidance to allow proactive skill expansion at full definition-of-done quality.
 
 ## [0.3.0] — 2026-08-16
 

@@ -13,7 +13,7 @@ labels: release, quality
 - [ ] Changelog reviewed and updated if needed
 - [ ] README/CONTRIBUTING/agent docs reviewed for drift
 - [ ] Package metadata and scripts reviewed
-- [ ] No ownership boundary conflicts across Claude/Codex/Copilot/Jules
+- [ ] No ownership boundary conflicts across Claude/Codex/Copilot/Jules/Grok
 
 ## Blockers or Risks
 

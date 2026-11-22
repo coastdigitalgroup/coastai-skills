@@ -70,7 +70,7 @@ and release consistency.
 - [ ] Add new skills only at full definition-of-done quality; no shallow drafts
 - [ ] Keep each new skill portable across all agent runtimes
 
-Candidate expansion areas (validate demand before building):
+Candidate expansion areas (ready to build proactively):
 - Performance auditing and Core Web Vitals optimization
 - SEO fundamentals and structured data
 - Analytics instrumentation and event tracking
@@ -107,5 +107,4 @@ Candidate expansion areas (validate demand before building):
 - Do not build platform-specific prompt collections that only work in one
   agent runtime.
 - Do not expand `src/` into a feature-heavy server; keep it a thin MCP layer.
-- Do not add new skills without demonstrated agent or team demand.
 - Do not move execution logic out of skill files into server code.

@@ -16,6 +16,12 @@ repository governance, or production stabilization decisions.
 - Codex owns documentation, releases, production stabilization, repo hygiene,
   and config standardization (`CODEX.md`).
 - Jules owns bounded automated maintenance (`JULES.md`).
+- Grok (including Grok Bot) is a development assistant like Copilot (`GROK.md`).
+
+Copilot has commit, push, and tag authority per the companywide grant, scoped
+to its own work: commit directly to `main`, push immediately, keep authorship
+human-only (no AI `Co-Authored-By` trailer). Copilot does not cut releases,
+merge PRs, or publish packages. Full roster: [AGENTS.md](AGENTS.md).
 
 ## Practical Guardrails
 

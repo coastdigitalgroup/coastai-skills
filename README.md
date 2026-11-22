@@ -106,6 +106,7 @@ This package is CLI-first. There is no documented stable JavaScript API.
   stewardship.
 - `COPILOT.md`: IDE support guidance.
 - `JULES.md`: bounded automation and micro-maintenance.
+- `GROK.md`: xAI Grok (and Grok Bot) development assistance.
 - `AGENTS.md`: shared coordination and ownership boundaries.
 
 ---
@@ -456,7 +457,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow,
 [AGENTS.md](AGENTS.md) for shared agent coordination, [CLAUDE.md](CLAUDE.md) for
 Claude Code implementation authority, [CODEX.md](CODEX.md) for Codex release and
 review guidance, [COPILOT.md](COPILOT.md) for GitHub Copilot support guidance,
-[JULES.md](JULES.md) for Google Jules maintenance boundaries, and
+[JULES.md](JULES.md) for Google Jules maintenance boundaries,
+[GROK.md](GROK.md) for xAI Grok development assistance, and
 [RELEASE.md](RELEASE.md) for the release checklist.
 
 GitHub Copilot support behavior is defined in

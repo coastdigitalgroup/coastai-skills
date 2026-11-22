@@ -124,7 +124,7 @@ implementation authority, [CODEX.md](CODEX.md) for Codex release and review
 guidance, [COPILOT.md](COPILOT.md) and
 [.github/copilot-instructions.md](.github/copilot-instructions.md) for GitHub
 Copilot support behavior, [JULES.md](JULES.md) for Google Jules maintenance
-boundaries, and [RELEASE.md](RELEASE.md) for package publication checks.
+boundaries, [GROK.md](GROK.md) for xAI Grok development assistance, and [RELEASE.md](RELEASE.md) for package publication checks.
 
 ## License
 

@@ -30,9 +30,11 @@ Copilot does not own:
 
 - Claude Code is the lead developer and primary implementation owner.
 - OpenAI Codex owns documentation, releases, production stabilization, repo
-  hygiene, and config standardization.
+  hygiene, and config standardization, and executes all git operations for
+  Claude Code's handed-off work (Claude Code has no git access).
 - GitHub Copilot is a support assistant for day-to-day coding help.
 - Google Jules handles automated maintenance for small fixes, dependency updates, and micro-updates.
+- xAI Grok (including Grok Bot) works under these same instructions as a development assistant; see `GROK.md`.
 
 If guidance conflicts, defer to `CLAUDE.md` for implementation behavior and
 `CODEX.md` for release, documentation, and standardization behavior.

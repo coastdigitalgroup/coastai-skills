@@ -34,7 +34,7 @@ through a thin MCP layer.
   alignment, and support-folder policy. `check:package` validates packability.
 - Full validation gate: `npm run validate` covers typecheck, lint, build, skill
   checks, and package checks.
-- Multi-agent team (Claude Code, Codex, Copilot, Jules) with documented
+- Multi-agent team (Claude Code, Codex, Copilot, Jules, Grok) with documented
   authority boundaries and PR requirements.
 
 ### What will not change
@@ -184,7 +184,6 @@ a bump from the changelog entries reduces human error and speeds up handoff.
 - Dynamic runtime orchestration beyond skill lookup and retrieval.
 - Downstream UI structure, component anatomy, or adapter behavior.
 - Platform-specific prompt collections that only work in one agent runtime.
-- Speculative skill expansion without demonstrated team or agent demand.
 - Anything that turns `src/` into a feature-heavy application server.
 
 ---

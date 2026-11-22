@@ -55,7 +55,9 @@ checks and why they were not needed.
 
 ## Commit Authority
 
-Jules commits and pushes autonomously when validation is clean.
+Jules commits and pushes directly to `main` autonomously when validation is
+clean. A commit is not finished until it is pushed, and authorship stays
+human-only (no AI `Co-Authored-By` trailer, no author-field changes).
 Jules must not:
 - reset or discard changes it did not make
 - force-push or rewrite history

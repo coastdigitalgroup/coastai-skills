@@ -62,6 +62,7 @@ Check these files for contradictions:
 - `CODEX.md`
 - `COPILOT.md`
 - `JULES.md`
+- `GROK.md`
 - `RELEASE.md`
 - `CHANGELOG.md`
 - `.codex/README.md`

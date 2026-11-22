@@ -1,18 +1,37 @@
 # CLAUDE.md — CoastAi Skills
 
+## Verified TODO Completion Workflow
+
+For every TODO item Claude Code completes, use this sequence in the same change:
+
+1. Keep the item in `TODO.md` while implementation or verification is in progress.
+2. Confirm every acceptance criterion is met and the repository's required tests and validation gate pass.
+3. Only after verification passes, remove the completed item from `TODO.md` immediately; do not leave it active or checked off.
+4. Update `CHANGELOG.md` under `[Unreleased]` as usual, update the applicable `ROADMAP.md` shipped/status table and phase text, and update every other affected status or dependency reference.
+
+If implementation is incomplete or any required check fails, keep the TODO item open and do not describe the work as shipped.
+
 This file is the authoritative guide for Claude Code as the primary developer
 and maintainer of this repository. Read it before touching any source file.
 
 ## Project Identity
 
-**Human owner:** Bradley Potts (brad.potts@coastdigitalgroup.com) — final
-authority on commits, merges, tags, publishing, and releases.
+**Human owner:** Bradley Potts (brad.potts@coastdigitalgroup.com) — ultimate
+ownership and sole npm publishing authority.
 **Primary AI developer:** Claude Code (claude-sonnet-4-6)
 
-## Commit Policy
+## Git Access — Denied
 
-Claude Code does not create git commits in this repository. Prepare changes,
-run all validation, and leave staging, committing, and pushing to human review.
+**Claude Code has zero git access in this repo, as part of a companywide
+policy.** Claude Code must not run `git commit`, `git push`, `git tag`, or
+any other git command — read-only or mutating — here. OpenAI Codex executes
+all git operations for this repo, committing and pushing directly to `main`;
+see [AGENTS.md](./AGENTS.md) and [CODEX.md](./CODEX.md).
+
+When work is ready, Claude Code runs `npm run validate` (for source, package,
+or tooling changes), then stops short of any git command and hands off to
+Codex (or Bradley Potts) with a summary of files changed and validation
+performed.
 
 ## Multi-Agent Team
 
@@ -57,6 +76,7 @@ AUDIT.md             Recurring library-wide audit process (dedup, structure, qua
 CODEX.md             Codex-specific release readiness and validation guidance
 COPILOT.md           GitHub Copilot support-agent guidance
 JULES.md             Google Jules automated maintenance guidance
+GROK.md              xAI Grok (and Grok Bot) development-assistant guidance
 CLAUDE.md            This file — authoritative guide for Claude Code
 ```
 
@@ -114,7 +134,7 @@ rather than relying on validation alone to keep the library non-redundant.
 - `EXCLUDED_DIRS` in `skills.ts` controls which top-level folders are skipped
   during skill discovery. Add new build/tooling directories there if needed.
 
-## Before committing
+## Before handing off to Codex
 
 1. `npm run validate` — must be clean for source, package, or tooling changes
 2. Update `CHANGELOG.md` under `[Unreleased]` for every meaningful change

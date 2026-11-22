@@ -11,9 +11,12 @@ Claude Code remains the primary implementation agent and works from
 production ready by checking skill quality, MCP behavior, package readiness,
 release metadata, and documentation consistency.
 
-Human final review, version decisions, tagging, publishing, and merge authority
-remain with the repository owner. GitHub Copilot assists without owning
-decisions. Google Jules handles bounded automated maintenance and must not take
+Codex is also responsible for executing git operations — commit, push, tag —
+for work Claude Code has validated and handed off in this repo, in addition to
+Codex's own documentation, release, and hygiene commits, since Claude Code has
+zero git access companywide. Codex commits and pushes directly to `main` (see
+`AGENTS.md` "Direct-to-`main` Git Policy"). `npm publish` stays with Bradley
+Potts. GitHub Copilot assists without owning decisions. Google Jules handles bounded automated maintenance and must not take
 on large feature work.
 
 Codex is not the primary feature-building agent unless explicitly assigned.
@@ -48,7 +51,7 @@ At the start of any Codex session:
 - Keep `CHANGELOG.md [Unreleased]` accurate for meaningful source, skill,
   documentation, and release metadata changes.
 - Standardize root documentation when `README.md`, `CONTRIBUTING.md`,
-  `AGENT.md`, `AGENTS.md`, `CLAUDE.md`, `CODEX.md`, `COPILOT.md`, `JULES.md`,
+  `AGENT.md`, `AGENTS.md`, `CLAUDE.md`, `CODEX.md`, `COPILOT.md`, `JULES.md`, `GROK.md`,
   `RELEASE.md`, or `CHANGELOG.md` drift.
 - Standardize AI-agent configuration when `.codex/`,
   `.github/copilot-instructions.md`, `.claude/settings.json`, or related
@@ -67,7 +70,7 @@ Before editing, identify:
 2. The files likely affected.
 3. Whether the work is documentation, configuration, validation, release,
    skill, source, package, or generated-output work.
-4. Whether Claude Code, a human, Copilot, or Jules already made changes that
+4. Whether Claude Code, a human, Copilot, Jules, or Grok already made changes that
    need review.
 5. Which validation checks must run afterward.
 6. Whether the change affects public package behavior, MCP tool behavior,
@@ -150,7 +153,7 @@ audit in this order:
 1. `AGENTS.md` -- shared boundaries; agent files must not contradict it.
 2. `README.md` -- public usage promises must match actual MCP tool behavior.
 3. `AGENT.md` -- portable skill quality standard for all contributors.
-4. `CLAUDE.md`, `CODEX.md`, `JULES.md`, `COPILOT.md` -- must stay internally
+4. `CLAUDE.md`, `CODEX.md`, `JULES.md`, `GROK.md`, `COPILOT.md` -- must stay internally
    consistent with each other and with `AGENTS.md`.
 5. `CHANGELOG.md` -- must have `[Unreleased]` entries for every meaningful
    pending change.
@@ -201,11 +204,38 @@ Use this matrix to choose checks before handing work back.
 | Root documentation | Check consistency with `README.md`, `AGENT.md`, `AGENTS.md`, and agent files |
 | Release metadata | Check `CHANGELOG.md`, package version intent, and release checklist |
 
-## Git Boundaries
+## Git Authority
 
-Codex may inspect status and diffs freely, but must not reset, discard, or
-overwrite changes it did not make. Existing local edits are assumed to belong to
-the human owner, Claude Code, or another active process.
+Codex has full commit, push, and tag authority in this repository and executes
+all git operations for Claude Code's handed-off work.
 
-Codex does not commit by default. Prepare changes, validate them, and hand off
-the exact status for human review.
+- On "commit", validate, stage only the intended paths, commit, and push
+  `main` immediately — no version bump, tag, or release. A commit is not
+  finished until it is pushed.
+- Commit authorship stays human-only: no `Co-Authored-By` AI trailer and no
+  author-field changes.
+- Inspect status and diffs freely, but never reset, discard, or overwrite
+  changes Codex did not make, and never force-push or rewrite history.
+  Existing local edits are assumed to belong to the human owner, Claude Code,
+  or another active process; commit them only when they are the handed-off
+  work.
+- Cut a release only when Bradley Potts says to get this repo ready for
+  release (see "Release Mechanics").
+
+### Release Mechanics
+
+1. Run the Release Review Checklist above; `npm run validate` must pass.
+2. Bump `version` in `package.json` (never `src/server.ts`).
+3. Move `CHANGELOG.md [Unreleased]` entries under a new
+   `## [<version>] - <YYYY-MM-DD>` heading, with a
+   `**Release Title:** <short title>` line summarizing what shipped. Do not
+   include roadmap phase numbers in release titles.
+4. Commit the version bump and changelog update, create the tag
+   `v<version>` (matching `package.json` exactly), then push the commit and
+   tag.
+5. Publish the GitHub Release from that tag with `gh release create
+   v<version> --title "<short title>" --notes-file <file>`. The notes file
+   contains the full versioned `CHANGELOG.md` entry verbatim except for the
+   version heading and `Release Title` line. Never summarize, paraphrase, or
+   use inline `--notes`.
+6. `npm publish` is **not** run by Codex — that stays with Bradley Potts.
